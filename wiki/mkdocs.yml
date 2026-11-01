@@ -1,0 +1,86 @@
+site_name: NT;RE Wiki
+site_description: Reference wiki for NEOTOKYO Rebuild, with every stat sourced from the game's code.
+repo_url: https://github.com/NeotokyoRebuild/neo
+repo_name: NeotokyoRebuild/neo
+edit_uri: ""
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  favicon: assets/favicon.png
+  font:
+    text: Inter
+    code: IBM Plex Mono
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Dark first: it's the default. Colours come from stylesheets/ntre.css.
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.footnote.tooltips
+    - content.tooltips
+
+extra_css:
+  - stylesheets/ntre.css
+
+extra:
+  generator: false
+
+plugins:
+  - search
+
+hooks:
+  - hooks/ntre.py
+
+watch:
+  - data
+  - hooks
+  - column-tips.yml
+  - ../WRITING-STYLE.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.keys
+  # Includes WRITING-STYLE.md (at the repository root) in the style guide page.
+  - pymdownx.snippets:
+      base_path: !relative $config_dir/..
+      check_paths: true
+
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    anchors: warn
+
+nav:
+  - About:
+      - Style guide: about/style-guide.md
+      - Logos: about/logos.md
+      - Colours & type: about/colours-and-type.md

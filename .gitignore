@@ -1,0 +1,5 @@
+# MkDocs wiki: local virtualenv and build output
+wiki/.venv/
+wiki/site/
+
+__pycache__/

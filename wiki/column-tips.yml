@@ -1,0 +1,102 @@
+# Tooltips for table column headers, shown when you hover over a header.
+#
+# `columns` gives the tip for a header wherever it appears. `pages` overrides it on one
+# page, keyed by the page's slug, for a header that means something else there.
+# A generated table can also set a tip where it's built in hooks/generators.py.
+#
+# Every column header needs a tip: the build warns about one that has none. Write tips
+# the way WRITING-STYLE.md asks for all copy: plain and short.
+
+columns:
+  Assault/Support run: Assault and Support run speed with this weapon in hand, in u/s
+  Backstab: Damage from a stab in the back
+  Blast damage: Damage at the centre of the blast, with the ×1.485 explosive modifier
+  Camo: How long a full cloak lasts
+  Capacity: Size of the cloak battery, in seconds of use
+  Carried: How many you carry
+  Carried by: Who spawns with it
+  Class: The player class
+  Classes: The classes it applies to
+  Code: Short code for the mode, used in map names and settings
+  Console variable: The server setting that changes it
+  Crouch: Crouched speed, in u/s
+  Cycle time: The shortest time between two shots
+  Damage: Damage per bullet to the head or chest, with the ×1.485 modifier
+  Damage multiplier: The share of a bullet's damage this part of the body takes
+  Default: The value the game ships with
+  Description: What it does
+  Distance: Distance from the centre of the blast
+  DPS: 'Damage per second: damage ÷ cycle time, if every shot hits'
+  Effect: What widens your spread
+  Empty → full: Time to recharge a fully drained battery
+  Event: What happened
+  Explosive: The explosive
+  Fuse: Time from the throw until it goes off
+  Health: Maximum health
+  Highlights: What it makes stand out
+  Hit location: The part of the body hit
+  Item: The weapon or item
+  Jinrai: The Jinrai team
+  Jump: Jump height, in units
+  Key trait: What sets the class apart
+  Mag: Rounds per magazine
+  Magazine: Rounds per magazine; Heat means it has none
+  Map file: The map's file name
+  Match to: What wins the match
+  Max cone: The widest the spread gets, in degrees
+  Max duration: The longest a full battery lasts
+  Min cone: The tightest the spread gets, in degrees
+  Min. XP: The XP you need to pick it
+  Mode: The game mode
+  Mode (by suffix): The game mode, worked out from the end of the map's name
+  Move speed: Your speed with it in hand, as a multiple of your class's speed
+  Multiplier: How much damage this part of the body takes
+  Notes: Anything else worth knowing
+  NSF: The NSF team
+  Objective: How you win a round
+  Pen.: 'Penetration: how far its bullets get through surfaces. Higher goes further.'
+  Pen. to cross 12u: The penetration a bullet needs to get through 12 units of this surface
+  Penalty: How much it adds to your spread
+  Penetration: How far its bullets get through surfaces. Higher goes further.
+  Play it as: The role it suits
+  Primary weapon: A primary weapon this class can pick
+  Property: What's measured
+  Radius: Where the blast's damage falls to zero
+  Range: How far it reaches
+  Rank: The rank you need
+  Recharge /s: Battery regained each second while the cloak is off
+  Recon run: Recon run speed with this weapon in hand, in u/s
+  Regen /s: AUX regained each second
+  Respawns: Whether you come back during a round
+  Reveals cloak?: Whether it shows cloaked players
+  Round: Round length in minutes, including the freeze
+  RPM: 'Rounds per minute: the fastest it can fire'
+  Run: Run speed, in u/s
+  Setting: The rule
+  Short: Its short form, as shown in game
+  Slash: Damage from a normal swing
+  Smoke lasts: How long the smoke lasts
+  Soundscape: Whether the map has its own ambient sound
+  Speed: Your speed with it in hand, as a multiple of your class's speed
+  Speed scale: Multiplies your class's speed while you hold it
+  Spread: When this spread applies
+  Sprint: Sprint speed, in u/s
+  Sprint drain /s: AUX spent each second of sprinting
+  Sprint time (full bar): How long a full AUX bar lets you sprint
+  STK: 'Shots to kill: chest hits needed against a Recon / Assault / Support, in that order'
+  Surface: The material
+  Swing rate: Swings per minute
+  Team points: Points for the team
+  Value: Its value
+  Variable: The console variable's name
+  Vision: The class's vision mode
+  Weapon: The weapon
+  Weapon in hand: The weapon you're holding
+  While sprinting: AUX regained each second while you sprint
+  XP: XP gained or lost
+pages:
+  vision-modes:
+    Mode: The vision mode
+  game-modes:
+    Value: The setting's value
+    Behaviour: How the mode is chosen
