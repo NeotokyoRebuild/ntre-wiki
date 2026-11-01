@@ -80,7 +80,79 @@ validation:
     anchors: warn
 
 nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Game modes:
+      - game-modes/index.md
+      - Capture the Ghost:
+          - game-modes/capture-the-ghost/index.md
+          - The Ghost: game-modes/capture-the-ghost/ghost.md
+      - Team Deathmatch: game-modes/team-deathmatch.md
+      - Deathmatch: game-modes/deathmatch.md
+      - VIP: game-modes/vip.md
+      - Juggernaut: game-modes/juggernaut.md
+  - Classes:
+      - classes/index.md
+      - Recon: classes/recon.md
+      - Assault: classes/assault.md
+      - Support: classes/support.md
+  - Weapons:
+      - weapons/index.md
+      - Submachine guns:
+          - weapons/submachine-guns/index.md
+          - MPN45: weapons/submachine-guns/mpn45.md
+          - MPN45 (unsilenced): weapons/submachine-guns/mpn45-unsilenced.md
+          - SRM: weapons/submachine-guns/srm.md
+          - SRM-S: weapons/submachine-guns/srm-s.md
+          - Jitte: weapons/submachine-guns/jitte.md
+          - Jitte-S: weapons/submachine-guns/jitte-s.md
+      - Rifles:
+          - weapons/rifles/index.md
+          - ZR68C: weapons/rifles/zr68c.md
+          - ZR68-S: weapons/rifles/zr68-s.md
+          - MX: weapons/rifles/mx.md
+          - MX-S: weapons/rifles/mx-s.md
+          - Mosok: weapons/rifles/mosok.md
+          - Mosok-S: weapons/rifles/mosok-s.md
+          - Mosok-L: weapons/rifles/mosok-l.md
+      - Marksman rifles:
+          - weapons/marksman-rifles/index.md
+          - ZR68-L: weapons/marksman-rifles/zr68-l.md
+          - SRS: weapons/marksman-rifles/srs.md
+      - Shotguns:
+          - weapons/shotguns/index.md
+          - Murata Supa-7: weapons/shotguns/supa-7.md
+          - AA13: weapons/shotguns/aa13.md
+      - Machine guns:
+          - weapons/machine-guns/index.md
+          - PZ252: weapons/machine-guns/pz252.md
+          - PBK56S: weapons/machine-guns/pbk56.md
+      - Sidearms:
+          - weapons/sidearms/index.md
+          - MilSO: weapons/sidearms/milso.md
+          - Tachi: weapons/sidearms/tachi.md
+          - Kyla: weapons/sidearms/kyla.md
+      - Melee:
+          - weapons/melee/index.md
+          - Knife: weapons/melee/knife.md
+      - Grenades & explosives:
+          - weapons/explosives/index.md
+          - Frag grenade: weapons/explosives/frag-grenade.md
+          - Smoke grenade: weapons/explosives/smoke-grenade.md
+          - Detpack: weapons/explosives/detpack.md
+  - Mechanics:
+      - Damage & penetration: mechanics/damage.md
+      - Loadouts & ranks: mechanics/loadouts.md
+      - Movement: mechanics/movement.md
+      - AUX power: mechanics/aux-power.md
+      - Thermoptic camo: mechanics/thermoptic-camouflage.md
+      - Vision modes: mechanics/vision-modes.md
+  - World:
+      - Factions: world/factions.md
+      - Maps: world/maps.md
+  - Console variables: console-variables.md
   - About:
+      - about/index.md
       - Style guide: about/style-guide.md
       - Logos: about/logos.md
       - Colours & type: about/colours-and-type.md
