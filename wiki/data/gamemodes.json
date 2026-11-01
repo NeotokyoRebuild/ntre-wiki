@@ -1,0 +1,2194 @@
+{
+  "meta": {
+    "neo_commit": "120006db",
+    "generated": "2026-10-26",
+    "source_repo": "/var/home/sunmachine/dev/neo",
+    "citation_format": "path relative to repo root, ':' then a line number or 'start-end' line range",
+    "conventions": [
+      "All values are code defaults at this commit; server operators can change any ConVar.",
+      "Teams: Jinrai = 2, NSF = 3 (src/game/shared/neo/neo_gamerules.cpp:1690).",
+      "XP and rank are the same per-player number (m_iXP); rank is derived from XP.",
+      "'Inferred' in a note means it was read from control flow, not stated by a comment or string in the code."
+    ],
+    "caveats": [
+      "game/neo/maps contains only a .gitignore that ignores *.bsp (game/neo/maps/.gitignore:1). No map files were inspected, so map entity setups (cap zones, ghost spawns, neo_game_config GameType) are unknown. The map list comes from the hard-coded official map list in CNEORules::IsOfficialMap.",
+      "game/neo/cfg has no server.cfg, gamemode cfg or mapcycle. None of the shipped cfg files set any neo_/sv_neo_/mp_ gameplay ConVar (checked autoexec.cfg, skill.cfg, skill_manifest.cfg, valve.rc).",
+      "gameinfo.txt mounts original NEOTOKYO content (game/neo/gameinfo.txt:31), so legacy nt_* maps may be loadable. How their game mode is chosen was not verified. With sv_neo_gamemode_enforcement=0, a map without a neo_game_config entity falls back to EMT (Free Roam) (src/game/shared/neo/neo_gamerules.cpp:1092)."
+    ]
+  },
+  "enums": {
+    "game_types": {
+      "source": "src/game/shared/neo/neo_gamerules.h:102-112",
+      "values": [
+        {
+          "index": 0,
+          "code": "TDM"
+        },
+        {
+          "index": 1,
+          "code": "CTG"
+        },
+        {
+          "index": 2,
+          "code": "VIP"
+        },
+        {
+          "index": 3,
+          "code": "DM"
+        },
+        {
+          "index": 4,
+          "code": "EMT"
+        },
+        {
+          "index": 5,
+          "code": "TUT"
+        },
+        {
+          "index": 6,
+          "code": "JGR"
+        }
+      ],
+      "notes": [
+        "The help strings for neo_vote_game_mode and sv_neo_gamemode_single only list 'TDM=0, CTG=1, VIP=2, DM=3' (src/game/shared/neo/neo_gamerules.cpp:75), but their ranges allow values up to NEO_GAME_TYPE__TOTAL-1 = 6."
+      ]
+    },
+    "game_type_settings_table": {
+      "source": "src/game/shared/neo/neo_gamerules.cpp:406-415",
+      "columns": [
+        "respawns",
+        "neoRulesThink",
+        "changeTeamClassLoadoutWhenAlive",
+        "comp",
+        "capPrevent"
+      ],
+      "rows": {
+        "TDM": [
+          true,
+          true,
+          false,
+          false,
+          false
+        ],
+        "CTG": [
+          false,
+          true,
+          false,
+          true,
+          true
+        ],
+        "VIP": [
+          false,
+          true,
+          false,
+          true,
+          true
+        ],
+        "DM": [
+          true,
+          true,
+          false,
+          false,
+          false
+        ],
+        "EMT": [
+          true,
+          false,
+          true,
+          false,
+          false
+        ],
+        "TUT": [
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "JGR": [
+          true,
+          true,
+          false,
+          true,
+          false
+        ]
+      },
+      "notes": [
+        "neoRulesThink=false means the round/scoring logic in CNEORules::Think does not run (src/game/shared/neo/neo_gamerules.cpp:1116-1127, 1133-1152).",
+        "comp=true marks the modes where the ready-up lobby and .pause/.unpause chat commands work (src/game/shared/neo/neo_gamerules.cpp:2408-2419, 2518-2527, 4826-4830).",
+        "capPrevent=true enables the 'suicide to stop a ghost cap' punishment (src/game/shared/neo/neo_gamerules.cpp:4106-4111)."
+      ]
+    },
+    "round_status": {
+      "source": "src/game/shared/neo/neo_gamerules.h:126-137",
+      "values": [
+        "Idle",
+        "Warmup",
+        "PreRoundFreeze",
+        "RoundLive",
+        "Overtime",
+        "PostRound",
+        "Pause",
+        "Countdown"
+      ]
+    },
+    "win_reasons": {
+      "source": "src/game/shared/neo/neo_gamerules.h:139-149",
+      "values": [
+        "GHOST_CAPTURE",
+        "VIP_ESCORT",
+        "VIP_ELIMINATION",
+        "TEAM_ELIMINATION",
+        "TIMEOUT_WIN_BY_NUMBERS",
+        "POINTS",
+        "FORFEIT",
+        "STALEMATE",
+        "MAPIO"
+      ],
+      "notes": [
+        "NEO_VICTORY_TIMEOUT_WIN_BY_NUMBERS has a message string (src/game/shared/neo/neo_gamerules.cpp:3934-3936), but no code at this commit sets it. CTG/VIP timeouts end as a stalemate, not a win by numbers.",
+        "MAPIO is used by the neo_game_config input FireTeamWin (src/game/server/neo/neo_game_config.cpp:39-43)."
+      ]
+    }
+  },
+  "round_flow": {
+    "summary": "Idle -> (Countdown if ready-up) -> Warmup -> PreRoundFreeze -> RoundLive [-> Overtime] -> PostRound -> next PreRoundFreeze ... Only applies to modes with neoRulesThink=true (TDM, CTG, VIP, DM, JGR).",
+    "rules": {
+      "warmup_time": {
+        "value": 45,
+        "unit": "s",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:49",
+        "notes": "Runs when a match starts from Idle (src/game/shared/neo/neo_gamerules.cpp:2829-2838). Skipped if every human is on loopback, if only bots are playing (src/game/shared/neo/neo_gamerules.cpp:2786-2827), or under ready-up with sv_neo_readyup_skipwarmup=1. Dead players respawn during Idle/Warmup/Countdown (src/game/shared/neo/neo_gamerules.cpp:1201-1240)."
+      },
+      "preround_freeze_time": {
+        "value": 15,
+        "unit": "s",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:50",
+        "notes": "Players spawned during freeze get FL_GODMODE plus NEO_FL_FREEZETIME (src/game/server/neo/neo_player.cpp:661-665). Movement input is zeroed while frozen (src/game/shared/gamemovement.cpp:1078-1090). Both flags are cleared when the round goes live (src/game/shared/neo/neo_gamerules.cpp:4639-4648, 1682-1685)."
+      },
+      "round_timer_includes_freeze": {
+        "value": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:1876",
+        "notes": "Inferred. The round time limit is measured from m_flNeoRoundStartTime, which is set when PreRoundFreeze starts (src/game/shared/neo/neo_gamerules.cpp:2852). Freeze ends at that time + sv_neo_preround_freeze_time (src/game/shared/neo/neo_gamerules.cpp:1682). With default values, live play is therefore 15 s shorter than the time limit, e.g. CTG 3.25 min = 195 s, of which about 180 s is live."
+      },
+      "post_round_delay": {
+        "value": 15,
+        "unit": "s",
+        "convar": "mp_chattime",
+        "source": "src/game/shared/multiplay_gamerules.cpp:67-70",
+        "notes": "NEO overrides the HL2MP default of 10. The source comment says OGNT is hard-coded to 15 in practice. Applied in src/game/shared/neo/neo_gamerules.cpp:3842 and 1365."
+      },
+      "round_start_delay_when_team_empty": {
+        "value": 10,
+        "unit": "s",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:2768",
+        "notes": "A round will not start while either team has 0 players. In DM (no teamplay) it needs at least 2 players in total (src/game/shared/neo/neo_gamerules.cpp:2728-2734). The check retries every 10 s and shows '- NEW ROUND START DELAYED -'."
+      },
+      "late_spawn_window": {
+        "value": 15,
+        "unit": "s after freeze ends",
+        "convar": "sv_neo_latespawn_max_time",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:51",
+        "notes": "Non-respawn modes only. A player may spawn once per round, if (remaining freeze time + 15 s) > 0 (src/game/shared/neo/neo_gamerules.cpp:4590-4609)."
+      },
+      "sudden_death": {
+        "value": true,
+        "convar": "neo_round_sudden_death",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:488",
+        "notes": "Only matters if the round limit is non-zero. If rounds won are tied when the limit is reached, play continues with 'Next round: Sudden death!' until a team wins a round. If disabled, the match ends tied (src/game/shared/neo/neo_gamerules.cpp:3894-3909)."
+      },
+      "early_match_win_with_round_limit": {
+        "source": "src/game/shared/neo/neo_gamerules.cpp:3877-3893",
+        "notes": "With a non-zero round limit, the match ends as soon as the trailing team can no longer catch up."
+      },
+      "score_limit_semantics": {
+        "source": "src/game/shared/neo/neo_gamerules.cpp:3866-3873",
+        "notes": "The 'score limit' is compared against rounds won (GetRoundsWon), not against kill points. 0 means no score limit."
+      },
+      "side_swap_each_round": {
+        "source": "src/game/shared/neo/neo_player_spawnpoint.cpp:86-95",
+        "notes": "Team ownership of spawn points (info_player_attacker = Jinrai, info_player_defender = NSF; src/game/shared/neo/neo_player_spawnpoint.cpp:13-31) is used as placed on even round numbers and swapped on odd round numbers. Ghost cap zones use the same alternation (src/game/shared/neo/neo_ghost_cap_point.cpp:132-141). Round numbering starts at 1 (src/game/shared/neo/neo_gamerules.cpp:2872), so round 1 uses swapped ownership."
+      },
+      "match_reset_on_match_start": {
+        "source": "src/game/shared/neo/neo_gamerules.cpp:2875-2928",
+        "notes": "When coming out of Warmup/Countdown: team scores, rounds won and every player's XP are set to 0."
+      },
+      "pause": {
+        "value": {
+          "short": 60,
+          "long": 180
+        },
+        "unit": "s",
+        "source": "src/game/server/neo/neo_player.cpp:1937",
+        "notes": "Requires sv_neo_pausematch_enabled (default 0; turned on by sv_neo_comp) and a comp mode. A pause requested mid-round starts at the next round boundary, or immediately during freeze time (src/game/shared/neo/neo_gamerules.cpp:1164-1173, 2842-2850). Unpausing needs .unpause from the pausing team and then from the other team (src/game/shared/neo/neo_gamerules.cpp:2535-2580)."
+      },
+      "ready_up": {
+        "source": "src/game/shared/neo/neo_gamerules.cpp:2720-2783",
+        "notes": "With sv_neo_readyup_lobby=1 in a comp mode (CTG/VIP/JGR), the match starts only when exactly sv_neo_readyup_teamplayersthres (default 5) players per team are present and ready, or after '.forcelive'. A countdown of sv_neo_readyup_countdown (5 s) follows."
+      }
+    }
+  },
+  "game_modes": [
+    {
+      "id": "ctg",
+      "short_code": "CTG",
+      "name": "Capture the Ghost",
+      "name_source": "src/game/shared/neo/neo_gamerules.cpp:3069",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:409",
+      "map_prefix": "ntre_*_ctg",
+      "map_prefix_notes": "Official maps follow the ntre_<name>_ctg pattern (src/game/shared/neo/neo_gamerules.cpp:4873-4901). By default the mode comes from the map's neo_game_config 'GameType' keyvalue, not from the name (src/game/server/neo/neo_game_config.cpp:9; src/game/shared/neo/neo_gamerules.cpp:1089-1093). The name only matters for ghost spawning: if a map has no neo_ghostspawnpoint and no '_ctg' in its name, no ghost spawns (src/game/shared/neo/neo_gamerules.cpp:1976-1981).",
+      "objective": "Find the ghost, carry it to your team's capture zone, or eliminate the enemy team.",
+      "win_conditions": [
+        {
+          "condition": "Ghost capture: a live player carrying the ghost enters the radius of an active capture zone owned by their team (or a neutral zone) while the round is live. The round is won instantly; there is no hold timer.",
+          "reason": "GHOST_CAPTURE",
+          "source": "src/game/shared/neo/neo_ghost_cap_point.cpp:229-275; src/game/shared/neo/neo_gamerules.cpp:1515-1554"
+        },
+        {
+          "condition": "Team elimination: the enemy team has 0 living members. If both teams reach 0 at once, the round is a stalemate.",
+          "reason": "TEAM_ELIMINATION",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1691-1702"
+        },
+        {
+          "condition": "Time runs out with no capture or elimination: stalemate ('TIE'). Neither team gets a round win and nobody gets round-end XP.",
+          "reason": "STALEMATE",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1479-1481, 3999"
+        },
+        {
+          "condition": "Map logic can force a winner through neo_game_config FireTeamWin / FireRoundTie inputs.",
+          "reason": "MAPIO",
+          "source": "src/game/server/neo/neo_game_config.cpp:39-63"
+        }
+      ],
+      "rules": {
+        "respawns": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:409",
+          "notes": "One life per round. Late spawn allowed up to 15 s after freeze (see round_flow.rules.late_spawn_window)."
+        },
+        "round_time": {
+          "value": 3.25,
+          "unit": "min",
+          "convar": "neo_ctg_round_timelimit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:517",
+          "notes": "Includes the 15 s freeze (inferred; see round_flow)."
+        },
+        "preround_freeze_time": {
+          "value": 15,
+          "unit": "s",
+          "convar": "sv_neo_preround_freeze_time",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+        },
+        "score_limit": {
+          "value": 7,
+          "unit": "rounds won",
+          "convar": "sv_neo_ctg_score_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:494"
+        },
+        "round_limit": {
+          "value": 0,
+          "unit": "rounds (0 = none)",
+          "convar": "sv_neo_ctg_round_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:505"
+        },
+        "overtime_enabled": {
+          "value": false,
+          "convar": "sv_neo_ctg_ghost_overtime_enabled",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:535"
+        },
+        "overtime_max_extension": {
+          "value": 45,
+          "unit": "s",
+          "convar": "sv_neo_ctg_ghost_overtime",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:536"
+        },
+        "overtime_grace": {
+          "value": 10,
+          "unit": "s",
+          "convar": "sv_neo_ctg_ghost_overtime_grace",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:537"
+        },
+        "overtime_grace_decay": {
+          "value": false,
+          "convar": "sv_neo_ctg_ghost_overtime_grace_decay",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:538"
+        },
+        "competitive_mode": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:409"
+        }
+      },
+      "overtime_rules": {
+        "source": "src/game/shared/neo/neo_gamerules.cpp:1282-1294, 1879-1908",
+        "description": "Off by default. When enabled, the round enters Overtime once the ghost is carried with sv_neo_ctg_ghost_overtime_grace (10 s) or less on the clock. While the ghost is held, the round may run up to sv_neo_ctg_ghost_overtime (45 s) past the normal limit. When the ghost is dropped, the remaining time becomes the grace (10 s) minus the time since the drop, capped by the remaining overtime. With grace_decay=1, the post-drop time is instead scaled down in proportion to how much overtime is left."
+      },
+      "scoring": [
+        {
+          "event": "Round win",
+          "team_points": "+1 round won",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3844-3854"
+        },
+        {
+          "event": "Round-end XP",
+          "notes": "See xp_scoring.round_end. Ghost capture gives alive winners a rank-up; other CTG wins give survivor and carrier bonuses.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3999-4052"
+        }
+      ],
+      "mechanics": [
+        "One ghost (weapon_ghost) spawns each round at a random enabled neo_ghostspawnpoint (src/game/shared/neo/neo_gamerules.cpp:2057-2064; src/game/server/neo/neo_ghost_spawn_point.cpp:32-40). See the top-level 'ghost' object.",
+        "All capture zones are switched off once the ghost is captured (src/game/shared/neo/neo_gamerules.cpp:1529-1539).",
+        "Cap-prevention punishment: if the last living player of a team suicides, disconnects, or dies to their own team's grenade while the enemy carries the ghost and has living players, the ghost-carrying team gets capture rewards when it wins the round. A chat message announces it (src/game/shared/neo/neo_gamerules.cpp:4106-4163, 4187-4222, 4056-4060). Controlled by sv_neo_suicide_prevent_cap_punish (default 1, src/game/shared/neo/neo_gamerules.cpp:153)."
+      ],
+      "notes": [
+        "TIMEOUT_WIN_BY_NUMBERS exists in the enum but is never set. Time running out in CTG is a tie, whoever holds the ghost or has more players alive."
+      ]
+    },
+    {
+      "id": "vip",
+      "short_code": "VIP",
+      "name": "Extract or Kill the VIP",
+      "name_source": "src/game/shared/neo/neo_gamerules.cpp:3070",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:410",
+      "map_prefix": null,
+      "map_prefix_notes": "No official map has a _vip suffix (src/game/shared/neo/neo_gamerules.cpp:4869-4903). The code has no _vip name check. VIP extraction uses the same neo_ghost_retrieval_point capture zones as CTG.",
+      "objective": "The escorting team brings its VIP to its extraction (capture) zone. The other team kills the VIP.",
+      "win_conditions": [
+        {
+          "condition": "VIP escort: the VIP (class NEO_CLASS_VIP) enters the radius of an active capture zone owned by their team (or a neutral zone) while the round is live.",
+          "reason": "VIP_ESCORT",
+          "source": "src/game/shared/neo/neo_ghost_cap_point.cpp:240-275; src/game/shared/neo/neo_gamerules.cpp:1632-1671"
+        },
+        {
+          "condition": "VIP killed: the team opposing the escorting team wins (when sv_neo_vip_ctg_on_death=0).",
+          "reason": "VIP_ELIMINATION",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1612-1623"
+        },
+        {
+          "condition": "VIP disconnects (m_pVIP becomes null): the opposing team wins by forfeit (when sv_neo_vip_ctg_on_death=0).",
+          "reason": "FORFEIT",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1594-1605, 4491-4494"
+        },
+        {
+          "condition": "Team elimination, same as CTG.",
+          "reason": "TEAM_ELIMINATION",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1691-1702"
+        },
+        {
+          "condition": "Time runs out: stalemate.",
+          "reason": "STALEMATE",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1479-1481"
+        }
+      ],
+      "rules": {
+        "respawns": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:410"
+        },
+        "round_time": {
+          "value": 3.25,
+          "unit": "min",
+          "convar": "neo_vip_round_timelimit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:520",
+          "notes": "Includes the 15 s freeze (inferred)."
+        },
+        "preround_freeze_time": {
+          "value": 15,
+          "unit": "s",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+        },
+        "score_limit": {
+          "value": 7,
+          "unit": "rounds won",
+          "convar": "sv_neo_vip_score_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:496"
+        },
+        "round_limit": {
+          "value": 0,
+          "convar": "sv_neo_vip_round_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:507"
+        },
+        "overtime": {
+          "value": null,
+          "notes": "No VIP-specific overtime code found."
+        },
+        "ghost_on_vip_death": {
+          "value": false,
+          "convar": "sv_neo_vip_ctg_on_death",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:82",
+          "notes": "If 1, a VIP death or disconnect does not end the round. Instead '- HVT DOWN - RECOVER THE GHOST -' is shown and a ghost spawns at the VIP's position (map ghost spawns if the VIP disconnected). The round then continues as a ghost capture (src/game/shared/neo/neo_gamerules.cpp:1596-1600, 1614-1618)."
+        },
+        "competitive_mode": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:410"
+        }
+      },
+      "vip_selection": {
+        "escorting_team": "Random (Jinrai or NSF) in the first VIP round, then alternates every round.",
+        "escorting_team_source": "src/game/shared/neo/neo_gamerules.cpp:3331-3340",
+        "who_becomes_vip": "A random player on the escorting team who has cl_neo_vip_eligible=1 (client default 1, src/game/shared/neo/neo_gamerules.cpp:79). If nobody has it set, any random player on the escorting team.",
+        "who_becomes_vip_source": "src/game/shared/neo/neo_gamerules.cpp:2239-2285",
+        "reset": "At the next round start the previous VIP gets back their previous class, or Assault if none was recorded (src/game/shared/neo/neo_gamerules.cpp:3392-3403)."
+      },
+      "vip_class": {
+        "max_health": {
+          "value": 100,
+          "source": "src/game/shared/neo/neo_player_shared.h:233"
+        },
+        "base_speed": {
+          "value": 160,
+          "unit": "HU/s",
+          "notes": "NEO_VIP_BASE_SPEED = assault base = 200 * 0.8",
+          "source": "src/game/shared/neo/neo_player_shared.h:30, 34, 65"
+        },
+        "default_weapons": {
+          "value": [
+            "weapon_milso"
+          ],
+          "source": "src/game/server/neo/neo_player.cpp:3470-3473"
+        },
+        "loadout_primaries": {
+          "value": [
+            {
+              "weapon": "smac",
+              "min_rank": "any"
+            },
+            {
+              "weapon": "mpn",
+              "min_rank": "Corporal"
+            },
+            {
+              "weapon": "srm",
+              "min_rank": "Corporal"
+            },
+            {
+              "weapon": "jitte",
+              "min_rank": "Sergeant"
+            },
+            {
+              "weapon": "srms",
+              "min_rank": "Sergeant"
+            },
+            {
+              "weapon": "jittes",
+              "min_rank": "Lieutenant"
+            },
+            {
+              "weapon": "zr68c",
+              "min_rank": "Lieutenant"
+            },
+            {
+              "weapon": "zr68l",
+              "min_rank": "Lieutenant"
+            },
+            {
+              "weapon": "supa7",
+              "min_rank": "Lieutenant"
+            }
+          ],
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:55-61"
+        },
+        "restrictions": [
+          {
+            "text": "No thermoptic cloak.",
+            "source": "src/game/server/neo/neo_player.cpp:1263-1266"
+          },
+          {
+            "text": "No vision mode.",
+            "source": "src/game/shared/neo/neo_player_shared.cpp:792-795"
+          },
+          {
+            "text": "Cannot change class while VIP in VIP mode.",
+            "source": "src/game/server/neo/neo_player.cpp:429-435"
+          },
+          {
+            "text": "Cannot pick up the knife.",
+            "source": "src/game/shared/neo/weapons/weapon_knife.cpp:109"
+          }
+        ]
+      },
+      "scoring": [
+        {
+          "event": "Round win",
+          "team_points": "+1 round won",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3844-3854"
+        },
+        {
+          "event": "VIP escort",
+          "notes": "Treated like a ghost capture for XP: alive winners rank up (sv_neo_cap_reward=0).",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4002-4028"
+        },
+        {
+          "event": "VIP kill / elimination win",
+          "notes": "Base +1, plus survivor +1 if alive, plus ghost-carrier +1 if carrying the ghost.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4029-4039"
+        }
+      ],
+      "mechanics": [
+        "Pings from the VIP are flagged 'ghosterping', the same as pings from a ghost carrier (src/game/shared/neo/neo_player_shared.cpp:173).",
+        "IsObjective() is true for the VIP (src/game/server/neo/neo_player.cpp:2944-2947)."
+      ],
+      "notes": [
+        "No VIP-specific bot behaviour was found. Bots only have weapon preference templates for the VIP class (src/game/server/neo/bot/neo_bot_profile.h:27, 48-51).",
+        "sv_neo_gamemode_random_allow's default (11 = TDM+CTG+DM) leaves VIP out of random rotation (src/game/shared/neo/neo_gamerules.cpp:120-122)."
+      ]
+    },
+    {
+      "id": "tdm",
+      "short_code": "TDM",
+      "name": "Team Deathmatch",
+      "name_source": "src/game/shared/neo/neo_gamerules.cpp:3068",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:408",
+      "map_prefix": "ntre_*_tdm",
+      "map_prefix_notes": "One official map: ntre_bullet_tdm (src/game/shared/neo/neo_gamerules.cpp:4874).",
+      "objective": "Score more kills than the enemy team before time runs out.",
+      "win_conditions": [
+        {
+          "condition": "When time runs out, the team with the higher team score wins the round.",
+          "reason": "POINTS",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1406-1421"
+        },
+        {
+          "condition": "Equal team scores at time-out: stalemate.",
+          "reason": "STALEMATE",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1479-1481"
+        },
+        {
+          "condition": "Match ends when a team reaches the score limit in rounds won (default 1, so the first round won ends the match).",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:492, 3866-3873"
+        }
+      ],
+      "rules": {
+        "respawns": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:408"
+        },
+        "respawn_delay": {
+          "value": 10,
+          "unit": "s after death",
+          "source": "src/game/shared/baseplayer_shared.h:34",
+          "notes": "DEATH_ANIMATION_TIME is 10.0 under NEO, checked in RespawnWithRet (src/game/server/neo/neo_client.cpp:357). Dead players are respawned automatically by gamerules Think and shown the loadout menu (src/game/shared/neo/neo_gamerules.cpp:1201-1231). No respawns during PostRound (src/game/shared/neo/neo_gamerules.cpp:4561-4569)."
+        },
+        "round_time": {
+          "value": 10.25,
+          "unit": "min",
+          "convar": "neo_tdm_round_timelimit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:514",
+          "notes": "Includes the 15 s freeze (inferred)."
+        },
+        "preround_freeze_time": {
+          "value": 15,
+          "unit": "s",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+        },
+        "score_limit": {
+          "value": 1,
+          "unit": "rounds won",
+          "convar": "sv_neo_tdm_score_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:492"
+        },
+        "round_limit": {
+          "value": 0,
+          "convar": "sv_neo_tdm_round_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:503"
+        },
+        "overtime": {
+          "value": null,
+          "notes": "None. A tie at time-out is a stalemate."
+        },
+        "competitive_mode": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:408",
+          "notes": "Ready-up and pause chat commands answer 'You cannot use this command in DM/TDM.' (src/game/shared/neo/neo_gamerules.cpp:2416-2419, 2524-2527)."
+        }
+      },
+      "scoring": [
+        {
+          "event": "Any player death",
+          "team_points": "+1 to the dead player's opposing team",
+          "source": "src/game/server/neo/neo_player.cpp:2426-2429",
+          "notes": "Every death counts, including suicides and teamkills, because the point goes to the victim's opposing team whatever the cause."
+        },
+        {
+          "event": "Team scores reset",
+          "notes": "Team kill scores are reset to 0 at every round start (ResetTDM is called for all modes).",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3322, 3349-3355, 3376-3382"
+        },
+        {
+          "event": "Round win",
+          "team_points": "+1 round won",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3844-3854"
+        }
+      ],
+      "mechanics": [
+        "Dropped weapons are cleaned up as in other respawn modes, whatever mp_weaponstay is set to (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1380-1384)."
+      ],
+      "notes": []
+    },
+    {
+      "id": "dm",
+      "short_code": "DM",
+      "name": "Deathmatch",
+      "name_source": "src/game/shared/neo/neo_gamerules.cpp:3071",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:411",
+      "map_prefix": null,
+      "map_prefix_notes": "No official _dm map is in IsOfficialMap. A soundscape file exists for 'ntre_apparatus_dm' (game/neo/scripts/soundscapes_ntre_apparatus_dm.txt), but that map is not in the official list.",
+      "objective": "Free-for-all. First player to the XP target, or the sole XP leader at time-out, wins.",
+      "win_conditions": [
+        {
+          "condition": "A single player reaches sv_neo_dm_win_xp (50) XP or more while the round is live, and no other player is tied with them.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1704-1715"
+        },
+        {
+          "condition": "At time-out the single highest-XP player wins. If several players are tied, the round goes to Overtime and continues until one player leads alone.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1422-1439"
+        },
+        {
+          "condition": "When a winner is decided the game goes to intermission (map end).",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1721-1784"
+        }
+      ],
+      "rules": {
+        "teamplay": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4535-4538",
+          "notes": "IsTeamplay() is false only in DM (src/game/shared/hl2mp/hl2mp_gamerules.h:173-179). No teamkill penalties and no mirror damage. Players still join Jinrai/NSF teams."
+        },
+        "respawns": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:411"
+        },
+        "respawn_delay": {
+          "value": 10,
+          "unit": "s after death",
+          "source": "src/game/shared/baseplayer_shared.h:34"
+        },
+        "round_time": {
+          "value": 10.25,
+          "unit": "min",
+          "convar": "neo_dm_round_timelimit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:523"
+        },
+        "win_xp": {
+          "value": 50,
+          "unit": "XP",
+          "convar": "sv_neo_dm_win_xp",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:532",
+          "notes": "0 disables the early win."
+        },
+        "score_limit": {
+          "value": 7,
+          "convar": "sv_neo_dm_score_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:498",
+          "notes": "Inferred to have no effect in DM. Score limits are only checked in SetWinningTeam, which DM never calls; DM ends through SetWinningDMPlayer."
+        },
+        "round_limit": {
+          "value": 0,
+          "convar": "sv_neo_dm_round_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:509",
+          "notes": "Inferred unused in DM, for the same reason."
+        },
+        "class_change_window_on_respawn": {
+          "value": 10,
+          "unit": "s",
+          "convar": "sv_neo_dm_max_class_dur",
+          "source": "src/game/server/neo/neo_player.cpp:153"
+        },
+        "competitive_mode": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:411"
+        }
+      },
+      "scoring": [
+        {
+          "event": "Kill",
+          "xp": 1,
+          "notes": "With teamplay off, every kill of another player counts as an enemy kill.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4198-4226"
+        },
+        {
+          "event": "Suicide / environmental death",
+          "xp": -1,
+          "notes": "XP can go below 0.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4188-4191"
+        },
+        {
+          "event": "Assist",
+          "xp": 1,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4248-4268"
+        },
+        {
+          "event": "Round start",
+          "notes": "Every player's XP is set to 0.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3357-3367"
+        }
+      ],
+      "mechanics": [
+        "If maps/dm_locs/<mapname>.loc exists, players spawn at those saved positions, picking an unused one at random (src/game/shared/neo/neo_gamerules.cpp:4619-4630; src/game/server/neo/neo_dm_spawn.cpp:26-50, 190). Spawns are edited with the cheat-protected sv_neo_dmspawn_* commands (src/game/server/neo/neo_dm_spawn.cpp:248-255).",
+        "Otherwise the spawn manager shuffles the spawn points on every spawn in non-teamplay (src/game/server/neo/neo_spawn_manager.cpp:76-80).",
+        "For maps whose neo_game_config is DM, the nav mesh uses info_player_deathmatch as the spawn name (src/game/shared/neo/neo_gamerules.cpp:4853-4865)."
+      ],
+      "notes": [
+        "sv_neo_gamemode_single defaults to 3 (DM). This only matters when sv_neo_gamemode_enforcement=1 (src/game/shared/neo/neo_gamerules.cpp:118)."
+      ]
+    },
+    {
+      "id": "jgr",
+      "short_code": "JGR",
+      "name": "Juggernaut",
+      "name_source": "src/game/shared/neo/neo_player_shared.h:279",
+      "name_notes": "The game-mode description array NEO_GAME_TYPE_DESC_STRS has only 6 initializers for 7 game types, so JGR has no mode description string (src/game/shared/neo/neo_gamerules.cpp:3067-3074). The name 'Juggernaut' here is the class name. GetGameDescription() for JGR would read a value-initialized (empty/null) entry.",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:414",
+      "map_prefix": "ntre_*_jgr",
+      "map_prefix_notes": "Official maps: ntre_sentinel_jgr, ntre_terminal_jgr, ntre_yard_jgr (src/game/shared/neo/neo_gamerules.cpp:4892, 4898, 4902). If a map has no neo_juggernautspawnpoint and no '_jgr' in its name, no juggernaut spawns (src/game/shared/neo/neo_gamerules.cpp:2133-2138).",
+      "objective": "Activate the JGR56 juggernaut suit. Teams score points from kills made while their team has the juggernaut.",
+      "win_conditions": [
+        {
+          "condition": "A team reaches sv_neo_jgr_max_points (20) team points while the round is live.",
+          "reason": "POINTS",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1577-1590"
+        },
+        {
+          "condition": "Time-out with no living juggernaut, and nobody on the trailing team is mid-activation: the higher team score wins.",
+          "reason": "POINTS",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1440-1456"
+        },
+        {
+          "condition": "Time-out with equal scores and no juggernaut: stalemate.",
+          "reason": "STALEMATE",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1479-1481"
+        },
+        {
+          "condition": "Time-out while a juggernaut is alive, or while the trailing team is activating the suit: Overtime. Overtime ends when the juggernaut's team is ahead (they win), or when the juggernaut is gone and the first condition applies.",
+          "reason": "POINTS",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1457-1476"
+        }
+      ],
+      "rules": {
+        "respawns": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:414",
+          "notes": "Respawn delay is 10 s (src/game/shared/baseplayer_shared.h:34). The current juggernaut's team cannot respawn while the juggernaut is alive, or within 8 s of the juggernaut's death (src/game/shared/neo/neo_gamerules.cpp:4553-4559)."
+        },
+        "round_time": {
+          "value": 4.25,
+          "unit": "min",
+          "convar": "neo_jgr_round_timelimit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:526",
+          "notes": "Includes the 15 s freeze (inferred)."
+        },
+        "preround_freeze_time": {
+          "value": 15,
+          "unit": "s",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+        },
+        "max_points_per_round": {
+          "value": 20,
+          "convar": "sv_neo_jgr_max_points",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:83",
+          "notes": "FCVAR_GAMEDLL only, not replicated to clients."
+        },
+        "score_limit": {
+          "value": 0,
+          "unit": "rounds won (0 = none)",
+          "convar": "sv_neo_jgr_score_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:500"
+        },
+        "round_limit": {
+          "value": 5,
+          "unit": "rounds",
+          "convar": "sv_neo_jgr_round_limit",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:511",
+          "notes": "With score limit 0, the match is decided by rounds won over 5 rounds, with early finish and sudden death (see round_flow)."
+        },
+        "juggernaut_unlock_delay": {
+          "value": 20,
+          "unit": "s after freeze ends",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1558",
+          "notes": "Hard-coded. The spawned suit starts locked (src/game/shared/neo/neo_gamerules.cpp:2163) and unlocks with '- JUGGERNAUT ENABLED -' (src/game/shared/neo/neo_gamerules.cpp:1556-1575)."
+        },
+        "xp_cap_at_round_start": {
+          "value": 10,
+          "unit": "XP",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3414-3421",
+          "notes": "At every JGR round start, players with more than 10 XP drop to 10 (Sergeant). Players with 10 or less are unchanged."
+        },
+        "competitive_mode": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:414"
+        }
+      },
+      "scoring": [
+        {
+          "event": "Kill by the juggernaut",
+          "team_points": "+2 to the juggernaut's team (capped at sv_neo_jgr_max_points)",
+          "xp": 1,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4226-4233"
+        },
+        {
+          "event": "Kill by a teammate of the living juggernaut",
+          "team_points": "+1",
+          "xp": 1,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4234-4243"
+        },
+        {
+          "event": "Kill by the team without the juggernaut",
+          "team_points": 0,
+          "xp": 1,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4226-4244"
+        },
+        {
+          "event": "Round win",
+          "team_points": "+1 round won; winners get +1 XP",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:3844-3854, 4001"
+        }
+      ],
+      "juggernaut": {
+        "spawn": "Each round the suit (entity neo_juggernaut) is placed at a neo_juggernautspawnpoint. Spawns are shuffled in round 1, then index = round number % spawn count (src/game/shared/neo/neo_gamerules.cpp:2183-2205). sv_neo_jgr_spawn_force (cheat) can pin a spawn (src/game/shared/neo/neo_gamerules.cpp:179).",
+        "activation": {
+          "method": "Hold USE on the unlocked suit. The player is frozen while holding. Releasing USE, dying, or moving too far away cancels. Only one player can activate at a time. A player who is already the juggernaut cannot activate.",
+          "hold_time": {
+            "value": 5.0,
+            "unit": "s",
+            "source": "src/game/shared/neo/neo_juggernaut.cpp:14"
+          },
+          "max_distance": {
+            "value": 150,
+            "unit": "HU",
+            "notes": "USE_DISTANCE_SQUARED = 22500",
+            "source": "src/game/shared/neo/neo_juggernaut.cpp:15"
+          },
+          "source": "src/game/shared/neo/neo_juggernaut.cpp:150-222, 279-291"
+        },
+        "on_activation": "The player's current weapons are dropped, they become class JUGGERNAUT at full health and 100 suit power, and dead teammates are force-respawned (src/game/shared/neo/neo_juggernaut.cpp:198-216; src/game/server/neo/neo_player.cpp:4061-4098; src/game/shared/neo/neo_gamerules.cpp:2287-2307).",
+        "on_death": "The suit drops at the death position as a new neo_juggernaut item (cosmetic explosion, no damage) and can be activated again (src/game/server/neo/neo_player.cpp:2416-2419, 4100-4127; src/game/shared/neo/neo_juggernaut.cpp:111-118). It also drops if the juggernaut disconnects (src/game/shared/neo/neo_gamerules.cpp:4485-4489).",
+        "stats": {
+          "max_health": {
+            "value": 990,
+            "source": "src/game/shared/neo/neo_player_shared.h:234"
+          },
+          "weapon": {
+            "value": "weapon_balc (BALC3)",
+            "source": "src/game/server/neo/neo_player.cpp:3474-3477; game/neo/scripts/weapon_balc.txt:4"
+          },
+          "weapon_speed_scale": {
+            "value": 1.0,
+            "source": "src/game/shared/neo/weapons/weapon_balc.h:48"
+          },
+          "base_speed": {
+            "value": 160,
+            "unit": "HU/s",
+            "source": "src/game/shared/neo/neo_player_shared.h:70",
+            "notes": "NEO_JUGGERNAUT_BASE_SPEED = NEO_ASSAULT_BASE_SPEED = 200 * 0.8."
+          },
+          "sprint_speed": {
+            "value": null,
+            "notes": "Unclear. NEO_JUGGERNAUT_SPRINT_SPEED is defined as recon sprint speed, 270 HU/s (src/game/shared/neo/neo_player_shared.h:71). CalculateSpeed() instead multiplies by the assault sprint modifier 1.6, giving 256 HU/s (src/game/server/neo/neo_player.cpp:869-873). Which value is effective was not determined."
+          },
+          "cloak": {
+            "value": false,
+            "notes": "CloakPower_Cap returns 0 for classes other than Recon and Assault.",
+            "source": "src/game/server/neo/neo_player.cpp:3832-3844"
+          },
+          "pickup_restrictions": {
+            "value": "Cannot pick up the ghost or any other weapon. Only weapon_balc allows the juggernaut class.",
+            "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:332-335; src/game/shared/neo/weapons/weapon_balc.cpp:111-113"
+          },
+          "other": "Does not bleed, cannot be gibbed, no client ragdoll (src/game/server/neo/neo_player.cpp:4094-4096, 2172-2182)."
+        },
+        "visibility": "The juggernaut player is always networked to all clients so the compass can show it (src/game/server/neo/neo_player.cpp:3946-3950). The HUD marker shows the suit item, red while locked (src/game/client/neo/ui/neo_hud_ghost_marker.cpp:180-193).",
+        "boundary": "neo_ghost_boundary triggers also return a dropped suit to the juggernaut's last on-ground position (src/game/server/neo/neo_ghost_boundary.cpp:90-109, 135-147)."
+      },
+      "notes": [
+        "The suit lock flag m_bLocked has no explicit initializer (src/game/shared/neo/neo_juggernaut.h:47). A post-death suit is presumably unlocked because Source zero-fills entity memory. Not verified.",
+        "JGR is not in the default random rotation (sv_neo_gamemode_random_allow=11)."
+      ]
+    },
+    {
+      "id": "tut",
+      "short_code": "TUT",
+      "name": "Training",
+      "name_source": "src/game/shared/neo/neo_gamerules.cpp:3073",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:413",
+      "map_prefix": "ntre_*_tut",
+      "map_prefix_notes": "Official: ntre_class_tut, ntre_shooting_tut (src/game/shared/neo/neo_gamerules.cpp:4875, 4893).",
+      "objective": "Single-player tutorials driven by map logic. No round, win or scoring logic in gamerules.",
+      "win_conditions": [],
+      "rules": {
+        "round_logic": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:413, 1133-1152",
+          "notes": "neoRulesThink=false. Think only tracks the ghost for tutorial beacon sounds."
+        },
+        "respawns_flag": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:413",
+          "notes": "PlayerDeathThink returns early in TUT ('no respawning in TUT gamemode...'), so there is no automatic respawn (src/game/server/neo/neo_player.cpp:1685-1689). The TUT branch in FPlayerCanRespawn is never reached because CanRespawnAnyTime() is true for TUT (src/game/shared/neo/neo_gamerules.cpp:4561-4578)."
+        },
+        "forced_team_class_weapon": {
+          "source": "src/game/server/neo/neo_game_config.cpp:9-15",
+          "notes": "Maps can force team, class, skin, weapon and hidden HUD elements through neo_game_config."
+        }
+      },
+      "scoring": [],
+      "mechanics": [
+        "Ghost beacons work in TUT outside a live round, and against neo_npc_dummy targets (src/game/shared/neo/weapons/weapon_ghost.cpp:157, 275-281).",
+        "Class changes are blocked while alive in TUT (src/game/server/neo/neo_player.cpp:418-421).",
+        "Bots are not auto-managed in TUT or EMT (src/game/server/neo/bot/neo_bot_manager.cpp:260-264)."
+      ],
+      "achievements": [
+        {
+          "id": "NEO_TUTORIAL_COMPLETE",
+          "map": "ntre_class_tut",
+          "notes": "Components NEO_TUTORIAL_RECON / ASSAULT / SUPPORT",
+          "source": "src/game/shared/neo/achievements_neo.cpp:7-24"
+        },
+        {
+          "id": "NEO_TRIAL_50_SECONDS",
+          "map": "ntre_shooting_tut",
+          "source": "src/game/shared/neo/achievements_neo.cpp:26-35"
+        },
+        {
+          "id": "NEO_TRIAL_40_SECONDS",
+          "map": "ntre_shooting_tut",
+          "source": "src/game/shared/neo/achievements_neo.cpp:37-46"
+        }
+      ],
+      "notes": [
+        "The trial achievements' 50/40 second thresholds are presumably checked in map logic. The C++ only sets goal=1 and the map filter."
+      ]
+    },
+    {
+      "id": "emt",
+      "short_code": "EMT",
+      "name": "Free Roam",
+      "name_source": "src/game/shared/neo/neo_gamerules.cpp:3072",
+      "short_code_source": "src/game/shared/neo/neo_gamerules.cpp:412",
+      "map_prefix": null,
+      "map_prefix_notes": "Fallback mode for any map with no neo_game_config entity when sv_neo_gamemode_enforcement=0 (src/game/shared/neo/neo_gamerules.cpp:1089-1093).",
+      "objective": "None. Sandbox / free roam.",
+      "win_conditions": [],
+      "rules": {
+        "round_logic": {
+          "value": false,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:412"
+        },
+        "respawns": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:412"
+        },
+        "change_team_class_loadout_when_alive": {
+          "value": true,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:412",
+          "notes": "Switching team while alive soft-suicides the player instead of being refused (src/game/server/neo/neo_player.cpp:3211-3216)."
+        }
+      },
+      "scoring": [],
+      "mechanics": [],
+      "notes": [
+        "The neo_game_config entity's own GameType default is TDM (src/game/server/neo/neo_game_config.h:15). EMT applies only when the entity is absent."
+      ]
+    }
+  ],
+  "game_mode_selection": {
+    "convars": [
+      "sv_neo_gamemode_enforcement",
+      "sv_neo_gamemode_single",
+      "sv_neo_gamemode_random_allow",
+      "neo_vote_game_mode"
+    ],
+    "modes": [
+      {
+        "value": 0,
+        "meaning": "By map: neo_game_config GameType, else EMT",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:1089-1093"
+      },
+      {
+        "value": 1,
+        "meaning": "Fixed: sv_neo_gamemode_single",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:1033-1036"
+      },
+      {
+        "value": 2,
+        "meaning": "Random from the sv_neo_gamemode_random_allow bitmask, avoiding a repeat until all allowed modes are used",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:1037-1088"
+      },
+      {
+        "value": 3,
+        "meaning": "Vote: most common neo_vote_game_mode client value, gathered when leaving warmup",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:2333-2365, 2864-2867"
+      }
+    ],
+    "notes": [
+      "Vote ties are not handled (NEOTODO), and the lowest index wins ties (src/game/shared/neo/neo_gamerules.cpp:2357).",
+      "A source comment says the vote mostly just picks the client default (neo_vote_game_mode=1, CTG), which may not suit the map (src/game/shared/neo/neo_gamerules.cpp:3481-3485)."
+    ]
+  },
+  "ghost": {
+    "entity": "weapon_ghost",
+    "source": "src/game/shared/neo/weapons/weapon_ghost.cpp",
+    "properties": {
+      "slot": {
+        "value": 0,
+        "source": "game/neo/scripts/weapon_ghost.txt:13",
+        "notes": "Bucket 0 is the primary slot. BumpWeapon refuses a pickup if the slot is already taken (src/game/server/neo/neo_player.cpp:2803-2807), so a player holding a primary must drop it first (inferred). The ghost is also in the primary-bits set (src/game/server/neo/neo_player.cpp:307)."
+      },
+      "can_attack": {
+        "value": false,
+        "source": "src/game/shared/neo/weapons/weapon_ghost.h:60-61"
+      },
+      "can_aim": {
+        "value": false,
+        "source": "src/game/shared/neo/weapons/weapon_ghost.h:67"
+      },
+      "xp_cost": {
+        "value": 0,
+        "source": "src/game/shared/neo/weapons/weapon_ghost.h:72"
+      },
+      "speed_scale_when_active": {
+        "value": 0.85,
+        "source": "src/game/shared/neo/weapons/weapon_ghost.h:74",
+        "notes": "Only applies while the ghost is the active weapon (src/game/server/neo/neo_player.cpp:844-851)."
+      },
+      "pickup_restriction": {
+        "value": "Any class except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:332-335"
+      },
+      "removable": {
+        "value": false,
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:322; src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1373-1378",
+        "notes": "A dropped ghost is never auto-removed."
+      }
+    },
+    "carrier_restrictions": [
+      {
+        "text": "Sprinting stops on pickup.",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:209-213"
+      },
+      {
+        "text": "Recon super-jump is disabled while carrying.",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:951-952"
+      },
+      {
+        "text": "Sprint while carrying: the client CanSprint() returns false for ghost carriers (src/game/client/neo/c_neo_player.cpp:1580-1588), but the server CanSprint() only blocks Support (src/game/server/neo/neo_player.cpp:3750-3758). Effective behaviour is ambiguous; see notes.",
+        "source": "src/game/client/neo/c_neo_player.cpp:1582"
+      }
+    ],
+    "pickup_and_drop": [
+      {
+        "text": "Pickup plays HUD.GhostPickUp for every player except the carrier.",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:218-231"
+      },
+      {
+        "text": "Dropped on death with the rest of the inventory (Weapon_DropAllOnDeath).",
+        "source": "src/game/server/neo/neo_player.cpp:2414"
+      },
+      {
+        "text": "Dropped when the carrier disconnects.",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4477-4482"
+      },
+      {
+        "text": "Can be dropped manually with the drop key while it is the active weapon (generic drop handling).",
+        "source": "src/game/server/neo/neo_player.cpp:1672-1682"
+      }
+    ],
+    "spawning": {
+      "default": "Random enabled neo_ghostspawnpoint each round.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:2061-2064",
+      "spawn_bias": {
+        "convar": "sv_neo_ghost_spawn_bias",
+        "default": 0,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:176",
+        "notes": "When enabled (sv_neo_comp turns it on), spawn points are shuffled in round 1 and spawn index = ceil(round/2) % count, so rounds play in pairs at the same location (src/game/shared/neo/neo_gamerules.cpp:2065-2078)."
+      },
+      "fallbacks": "No spawn points but '_ctg' in the map name: the ghost spawns at the map origin. No spawn points and no '_ctg': no ghost (src/game/shared/neo/neo_gamerules.cpp:1976-1981, 2031-2036)."
+    },
+    "beacons": {
+      "summary": "The carrier sees red beacons with distance labels on living, non-dormant enemies in range, after a boot-up delay. Spectators watching the carrier in-eye or chase also see them. Teammates do not.",
+      "range": {
+        "value": 45.72,
+        "unit": "m",
+        "convar": "sv_neo_ghost_view_distance",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:62",
+        "notes": "Equals 1800 Hammer units, matching original NT (comment at src/game/shared/neo/neo_player_shared.cpp:60-61)."
+      },
+      "bootup_delay": {
+        "value": 3.3,
+        "unit": "s",
+        "convar": "sv_neo_ghost_delay_secs",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:64",
+        "notes": "Measured from when the ghost becomes the active weapon, or from pickup if sv_neo_ctg_ghost_beacons_when_inactive=1 (src/game/shared/neo/weapons/weapon_ghost.h:46-54)."
+      },
+      "requires_active_weapon": {
+        "value": true,
+        "convar": "sv_neo_ctg_ghost_beacons_when_inactive (default 0)",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:26"
+      },
+      "visibility_rules_source": "src/game/client/neo/ui/neo_hud_ghost_beacons.cpp:99-152",
+      "audio_ping_interval": {
+        "value": "clamp(0.1 * nearest_enemy_distance_m, 1.0, 3.5)",
+        "unit": "s",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:173-174"
+      },
+      "only_during_live_round": {
+        "value": true,
+        "notes": "Except in TUT (src/game/shared/neo/weapons/weapon_ghost.cpp:157-158). The HUD hides beacons once the round is over (src/game/client/neo/ui/neo_hud_ghost_beacons.cpp:105).",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:157-158; src/game/client/neo/ui/neo_hud_ghost_beacons.cpp:103-109"
+      },
+      "serverside_processing": {
+        "convar": "sv_neo_serverside_beacons",
+        "default": 1,
+        "source": "src/game/shared/neo/neo_player_shared.cpp:67",
+        "notes": "Anti-cheat: enemy positions outside the PVS are only sent after boot-up and within range (src/game/server/neo/neo_player.cpp:3984-4000)."
+      }
+    },
+    "carrier_exposure": [
+      {
+        "text": "Everyone sees a pulsing HUD marker on the ghost or its carrier: red for the enemy team, the carrying team's colour for friendlies and spectators, grey when nobody carries it. The carrier does not see the marker.",
+        "source": "src/game/client/neo/ui/neo_hud_ghost_marker.cpp:141-178"
+      },
+      {
+        "text": "The carrier is always networked to every client (FL_EDICT_ALWAYS).",
+        "source": "src/game/server/neo/neo_player.cpp:3941-3944"
+      }
+    ],
+    "boundaries": {
+      "entity": "neo_ghost_boundary (built on neo_trigger_weapon)",
+      "source": "src/game/server/neo/neo_ghost_boundary.cpp:80-185",
+      "behaviour": "Checked every 0.05 s (src/game/server/neo/neo_ghost_boundary.cpp:5). A dropped ghost entering the trigger is teleported to the last carrier's last on-ground position and frozen. If there was no carrier, it goes back to the round's ghost spawn and is not frozen. A carrier entering the trigger drops the ghost, which moves to the carrier's last on-ground position. The ghost is laid on its back (angles 15,0,270; line 6)."
+    },
+    "capture_zones": {
+      "entity": "neo_ghost_retrieval_point",
+      "source": "src/game/shared/neo/neo_ghost_cap_point.cpp",
+      "keyvalues": "Radius, team (0 = attacker/Jinrai, 1 = defender/NSF, 2 = neutral), StartDisabled. Inputs Enable/Disable. Output OnCap.",
+      "keyvalues_source": "src/game/shared/neo/neo_ghost_cap_point.cpp:33-35, 62-76",
+      "radius_clamp": {
+        "value": {
+          "min": 8.0,
+          "max": 10240.0
+        },
+        "unit": "HU",
+        "source": "src/game/shared/neo/neo_ghost_cap_point.cpp:30-31, 189",
+        "notes": "The original NT FGD suggested 48-256 HU (comment at lines 26-29)."
+      },
+      "check_rate": {
+        "value": 10,
+        "unit": "checks/s",
+        "source": "src/game/shared/neo/neo_ghost_cap_point.cpp:226"
+      },
+      "distance_metric": "3D distance from the player's origin to the zone origin (src/game/shared/neo/neo_ghost_cap_point.cpp:254-264)",
+      "hold_time": {
+        "value": 0,
+        "notes": "Instant: the capture registers on the first check where the carrier is inside the radius.",
+        "source": "src/game/shared/neo/neo_ghost_cap_point.cpp:254-267"
+      },
+      "team_alternation": "Owning team as placed on even rounds and swapped on odd rounds. Neutral zones accept either team (src/game/shared/neo/neo_ghost_cap_point.cpp:132-141, 245)."
+    },
+    "notes": [
+      "The client predicts no sprint for a ghost carrier, but the server CanSprint has no ghost check. In-game sprint behaviour for a carrier needs testing.",
+      "Ghost marker height offsets on the carrier: +32 HU standing, +24 HU crouching (src/game/shared/neo/neo_gamerules.cpp:4779-4781)."
+    ]
+  },
+  "xp_scoring": {
+    "ranks": {
+      "source": "src/game/shared/neo/neo_weapon_loadout.h:11-14; src/game/shared/neo/neo_player_shared.cpp:409-448",
+      "thresholds": [
+        {
+          "rank": "Rankless Dog",
+          "short": "Dog",
+          "xp": "< 0"
+        },
+        {
+          "rank": "Private",
+          "short": "Pvt",
+          "xp": "0-3"
+        },
+        {
+          "rank": "Corporal",
+          "short": "Cpl",
+          "xp": "4-9"
+        },
+        {
+          "rank": "Sergeant",
+          "short": "Sgt",
+          "xp": "10-19"
+        },
+        {
+          "rank": "Lieutenant",
+          "short": "Lt",
+          "xp": ">= 20"
+        }
+      ],
+      "notes": "Rank gates which loadout weapons are available (src/game/shared/neo/neo_weapon_loadout.cpp:28-61)."
+    },
+    "per_event": [
+      {
+        "event": "Enemy kill",
+        "xp": 1,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4226"
+      },
+      {
+        "event": "Suicide, or death with no attacker and no grenade (environment)",
+        "xp": -1,
+        "can_go_negative": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4188-4191"
+      },
+      {
+        "event": "Teamkill (teamplay modes)",
+        "xp": -1,
+        "can_go_negative": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4201-4203"
+      },
+      {
+        "event": "Kill assist: did at least 50% of the victim's max health in damage and was not the killer. Only the first qualifying player by entity index gets it.",
+        "xp": 1,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4079-4103, 4262-4267"
+      },
+      {
+        "event": "Teamkill assist",
+        "xp": -1,
+        "notes": "Only if sv_neo_teamdamage_assists=1 (default 0).",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4251-4261, 181"
+      },
+      {
+        "event": "Kills during Pause",
+        "xp": 0,
+        "notes": "During a pause the death is not counted and no XP changes.",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4180-4185"
+      }
+    ],
+    "add_points_rule": "Penalties called with bAllowNegativeScore=false cannot push XP below 0. Suicides and teamkills pass true, so they can (src/game/server/neo/neo_player.cpp:2338-2364).",
+    "round_end": {
+      "source": "src/game/shared/neo/neo_gamerules.cpp:3999-4052",
+      "applies_to": "Every member of the winning team, alive or dead. Not given on a stalemate, where the 'winner' is the spectator team.",
+      "rules": [
+        {
+          "case": "Base award for being on the winning team",
+          "xp": 1,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4001"
+        },
+        {
+          "case": "Win by ghost capture, VIP escort, or cap-prevention award, with sv_neo_cap_reward=0 (default)",
+          "xp": "Rank-up: XP set to the next threshold in {0,4,10,20}, or +1 if already >= 20. Replaces the base +1. Only alive players get it unless sv_neo_cap_reward_dead=1; dead teammates keep the base +1.",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:1813-1824, 4002-4020"
+        },
+        {
+          "case": "Same wins with sv_neo_cap_reward > 0",
+          "xp": "sv_neo_cap_reward instead of the base award (alive only unless sv_neo_cap_reward_dead=1)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4021-4027"
+        },
+        {
+          "case": "Other CTG/VIP wins (elimination, VIP kill, forfeit): survivor bonus",
+          "xp": 1,
+          "condition": "alive and sv_neo_survivor_bonus=1 (default)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4029-4034"
+        },
+        {
+          "case": "Other CTG/VIP wins: ghost carrier bonus",
+          "xp": 1,
+          "condition": "carrying the ghost and sv_neo_ghost_carrier_bonus=1 (default)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:4035-4038"
+        }
+      ],
+      "examples": [
+        "CTG elimination win: alive winner +2, alive ghost carrier +3, dead winner +1 (inferred from the rules above).",
+        "CTG ghost capture (defaults): alive winners rank up, dead winners +1."
+      ],
+      "notes": "In TDM and JGR, round winners get the base +1. DM ends through SetWinningDMPlayer, which gives no XP."
+    },
+    "resets": [
+      {
+        "when": "Match start (leaving warmup or countdown)",
+        "effect": "XP set to 0 for all players",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:2922-2928"
+      },
+      {
+        "when": "Every DM round start",
+        "effect": "XP set to 0",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:3357-3367"
+      },
+      {
+        "when": "Every JGR round start",
+        "effect": "XP capped at 10",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:3414-3421"
+      },
+      {
+        "when": "Reconnect in the same match",
+        "effect": "XP and deaths restored if sv_neo_player_restore=1 (default)",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:56, 4496-4525"
+      }
+    ]
+  },
+  "team_rules": {
+    "friendly_fire": {
+      "value": 1,
+      "convar": "mp_friendlyfire",
+      "source": "src/game/shared/gamevars_shared.cpp:46-55",
+      "notes": "NEO sets the default to 1; non-NEO builds use 0."
+    },
+    "mirror_team_damage": {
+      "summary": "Teamplay modes only. For the first sv_neo_mirror_teamdamage_duration seconds of the live round (after freeze), damage to a teammate is mirrored to the attacker at sv_neo_mirror_teamdamage_multiplier. The victim takes no damage if immunity is on. An attacker killed by mirrored damage is made to suicide and cannot respawn that round.",
+      "multiplier": {
+        "value": 2,
+        "notes": "Release build default. DEBUG builds default to 0 (src/game/shared/neo/neo_gamerules.cpp:141-145).",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:146"
+      },
+      "duration": {
+        "value": 7,
+        "unit": "s",
+        "notes": "0 = whole round",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:147"
+      },
+      "victim_immunity": {
+        "value": 1,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:148"
+      },
+      "implementation": "src/game/shared/neo/neo_gamerules.cpp:1315-1328, 1916-1926, 4600-4604; src/game/server/neo/neo_player.cpp:3332-3356"
+    },
+    "teamdamage_kick": {
+      "enabled": {
+        "value": 0,
+        "convar": "sv_neo_teamdamage_kick",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:150"
+      },
+      "hp_threshold": {
+        "value": 900,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:151"
+      },
+      "teamkill_threshold": {
+        "value": 6,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:152"
+      },
+      "notes": "Counts only accumulate during a live round (src/game/shared/neo/neo_gamerules.cpp:1330-1358, 4204-4207)."
+    },
+    "autobalance": {
+      "value": null,
+      "notes": "No team autobalance or team-size limit logic was found in the NT;RE code (searched src/game/shared/neo and src/game/server/neo). mp_autoteambalance is defined only in src/game/shared/teamplayroundbased_gamerules.cpp:249, and CNEORules derives from CHL2MPRules, not from that class (src/game/shared/neo/neo_gamerules.h:185). Not proven to be inactive."
+    },
+    "team_switching": {
+      "notes": "A living player cannot switch between Jinrai and NSF ('You can't switch teams while you are alive.') unless sv_neo_change_suicide_player=1 or the mode allows mid-life changes (EMT). Team changes are rate-limited by sv_neo_change_threshold_interval (0.25 s).",
+      "source": "src/game/server/neo/neo_player.cpp:3209-3222, 3254, 151-152"
+    },
+    "class_limits": {
+      "value": -1,
+      "notes": "Per team. -1 = no limit, 0 = banned.",
+      "convars": [
+        "sv_neo_class_limit_recon",
+        "sv_neo_class_limit_assault",
+        "sv_neo_class_limit_support"
+      ],
+      "source": "src/game/shared/neo/neo_gamerules.cpp:60-62"
+    },
+    "player_collisions": {
+      "notes": "Players do not collide with other players, weapons or projectiles.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:842-858"
+    }
+  },
+  "spectating_and_death": {
+    "mp_forcecamera": {
+      "value": 0,
+      "meaning": "0 = all spectator targets allowed; 1 = own team only. sv_neo_comp sets it to 1.",
+      "source": "src/game/shared/gamevars_shared.cpp:24-29; src/game/shared/neo/neo_gamerules.cpp:201"
+    },
+    "mp_fadetoblack": {
+      "value": 0,
+      "source": "src/game/shared/gamevars_shared.cpp:57-61"
+    },
+    "dead_chat_prefix": {
+      "value": "*DEAD*",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4303, 4328-4350"
+    },
+    "auto_follow_killer": {
+      "convar": "cl_neo_spec_auto_observe_killer_if_observing_victim",
+      "default": 1,
+      "source": "src/game/server/neo/neo_player.cpp:2386",
+      "notes": "Client setting: switch to the killer when the observed player dies."
+    },
+    "spectator_takeover": {
+      "notes": "Spectators may take over bots (sv_neo_spec_replace_player_bot_enable=1) and, if enabled, AFK players (sv_neo_spec_replace_player_afk_enable=0; AFK after 180 s).",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:70-80"
+    },
+    "fall_damage": {
+      "value": 1,
+      "convar": "mp_falldamage",
+      "source": "src/game/server/game.cpp:36",
+      "notes": "Scaled by sv_neo_falldmg_scale 0.25 (cheat/dev-only) (src/game/shared/neo/neo_gamerules.cpp:4274-4287)."
+    },
+    "warmup_godmode": {
+      "value": 0,
+      "convar": "sv_neo_warmup_godmode",
+      "source": "src/game/server/neo/neo_player.cpp:154",
+      "notes": "If 1, nobody takes damage during Idle/Warmup/Countdown/Pause (src/game/server/neo/neo_player.cpp:3298-3310)."
+    }
+  },
+  "competitive_preset": {
+    "convar": "sv_neo_comp",
+    "default": 0,
+    "source": "src/game/shared/neo/neo_gamerules.cpp:211-215",
+    "effects": "Setting it copies its value into sv_neo_readyup_lobby, mp_forcecamera, sv_neo_spraydisable, sv_neo_pausematch_enabled, sv_neo_ghost_spawn_bias, sv_neo_client_autorecord and sv_neo_reject_opengl_mesa_check (src/game/shared/neo/neo_gamerules.cpp:197-209). It also fires neo_game_config.OnCompetitive on every map reset (src/game/shared/neo/neo_gamerules.cpp:3227-3232)."
+  },
+  "maps": {
+    "source": "src/game/shared/neo/neo_gamerules.cpp:4867-4903",
+    "notes": [
+      "This is the hard-coded IsOfficialMap() list. No .bsp files are in the repo (game/neo/maps/.gitignore:1).",
+      "'mode' is inferred from the map name suffix. The real mode comes from each map's neo_game_config entity, which was not inspected.",
+      "has_soundscape marks maps with a game/neo/scripts/soundscapes_<map>.txt file."
+    ],
+    "list": [
+      {
+        "map": "background_alley",
+        "mode": "menu background",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4871"
+      },
+      {
+        "map": "background_door",
+        "mode": "menu background",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4872"
+      },
+      {
+        "map": "ntre_ballistrade_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4873"
+      },
+      {
+        "map": "ntre_bullet_tdm",
+        "mode": "tdm",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4874"
+      },
+      {
+        "map": "ntre_class_tut",
+        "mode": "tut",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4875"
+      },
+      {
+        "map": "ntre_dawn_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4876"
+      },
+      {
+        "map": "ntre_decom_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4877"
+      },
+      {
+        "map": "ntre_disengage_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4878"
+      },
+      {
+        "map": "ntre_dusk_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4879"
+      },
+      {
+        "map": "ntre_engage_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4880"
+      },
+      {
+        "map": "ntre_ghost_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4881"
+      },
+      {
+        "map": "ntre_isolation_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4882"
+      },
+      {
+        "map": "ntre_marketa_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4883"
+      },
+      {
+        "map": "ntre_oilstain_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4884"
+      },
+      {
+        "map": "ntre_pissalley_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4885"
+      },
+      {
+        "map": "ntre_redlight_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4886"
+      },
+      {
+        "map": "ntre_ridgeline_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4887"
+      },
+      {
+        "map": "ntre_rise_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4888"
+      },
+      {
+        "map": "ntre_rogue_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4889"
+      },
+      {
+        "map": "ntre_saitama_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4890"
+      },
+      {
+        "map": "ntre_sentinel_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4891"
+      },
+      {
+        "map": "ntre_sentinel_jgr",
+        "mode": "jgr",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4892"
+      },
+      {
+        "map": "ntre_shooting_tut",
+        "mode": "tut",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4893"
+      },
+      {
+        "map": "ntre_shrine_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4894"
+      },
+      {
+        "map": "ntre_skyline_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4895"
+      },
+      {
+        "map": "ntre_subsurface_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4896"
+      },
+      {
+        "map": "ntre_tarmac_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4897"
+      },
+      {
+        "map": "ntre_terminal_jgr",
+        "mode": "jgr",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4898"
+      },
+      {
+        "map": "ntre_threadplate_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4899"
+      },
+      {
+        "map": "ntre_transit_ctg",
+        "mode": "ctg",
+        "has_soundscape": false,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4900"
+      },
+      {
+        "map": "ntre_vtol_ctg",
+        "mode": "ctg",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4901"
+      },
+      {
+        "map": "ntre_yard_jgr",
+        "mode": "jgr",
+        "has_soundscape": true,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4902"
+      }
+    ],
+    "counts": {
+      "ctg": 24,
+      "jgr": 3,
+      "tdm": 1,
+      "tut": 2,
+      "background": 2,
+      "total": 32
+    },
+    "non_official_soundscapes": [
+      "ntre_apparatus_dm",
+      "rebuild_tutorial",
+      "streetwar",
+      "strike",
+      "labs",
+      "background"
+    ],
+    "non_official_soundscapes_notes": "Soundscape files in game/neo/scripts/ whose names do not match any official map. Their meaning was not investigated."
+  },
+  "convars": [
+    {
+      "name": "sv_neo_gamemode_enforcement",
+      "default": "0",
+      "description": "How the gamemode are determined. 0 = By map, 1 = By sv_neo_gamemode_single, 2 = Random, 3 = Pre-match voting",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:115"
+    },
+    {
+      "name": "sv_neo_gamemode_single",
+      "default": "3",
+      "description": "The gamemode that is enforced by the server. TDM=0, CTG=1, VIP=2, DM=3",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:118"
+    },
+    {
+      "name": "sv_neo_gamemode_random_allow",
+      "default": "11",
+      "description": "In bitwise, the gamemodes that are allowed for random selection. Default = TDM+CTG+DM. TDM=1, CTG=2, VIP=4, DM=8",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:120"
+    },
+    {
+      "name": "neo_vote_game_mode",
+      "default": "1",
+      "description": "Vote on game mode to play. TDM=0, CTG=1, VIP=2, DM=3 (client, userinfo)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:78"
+    },
+    {
+      "name": "sv_neo_warmup_round_time",
+      "default": "45",
+      "description": "The warmup round time, in seconds.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:49"
+    },
+    {
+      "name": "sv_neo_preround_freeze_time",
+      "default": "15",
+      "description": "The pre-round freeze time, in seconds.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+    },
+    {
+      "name": "sv_neo_latespawn_max_time",
+      "default": "15",
+      "description": "How many seconds late are players still allowed to spawn.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:51"
+    },
+    {
+      "name": "sv_neo_loopback_warmup_round",
+      "default": "0",
+      "description": "Allow loopback server to do warmup rounds.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:47"
+    },
+    {
+      "name": "sv_neo_botsonly_warmup_round",
+      "default": "0",
+      "description": "Allow bots-only match to do warmup rounds.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:48"
+    },
+    {
+      "name": "neo_tdm_round_timelimit",
+      "default": "10.25",
+      "description": "TDM round timelimit, in minutes.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:514"
+    },
+    {
+      "name": "neo_ctg_round_timelimit",
+      "default": "3.25",
+      "description": "CTG round timelimit, in minutes.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:517"
+    },
+    {
+      "name": "neo_vip_round_timelimit",
+      "default": "3.25",
+      "description": "VIP round timelimit, in minutes.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:520"
+    },
+    {
+      "name": "neo_dm_round_timelimit",
+      "default": "10.25",
+      "description": "DM round timelimit, in minutes.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:523"
+    },
+    {
+      "name": "neo_jgr_round_timelimit",
+      "default": "4.25",
+      "description": "JGR round timelimit, in minutes.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:526"
+    },
+    {
+      "name": "sv_neo_tdm_score_limit",
+      "default": "1",
+      "description": "TDM score limit",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:492"
+    },
+    {
+      "name": "sv_neo_ctg_score_limit",
+      "default": "7",
+      "description": "CTG score limit",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:494"
+    },
+    {
+      "name": "sv_neo_vip_score_limit",
+      "default": "7",
+      "description": "VIP score limit",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:496"
+    },
+    {
+      "name": "sv_neo_dm_score_limit",
+      "default": "7",
+      "description": "DM score limit",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:498"
+    },
+    {
+      "name": "sv_neo_jgr_score_limit",
+      "default": "0",
+      "description": "JGR score limit",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:500"
+    },
+    {
+      "name": "sv_neo_tdm_round_limit",
+      "default": "0",
+      "description": "TDM max amount of rounds, 0 for no limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:503"
+    },
+    {
+      "name": "sv_neo_ctg_round_limit",
+      "default": "0",
+      "description": "CTG max amount of rounds, 0 for no limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:505"
+    },
+    {
+      "name": "sv_neo_vip_round_limit",
+      "default": "0",
+      "description": "VIP max amount of rounds, 0 for no limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:507"
+    },
+    {
+      "name": "sv_neo_dm_round_limit",
+      "default": "0",
+      "description": "DM max amount of rounds, 0 for no limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:509"
+    },
+    {
+      "name": "sv_neo_jgr_round_limit",
+      "default": "5",
+      "description": "JGR max amount of rounds, 0 for no limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:511"
+    },
+    {
+      "name": "neo_score_limit",
+      "default": "7",
+      "description": "(Legacy) Neo score limit. Hidden; writing it copies the value into sv_neo_ctg_score_limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:477"
+    },
+    {
+      "name": "neo_round_limit",
+      "default": "0",
+      "description": "(Legacy) Max amount of rounds, 0 for no limit. Hidden; copies into sv_neo_ctg_round_limit.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:482"
+    },
+    {
+      "name": "neo_round_sudden_death",
+      "default": "1",
+      "description": "If neo_round_limit is not 0 and round is past neo_round_limit, go into sudden death where match won't end until a team won.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:488"
+    },
+    {
+      "name": "sv_neo_dm_win_xp",
+      "default": "50",
+      "description": "The XP limit to win the match.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:532"
+    },
+    {
+      "name": "sv_neo_jgr_max_points",
+      "default": "20",
+      "description": "Maximum points required for a team to win in JGR",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:83"
+    },
+    {
+      "name": "sv_neo_vip_ctg_on_death",
+      "default": "0",
+      "description": "Spawn Ghost when VIP dies, continue the game",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:82"
+    },
+    {
+      "name": "cl_neo_vip_eligible",
+      "default": "1",
+      "description": "Eligible for VIP (client, archived)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:79"
+    },
+    {
+      "name": "sv_neo_ctg_ghost_overtime_enabled",
+      "default": "0",
+      "description": "Enable ghost overtime.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:535"
+    },
+    {
+      "name": "sv_neo_ctg_ghost_overtime",
+      "default": "45",
+      "description": "Adds up to this many seconds to the round while the ghost is held.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:536"
+    },
+    {
+      "name": "sv_neo_ctg_ghost_overtime_grace",
+      "default": "10",
+      "description": "Number of seconds left in the round when the ghost is dropped in overtime.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:537"
+    },
+    {
+      "name": "sv_neo_ctg_ghost_overtime_grace_decay",
+      "default": "0",
+      "description": "Slowly reduce the grace time as overtime goes on.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:538"
+    },
+    {
+      "name": "sv_neo_ghost_spawn_bias",
+      "default": "0",
+      "description": "Spawn ghost in the same location as the previous round on odd-indexed rounds (Round 1 = index 0)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:176"
+    },
+    {
+      "name": "sv_neo_ghost_spawn_force",
+      "default": "-1",
+      "description": "Pin the ghost to a fixed neo_ghostspawnpoint every round. -1 uses default random selection. (cheat)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:177"
+    },
+    {
+      "name": "sv_neo_jgr_spawn_force",
+      "default": "-1",
+      "description": "Pin the juggernaut to a fixed neo_juggernautspawnpoint every round. -1 uses default random selection. (cheat)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:179"
+    },
+    {
+      "name": "sv_neo_ghost_view_distance",
+      "default": "45.72",
+      "description": "How far can the ghost user see players in meters.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:62"
+    },
+    {
+      "name": "sv_neo_ghost_delay_secs",
+      "default": "3.3",
+      "description": "The delay in seconds until the ghost shows up after pick up.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:64"
+    },
+    {
+      "name": "sv_neo_serverside_beacons",
+      "default": "1",
+      "description": "Whether ghost beacons should be processed server-side.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:67"
+    },
+    {
+      "name": "sv_neo_ctg_ghost_beacons_when_inactive",
+      "default": "0",
+      "description": "Show ghost beacons when the ghost isn't the active weapon.",
+      "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:26"
+    },
+    {
+      "name": "sv_neo_cap_reward",
+      "default": "0",
+      "description": "How much XP to reward for capturing the ghost or escaping as VIP. 0 = Rank up.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:164"
+    },
+    {
+      "name": "sv_neo_cap_reward_dead",
+      "default": "0",
+      "description": "Whether dead players should receive the ghost capture or escape reward.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:165"
+    },
+    {
+      "name": "sv_neo_survivor_bonus",
+      "default": "1",
+      "description": "Whether surviving players on the winning team in CTG and VIP should receive extra XP.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:166"
+    },
+    {
+      "name": "sv_neo_ghost_carrier_bonus",
+      "default": "1",
+      "description": "Whether the ghost carrier on the winning team should receive extra XP.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:167"
+    },
+    {
+      "name": "sv_neo_suicide_prevent_cap_punish",
+      "default": "1",
+      "description": "If enabled, if a player suicides and is the only one alive in their team, while the other team is holding the ghost, reward the ghost holder team a rank up.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:153"
+    },
+    {
+      "name": "sv_neo_teamdamage_assists",
+      "default": "0",
+      "description": "Whether to drain XP when assisting the death of a teammate.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:181"
+    },
+    {
+      "name": "sv_neo_mirror_teamdamage_multiplier",
+      "default": "2 (release) / 0 (DEBUG build)",
+      "description": "The damage multiplier given to the friendly-firing individual. Set value to 0 to disable mirror team damage.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:146"
+    },
+    {
+      "name": "sv_neo_mirror_teamdamage_duration",
+      "default": "7",
+      "description": "How long in seconds the mirror damage is active for the start of each round. Set to 0 for the entire round.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:147"
+    },
+    {
+      "name": "sv_neo_mirror_teamdamage_immunity",
+      "default": "1",
+      "description": "If enabled, the victim will not take damage from a teammate during the mirror team damage duration.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:148"
+    },
+    {
+      "name": "sv_neo_teamdamage_kick",
+      "default": "0",
+      "description": "If enabled, the friendly-firing individual will be kicked if damage is received during the sv_neo_mirror_teamdamage_duration, exceeds the sv_neo_teamdamage_kick_hp value, or executes a teammate.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:150"
+    },
+    {
+      "name": "sv_neo_teamdamage_kick_hp",
+      "default": "900",
+      "description": "The threshold for the amount of HP damage inflicted on teammates before the client is kicked.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:151"
+    },
+    {
+      "name": "sv_neo_teamdamage_kick_kills",
+      "default": "6",
+      "description": "The threshold for the amount of team kills before the client is kicked.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:152"
+    },
+    {
+      "name": "sv_neo_player_restore",
+      "default": "1",
+      "description": "If enabled, the server will save players XP and deaths per match session and restore them if they reconnect.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:56"
+    },
+    {
+      "name": "sv_neo_class_limit_recon",
+      "default": "-1",
+      "description": "Maximum number of Recon class players per team (-1 = no limit, 0 = banned).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:60"
+    },
+    {
+      "name": "sv_neo_class_limit_assault",
+      "default": "-1",
+      "description": "Maximum number of Assault class players per team (-1 = no limit, 0 = banned).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:61"
+    },
+    {
+      "name": "sv_neo_class_limit_support",
+      "default": "-1",
+      "description": "Maximum number of Support class players per team (-1 = no limit, 0 = banned).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:62"
+    },
+    {
+      "name": "sv_neo_comp",
+      "default": "0",
+      "description": "Enables competitive gamerules",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:211"
+    },
+    {
+      "name": "sv_neo_readyup_lobby",
+      "default": "0",
+      "description": "If enabled, players would need to ready up and match the players total requirements to start a game.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:172"
+    },
+    {
+      "name": "sv_neo_readyup_teamplayersthres",
+      "default": "5",
+      "description": "The exact total players per team to be in and ready up to start a game.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:161"
+    },
+    {
+      "name": "sv_neo_readyup_skipwarmup",
+      "default": "1",
+      "description": "Skip the warmup round when already using ready up.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:162"
+    },
+    {
+      "name": "sv_neo_readyup_autointermission",
+      "default": "0",
+      "description": "If disabled, skips the automatic intermission at the end of the match.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:163"
+    },
+    {
+      "name": "sv_neo_readyup_countdown",
+      "default": "5",
+      "description": "Set the countdown from fully ready to start of match in seconds.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:175"
+    },
+    {
+      "name": "sv_neo_pausematch_enabled",
+      "default": "0",
+      "description": "If enabled, players will be able to pause the match mid-game.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:173"
+    },
+    {
+      "name": "sv_neo_wep_dmg_modifier",
+      "default": "1.485",
+      "description": "Weapon damage modifier.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:53"
+    },
+    {
+      "name": "sv_neo_exp_dmg_modifier",
+      "default": "1.485",
+      "description": "Explosive damage modifier",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:54"
+    },
+    {
+      "name": "sv_neo_ignore_wep_xp_limit",
+      "default": "0",
+      "description": "If true, allow equipping any loadout regardless of player XP. (cheat)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:529"
+    },
+    {
+      "name": "sv_neo_change_suicide_player",
+      "default": "0",
+      "description": "Kill the player if they change the team and they're alive.",
+      "source": "src/game/server/neo/neo_player.cpp:151"
+    },
+    {
+      "name": "sv_neo_change_threshold_interval",
+      "default": "0.25",
+      "description": "The interval threshold limit in seconds before the player is allowed to change team.",
+      "source": "src/game/server/neo/neo_player.cpp:152"
+    },
+    {
+      "name": "sv_neo_dm_max_class_dur",
+      "default": "10",
+      "description": "The time in seconds when the player can change class on respawn during deathmatch.",
+      "source": "src/game/server/neo/neo_player.cpp:153"
+    },
+    {
+      "name": "sv_neo_warmup_godmode",
+      "default": "0",
+      "description": "If enabled, everyone is invincible on idle and warmup.",
+      "source": "src/game/server/neo/neo_player.cpp:154"
+    },
+    {
+      "name": "sv_neo_can_change_classes_anytime",
+      "default": "0",
+      "description": "Can players change classes at any moment, even mid-round? (cheat)",
+      "source": "src/game/server/neo/neo_player.cpp:149"
+    },
+    {
+      "name": "sv_neo_time_alive_until_cant_change_loadout",
+      "default": "25.0",
+      "description": "How long after spawning changing loadouts is disabled (cheat)",
+      "source": "src/game/server/neo/neo_player.cpp:3485"
+    },
+    {
+      "name": "sv_neo_spec_replace_player_bot_enable",
+      "default": "1",
+      "description": "Allow spectators to take over bots.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:70"
+    },
+    {
+      "name": "sv_neo_spec_replace_player_afk_enable",
+      "default": "0",
+      "description": "Allow spectators to take over AFK players.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:71"
+    },
+    {
+      "name": "sv_neo_restore_xp_death_any_round",
+      "default": "0",
+      "description": "Permit giving XP at any round rather than restricting to only readyup stage (cheat)",
+      "source": "src/game/server/neo/neo_gamerules_restore.cpp:16"
+    },
+    {
+      "name": "sv_neo_restore_session_allow_name_match",
+      "default": "0",
+      "description": "Permit restoring session with matching players name",
+      "source": "src/game/server/neo/neo_gamerules_restore.cpp:21"
+    },
+    {
+      "name": "sv_neo_falldmg_scale",
+      "default": "0.25",
+      "description": "Scale factor for NEO fall damage. (cheat, development only)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4274"
+    },
+    {
+      "name": "mp_chattime",
+      "default": "15",
+      "description": "amount of time players can chat after the game is over (NEO default; used as the post-round delay)",
+      "source": "src/game/shared/multiplay_gamerules.cpp:67"
+    },
+    {
+      "name": "mp_friendlyfire",
+      "default": "1",
+      "description": "Allows team members to injure other members of their team (NEO default)",
+      "source": "src/game/shared/gamevars_shared.cpp:46"
+    },
+    {
+      "name": "mp_forcecamera",
+      "default": "0",
+      "description": "Restricts spectator modes for dead players (NEO default)",
+      "source": "src/game/shared/gamevars_shared.cpp:24"
+    },
+    {
+      "name": "mp_falldamage",
+      "default": "1",
+      "description": "Whether to apply fall damage to players. (NEO default)",
+      "source": "src/game/server/game.cpp:36"
+    },
+    {
+      "name": "mp_weaponstay",
+      "default": "1",
+      "description": "NEO default. Respawn modes still remove dropped weapons regardless (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1380).",
+      "source": "src/game/server/game.cpp:42"
+    },
+    {
+      "name": "mp_timelimit",
+      "default": "0",
+      "description": "game time per map in minutes",
+      "source": "src/game/shared/multiplay_gamerules.cpp:94"
+    }
+  ],
+  "bots": "Bot code (src/game/server/neo/bot) has mode-specific behaviours only for CTG (seek, capture, carrier, escort, enemy-carrier, lone-wolf ambush/seek) and JGR (seek, capture, escort, enemy, juggernaut). Bots enter them during freeze (src/game/server/neo/bot/behavior/neo_bot_seek_and_destroy.cpp:164-200). TDM, DM and VIP use generic seek-and-destroy, and there is no VIP-specific behaviour. The bot quota manager does nothing in EMT or TUT (src/game/server/neo/bot/neo_bot_manager.cpp:260-264). Players can command bots with +use (sv_neo_bot_cmdr_enable=1, src/game/shared/neo/neo_player_shared.cpp:193).",
+  "class_reference": {
+    "max_health": {
+      "recon": 100,
+      "assault": 120,
+      "support": 225,
+      "vip": 100,
+      "juggernaut": 990,
+      "source": "src/game/shared/neo/neo_player_shared.h:229-235"
+    },
+    "base_speed_hu": {
+      "base": 200,
+      "recon_mod": 1.0,
+      "assault_mod": 0.8,
+      "support_mod": 0.8,
+      "source": "src/game/shared/neo/neo_player_shared.h:30-35"
+    },
+    "sprint_mod": {
+      "recon": 1.35,
+      "assault": 1.6,
+      "support": 1.35,
+      "source": "src/game/shared/neo/neo_player_shared.h:38-40",
+      "notes": "Support cannot sprint (src/game/server/neo/neo_player.cpp:3750-3755)."
+    },
+    "aim_mod": {
+      "value": 0.6,
+      "source": "src/game/shared/neo/neo_player_shared.h:43"
+    },
+    "crouch_walk_mod": {
+      "value": 0.75,
+      "source": "src/game/shared/neo/neo_player_shared.h:45"
+    },
+    "notes": "Included for context because the VIP/JGR sections refer to these values. Not a full class reference."
+  }
+}

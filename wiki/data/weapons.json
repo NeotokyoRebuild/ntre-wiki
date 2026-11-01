@@ -1,0 +1,5041 @@
+{
+  "meta": {
+    "neo_commit": "120006db",
+    "generated": "2026-10-26",
+    "repo": "NEOTOKYO Rebuild (neo)",
+    "citation_format": "repo-relative path:line (or :start-end); 'derived' values carry a 'formula'.",
+    "conventions": {
+      "effective_damage_body": "Damage x sv_neo_wep_dmg_modifier (1.485), before hitgroup multipliers (chest/head 1.0).",
+      "rpm": "round(60 / CycleTime); a cap for semi-auto weapons, not a guaranteed rate.",
+      "aim_fov": "Absolute camera FOV while aiming; lower = more magnification.",
+      "categories": "From WEP_TYPE_* in weapon_bits.h; WEP_TYPE_NIL items categorised manually as melee/explosive/special."
+    }
+  },
+  "weapons": [
+    {
+      "id": "weapon_mpn",
+      "name": "MPN45 (silenced)",
+      "printname": {
+        "value": "MPN45",
+        "source": "game/neo/scripts/weapon_mpn.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:21"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_mpn.txt",
+      "stats": {
+        "damage": {
+          "value": 12,
+          "source": "game/neo/scripts/weapon_mpn.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 17.82,
+          "source": "game/neo/scripts/weapon_mpn.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "12 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 12.0,
+          "source": "game/neo/scripts/weapon_mpn.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.075757,
+          "source": "game/neo/scripts/weapon_mpn.txt:15"
+        },
+        "rpm": {
+          "value": 792,
+          "source": "game/neo/scripts/weapon_mpn.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.075757 = 792.006"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_mpn.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_mpn.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_mpn.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_mpn.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_mpn.txt:46",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_mpns.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:161-165",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.0,
+          "maxX": 0.0,
+          "minY": 0.0,
+          "maxY": 0.0
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 1.0,
+          "minX": -0.5,
+          "maxX": -0.25,
+          "minY": -0.6,
+          "maxY": 0.6
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mpn_s.mdl",
+          "source": "game/neo/scripts/weapon_mpn.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mpn_s.mdl",
+          "source": "game/neo/scripts/weapon_mpn.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_mpns.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Any (incl. Rankless Dog)",
+          "min_xp": null,
+          "loadout_slot_id": "mpn",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:32",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:10"
+        },
+        {
+          "class": "Assault",
+          "rank": "Any (incl. Rankless Dog)",
+          "min_xp": null,
+          "loadout_slot_id": "mpn",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:39",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:10"
+        },
+        {
+          "class": "Support",
+          "rank": "Any (incl. Rankless Dog)",
+          "min_xp": null,
+          "loadout_slot_id": "mpn",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:46",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:10"
+        },
+        {
+          "class": "VIP",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "mpn",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:57",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        }
+      ],
+      "notes": [
+        "Entity weapon_mpn is the SUPPRESSED class CWeaponMPN_S (src/game/shared/neo/weapons/weapon_mpns.cpp:21, weapon_mpns.h:37). The loadout slot 'mpn' gives this entity (src/game/shared/neo/weapons/weapon_bits.h:21).",
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_mpn_unsilenced",
+      "name": "MPN45 (unsilenced)",
+      "printname": {
+        "value": "MPN45",
+        "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:20"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_mpn_unsilenced.txt",
+      "stats": {
+        "damage": {
+          "value": 12,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 17.82,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "12 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 12.0,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.075757,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:15"
+        },
+        "rpm": {
+          "value": 792,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.075757 = 792.006"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:46",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_mpn.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:156-160",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.0,
+          "maxX": 0.0,
+          "minY": 0.0,
+          "maxY": 0.0
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 1.0,
+          "minX": -0.5,
+          "maxX": -0.25,
+          "minY": -0.6,
+          "maxY": 0.6
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mpn.mdl",
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mpn.mdl",
+          "source": "game/neo/scripts/weapon_mpn_unsilenced.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_mpn.cpp:40-43"
+      },
+      "loadout": [],
+      "notes": [
+        "Not offered in any class loadout (no WEAPON(mpn_unsilenced) entry in src/game/shared/neo/neo_weapon_loadout.cpp:28-87); only obtainable via map placement/commands.",
+        "Stats identical to the silenced MPN45 except it is not suppressed."
+      ]
+    },
+    {
+      "id": "weapon_srm",
+      "name": "SRM",
+      "printname": {
+        "value": "SRM",
+        "source": "game/neo/scripts/weapon_srm.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:28"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_srm.txt",
+      "stats": {
+        "damage": {
+          "value": 12,
+          "source": "game/neo/scripts/weapon_srm.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 17.82,
+          "source": "game/neo/scripts/weapon_srm.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "12 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 20.0,
+          "source": "game/neo/scripts/weapon_srm.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.060606,
+          "source": "game/neo/scripts/weapon_srm.txt:15"
+        },
+        "rpm": {
+          "value": 990,
+          "source": "game/neo/scripts/weapon_srm.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.060606 = 990.001"
+        },
+        "clip_size": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_srm.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 150,
+          "source": "game/neo/scripts/weapon_srm.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_srm.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_srm.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_srm.txt:46",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_srm.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:190-193",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_srm.mdl",
+          "source": "game/neo/scripts/weapon_srm.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_srm.mdl",
+          "source": "game/neo/scripts/weapon_srm.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_srm.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "srm",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:32",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "Assault",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "srm",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:39",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "Support",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "srm",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:46",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "VIP",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "srm",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:57",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "weapon_srm_s",
+      "name": "SRM-S",
+      "printname": {
+        "value": "SRM-S",
+        "source": "game/neo/scripts/weapon_srm_s.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:29"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_srm_s.txt",
+      "stats": {
+        "damage": {
+          "value": 12,
+          "source": "game/neo/scripts/weapon_srm_s.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 17.82,
+          "source": "game/neo/scripts/weapon_srm_s.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "12 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 10.0,
+          "source": "game/neo/scripts/weapon_srm_s.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.090909,
+          "source": "game/neo/scripts/weapon_srm_s.txt:15"
+        },
+        "rpm": {
+          "value": 660,
+          "source": "game/neo/scripts/weapon_srm_s.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.090909 = 660.001"
+        },
+        "clip_size": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_srm_s.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 150,
+          "source": "game/neo/scripts/weapon_srm_s.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_srm_s.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_srm_s.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_srm_s.txt:46",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_srms.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:194-197",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_srm_s.mdl",
+          "source": "game/neo/scripts/weapon_srm_s.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_srm_s.mdl",
+          "source": "game/neo/scripts/weapon_srm_s.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_srms.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "srms",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:33",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        },
+        {
+          "class": "VIP",
+          "rank": "Sergeant",
+          "min_xp": 10,
+          "loadout_slot_id": "srms",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:58",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+        }
+      ],
+      "notes": [
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_jitte",
+      "name": "Jitte",
+      "printname": {
+        "value": "Jitte",
+        "source": "game/neo/scripts/weapon_jitte.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:12"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_jitte.txt",
+      "stats": {
+        "damage": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_jitte.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 22.275,
+          "source": "game/neo/scripts/weapon_jitte.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "15 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 12.0,
+          "source": "game/neo/scripts/weapon_jitte.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.090909,
+          "source": "game/neo/scripts/weapon_jitte.txt:15"
+        },
+        "rpm": {
+          "value": 660,
+          "source": "game/neo/scripts/weapon_jitte.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.090909 = 660.001"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_jitte.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_jitte.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_jitte.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_jitte.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_jitte.txt:47",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_jitte.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:128-131",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": -0.5,
+          "maxX": -0.25,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_jitte.mdl",
+          "source": "game/neo/scripts/weapon_jitte.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_jitte.mdl",
+          "source": "game/neo/scripts/weapon_jitte.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_jitte.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "jitte",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:32",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "Assault",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "jitte",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:39",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "VIP",
+          "rank": "Sergeant",
+          "min_xp": 10,
+          "loadout_slot_id": "jitte",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:58",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "weapon_jittescoped",
+      "name": "Jitte-S",
+      "printname": {
+        "value": "Jitte",
+        "source": "game/neo/scripts/weapon_jittescoped.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:13"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_jittescoped.txt",
+      "stats": {
+        "damage": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 22.275,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "15 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 20.0,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.090909,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:15"
+        },
+        "rpm": {
+          "value": 660,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.090909 = 660.001"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_jittescoped.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 38,
+          "source": "game/neo/scripts/weapon_jittescoped.txt:48",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_jittes.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:128-131",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": -0.5,
+          "maxX": -0.25,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_jittes.mdl",
+          "source": "game/neo/scripts/weapon_jittescoped.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_jittes.mdl",
+          "source": "game/neo/scripts/weapon_jittescoped.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_jittes.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "jittes",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:33",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        },
+        {
+          "class": "VIP",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "jittes",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:58",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": [
+        "weapon_bits.h calls it 'Jitte (with scope)' (src/game/shared/neo/weapons/weapon_bits.h:13); script printname is just 'Jitte'.",
+        "Its GetNeoWepBits() returns NEO_WEP_JITTE | NEO_WEP_SUPPRESSED, not NEO_WEP_JITTE_S (src/game/shared/neo/weapons/weapon_jittes.h:37). So it is SUPPRESSED, uses the Jitte handlingTable row (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:128-131; the JITTE_S row at :132-135 has identical values), and is NOT flagged SCOPEDWEAPON (no scope overlay).",
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_smac",
+      "name": "SMAC",
+      "printname": {
+        "value": "SMAC",
+        "source": "game/neo/scripts/weapon_smac.txt:4"
+      },
+      "category": {
+        "value": "SMG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:26"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_smac.txt",
+      "stats": {
+        "damage": {
+          "value": 12,
+          "source": "game/neo/scripts/weapon_smac.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 17.82,
+          "source": "game/neo/scripts/weapon_smac.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "12 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 12.0,
+          "source": "game/neo/scripts/weapon_smac.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.090909,
+          "source": "game/neo/scripts/weapon_smac.txt:15"
+        },
+        "rpm": {
+          "value": 660,
+          "source": "game/neo/scripts/weapon_smac.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.090909 = 660.001"
+        },
+        "clip_size": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_smac.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 0,
+          "source": "game/neo/scripts/weapon_smac.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_SMAC",
+          "source": "game/neo/scripts/weapon_smac.txt:21"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_smac.txt:26",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_smac.txt:45",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_smac.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:186-189",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_vip_smac.mdl",
+          "source": "game/neo/scripts/weapon_smac.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_vip_smac.mdl",
+          "source": "game/neo/scripts/weapon_smac.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_smac.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "VIP",
+          "rank": "Any (incl. Rankless Dog)",
+          "min_xp": null,
+          "loadout_slot_id": "smac",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:57",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:10"
+        }
+      ],
+      "notes": [
+        "VIP weapon. One 90-round clip and zero reserve ammo (default_clip 0).",
+        "Same viewmodel for both teams."
+      ]
+    },
+    {
+      "id": "weapon_zr68c",
+      "name": "ZR68C",
+      "printname": {
+        "value": "ZR68C",
+        "source": "game/neo/scripts/weapon_zr68c.txt:6"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:33"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_zr68c.txt",
+      "stats": {
+        "damage": {
+          "value": 17,
+          "source": "game/neo/scripts/weapon_zr68c.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 25.245,
+          "source": "game/neo/scripts/weapon_zr68c.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "17 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 28.0,
+          "source": "game/neo/scripts/weapon_zr68c.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.090909,
+          "source": "game/neo/scripts/weapon_zr68c.txt:17"
+        },
+        "rpm": {
+          "value": 660,
+          "source": "game/neo/scripts/weapon_zr68c.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.090909 = 660.001"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_zr68c.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_zr68c.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_zr68c.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_zr68c.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_zr68c.txt:47",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_zr68c.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:214-217",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_zr68c.mdl",
+          "source": "game/neo/scripts/weapon_zr68c.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_zr68c.mdl",
+          "source": "game/neo/scripts/weapon_zr68c.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_zr68c.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Sergeant",
+          "min_xp": 10,
+          "loadout_slot_id": "zr68c",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:34",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+        },
+        {
+          "class": "Assault",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "zr68c",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:40",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "Support",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "zr68c",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:46",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "VIP",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "zr68c",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:59",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "weapon_zr68s",
+      "name": "ZR68-S",
+      "printname": {
+        "value": "ZR68S",
+        "source": "game/neo/scripts/weapon_zr68s.txt:6"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:35"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_zr68s.txt",
+      "stats": {
+        "damage": {
+          "value": 22,
+          "source": "game/neo/scripts/weapon_zr68s.txt:17",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 32.67,
+          "source": "game/neo/scripts/weapon_zr68s.txt:17; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "22 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 18.0,
+          "source": "game/neo/scripts/weapon_zr68s.txt:18"
+        },
+        "cycle_time_s": {
+          "value": 0.10606,
+          "source": "game/neo/scripts/weapon_zr68s.txt:19"
+        },
+        "rpm": {
+          "value": 566,
+          "source": "game/neo/scripts/weapon_zr68s.txt:19",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.10606 = 565.718"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_zr68s.txt:23"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_zr68s.txt:24",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_zr68s.txt:26"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_zr68s.txt:29",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_zr68s.txt:52",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.775,
+          "source": "src/game/shared/neo/weapons/weapon_zr68s.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:223-226",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.15,
+          "maxX": 0.25,
+          "minY": -0.4,
+          "maxY": 0.4
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_zr68s.mdl",
+          "source": "game/neo/scripts/weapon_zr68s.txt:11"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_zr68s.mdl",
+          "source": "game/neo/scripts/weapon_zr68s.txt:12"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_zr68s.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Assault",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "zr68s",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:40",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        }
+      ],
+      "notes": [
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_mx",
+      "name": "MX",
+      "printname": {
+        "value": "MX",
+        "source": "game/neo/scripts/weapon_mx.txt:6"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:22"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_mx.txt",
+      "stats": {
+        "damage": {
+          "value": 28,
+          "source": "game/neo/scripts/weapon_mx.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 41.58,
+          "source": "game/neo/scripts/weapon_mx.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "28 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 38.0,
+          "source": "game/neo/scripts/weapon_mx.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.10606,
+          "source": "game/neo/scripts/weapon_mx.txt:17"
+        },
+        "rpm": {
+          "value": 566,
+          "source": "game/neo/scripts/weapon_mx.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.10606 = 565.718"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_mx.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_mx.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_mx.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_mx.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_mx.txt:47",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_mx.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:166-169",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": true
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mx.mdl",
+          "source": "game/neo/scripts/weapon_mx.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mx.mdl",
+          "source": "game/neo/scripts/weapon_mx.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_mx.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Assault",
+          "rank": "Sergeant",
+          "min_xp": 10,
+          "loadout_slot_id": "mx",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:41",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+        },
+        {
+          "class": "Support",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "mx",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:47",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        }
+      ],
+      "notes": [
+        "Draws tracers (src/game/shared/neo/weapons/weapon_mx.h:43)."
+      ]
+    },
+    {
+      "id": "weapon_mx_silenced",
+      "name": "MX Silenced",
+      "printname": {
+        "value": "MX Silenced",
+        "source": "game/neo/scripts/weapon_mx_silenced.txt:4"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:23"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_mx_silenced.txt",
+      "stats": {
+        "damage": {
+          "value": 23,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 34.155,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "23 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 18.0,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.10606,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:15"
+        },
+        "rpm": {
+          "value": 566,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.10606 = 565.718"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:22"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:45",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_mxs.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:170-173",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mxs.mdl",
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mxs.mdl",
+          "source": "game/neo/scripts/weapon_mx_silenced.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_mxs.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Assault",
+          "rank": "Sergeant",
+          "min_xp": 10,
+          "loadout_slot_id": "mxs",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:42",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+        },
+        {
+          "class": "Support",
+          "rank": "Sergeant",
+          "min_xp": 10,
+          "loadout_slot_id": "mxs",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:48",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+        }
+      ],
+      "notes": [
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_m41",
+      "name": "M41 (Mosok)",
+      "printname": {
+        "value": "M41",
+        "source": "game/neo/scripts/weapon_m41.txt:6"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:16"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_m41.txt",
+      "stats": {
+        "damage": {
+          "value": 29,
+          "source": "game/neo/scripts/weapon_m41.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 43.065,
+          "source": "game/neo/scripts/weapon_m41.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "29 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 32.0,
+          "source": "game/neo/scripts/weapon_m41.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.166666,
+          "source": "game/neo/scripts/weapon_m41.txt:17"
+        },
+        "rpm": {
+          "value": 360,
+          "source": "game/neo/scripts/weapon_m41.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.166666 = 360.001"
+        },
+        "clip_size": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_m41.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_m41.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_m41.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_m41.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_m41.txt:50",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_m41.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238",
+          "note": "Not in IsAutomatic() list, so IsSemiAuto(); trigger must be released between shots (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:678-681, 981-984)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:141-143",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; aggregate-initialised to zero."
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mosok41.mdl",
+          "source": "game/neo/scripts/weapon_m41.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mosok41.mdl",
+          "source": "game/neo/scripts/weapon_m41.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_m41.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Assault",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "mosok",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:41",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        },
+        {
+          "class": "Support",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "mosok",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:47",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        }
+      ],
+      "notes": [
+        "Loadout display name 'Mosok' (src/game/shared/neo/weapons/weapon_bits.h:16)."
+      ]
+    },
+    {
+      "id": "weapon_m41s",
+      "name": "M41-S (Mosok Silenced)",
+      "printname": {
+        "value": "M41S",
+        "source": "game/neo/scripts/weapon_m41s.txt:6"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:18"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_m41s.txt",
+      "stats": {
+        "damage": {
+          "value": 26,
+          "source": "game/neo/scripts/weapon_m41s.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 38.61,
+          "source": "game/neo/scripts/weapon_m41s.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "26 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 20.0,
+          "source": "game/neo/scripts/weapon_m41s.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.166666,
+          "source": "game/neo/scripts/weapon_m41s.txt:17"
+        },
+        "rpm": {
+          "value": 360,
+          "source": "game/neo/scripts/weapon_m41s.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.166666 = 360.001"
+        },
+        "clip_size": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_m41s.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_m41s.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_m41s.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_m41s.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_m41s.txt:50",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_m41s.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238",
+          "note": "Not in IsAutomatic() list, so IsSemiAuto(); trigger must be released between shots (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:678-681, 981-984)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:149-151",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; aggregate-initialised to zero."
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mosok41s.mdl",
+          "source": "game/neo/scripts/weapon_m41s.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mosok41s.mdl",
+          "source": "game/neo/scripts/weapon_m41s.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_m41s.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "mosokl",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:34",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        },
+        {
+          "class": "Assault",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "mosokl",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:41",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        },
+        {
+          "class": "Support",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "mosokl",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:48",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        }
+      ],
+      "notes": [
+        "AMBIGUOUS NAMING: the loadout slot 'mosokl' is labelled 'Mosok Silenced' and tagged with bot bit NEO_WEP_M41_L, but its entity name is 'weapon_m41s' (src/game/shared/neo/weapons/weapon_bits.h:17). The loadout therefore actually gives this suppressed M41S, while the bot/profile bit points at the M41L. weapon_bits.h also defines 'mosoks' as 'Mosok Scoped' -> weapon_m41s (src/game/shared/neo/weapons/weapon_bits.h:18), which mislabels this unscoped, suppressed weapon.",
+        "The entity class itself returns NEO_WEP_M41_S | NEO_WEP_SUPPRESSED (src/game/shared/neo/weapons/weapon_m41s.h:37).",
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_m41l",
+      "name": "M41-L (Mosok, scoped)",
+      "printname": {
+        "value": "M41L",
+        "source": "game/neo/scripts/weapon_m41l.txt:6"
+      },
+      "category": {
+        "value": "rifle",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:17"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_m41l.txt",
+      "stats": {
+        "damage": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_m41l.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 66.825,
+          "source": "game/neo/scripts/weapon_m41l.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "45 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 32.0,
+          "source": "game/neo/scripts/weapon_m41l.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.5,
+          "source": "game/neo/scripts/weapon_m41l.txt:17"
+        },
+        "rpm": {
+          "value": 120,
+          "source": "game/neo/scripts/weapon_m41l.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.5 = 120.000"
+        },
+        "clip_size": {
+          "value": 10,
+          "source": "game/neo/scripts/weapon_m41l.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_m41l.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_m41l.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_m41l.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 20,
+          "source": "game/neo/scripts/weapon_m41l.txt:49",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_m41l.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238",
+          "note": "Not in IsAutomatic() list, so IsSemiAuto(); trigger must be released between shots (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:678-681, 981-984)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:144-148",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.0,
+          "maxX": 0.0,
+          "minY": 0.0,
+          "maxY": 0.0
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 2.5,
+          "minX": -0.5,
+          "maxX": 0.0,
+          "minY": -0.5,
+          "maxY": 0.5
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": true,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_mosok41l.mdl",
+          "source": "game/neo/scripts/weapon_m41l.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_mosok41l.mdl",
+          "source": "game/neo/scripts/weapon_m41l.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_m41l.cpp:40-43"
+      },
+      "loadout": [],
+      "notes": [
+        "NOT reachable through any class loadout: no loadout entry resolves to entity 'weapon_m41l' (the 'mosokl' slot resolves to weapon_m41s, src/game/shared/neo/weapons/weapon_bits.h:17). Only obtainable via map placement/commands. It does appear in the legacy GetWeaponByLoadoutId() table (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:102), which nothing calls.",
+        "Flagged NEO_WEP_SCOPEDWEAPON (src/game/shared/neo/weapons/weapon_m41l.h:37), so it shows the scope overlay.",
+        "weapon_bits.h labels the M41_L bit 'Mosok Silenced' (src/game/shared/neo/weapons/weapon_bits.h:17), but this weapon is not suppressed."
+      ]
+    },
+    {
+      "id": "weapon_pbk56s",
+      "name": "PBK56S",
+      "printname": {
+        "value": "PBK56S",
+        "source": "game/neo/scripts/weapon_pbk56s.txt:6"
+      },
+      "category": {
+        "value": "MG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.cpp:10"
+      },
+      "status": "disabled_by_default",
+      "script": "game/neo/scripts/weapon_pbk56s.txt",
+      "stats": {
+        "damage": {
+          "value": 22,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 32.67,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "22 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 28.0,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.08,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:17"
+        },
+        "rpm": {
+          "value": 750,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.08 = 750.000"
+        },
+        "clip_size": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 90,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_pbk56s.txt:24"
+        },
+        "weight": {
+          "value": 2,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_pbk56s.txt:43",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_pbk56s.h:39",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:231-233"
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:180-184",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES / 2",
+            "cone_degrees": 0.5,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 0.0,
+          "minX": -0.25,
+          "maxX": -0.75,
+          "minY": -0.6,
+          "maxY": 0.6
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_pbk56.mdl",
+          "source": "game/neo/scripts/weapon_pbk56s.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_pbk56.mdl",
+          "source": "game/neo/scripts/weapon_pbk56s.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes (no CanBePickedUpByClass override)",
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1120-1123"
+      },
+      "loadout": [
+        {
+          "class": "Support",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "pbk56s",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:52",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14",
+          "note": "Only when built with INCLUDE_WEP_PBK."
+        }
+      ],
+      "notes": [
+        "DISABLED BY DEFAULT: compiled only when CMake option NEO_BUILD_WEAPON_PBK56S is ON (default OFF, src/CMakeLists.txt:36). Not in a default build.",
+        "Category from weapon_bits.cpp (WEP_TYPE_MACHINEGUN under INCLUDE_WEP_PBK, src/game/shared/neo/weapons/weapon_bits.cpp:9-11).",
+        "Dry-fire refire time 1.5 s vs 0.2 s for other guns (src/game/shared/neo/weapons/weapon_pbk56s.h:42).",
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ]
+    },
+    {
+      "id": "weapon_zr68l",
+      "name": "ZR68-L",
+      "printname": {
+        "value": "ZR68L",
+        "source": "game/neo/scripts/weapon_zr68l.txt:6"
+      },
+      "category": {
+        "value": "sniper",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:34"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_zr68l.txt",
+      "stats": {
+        "damage": {
+          "value": 37,
+          "source": "game/neo/scripts/weapon_zr68l.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 54.945,
+          "source": "game/neo/scripts/weapon_zr68l.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "37 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 32.0,
+          "source": "game/neo/scripts/weapon_zr68l.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.5,
+          "source": "game/neo/scripts/weapon_zr68l.txt:17"
+        },
+        "rpm": {
+          "value": 120,
+          "source": "game/neo/scripts/weapon_zr68l.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.5 = 120.000"
+        },
+        "clip_size": {
+          "value": 10,
+          "source": "game/neo/scripts/weapon_zr68l.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 30,
+          "source": "game/neo/scripts/weapon_zr68l.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_zr68l.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_zr68l.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 25,
+          "source": "game/neo/scripts/weapon_zr68l.txt:48",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_zr68l.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238",
+          "note": "Not in IsAutomatic() list, so IsSemiAuto(); trigger must be released between shots (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:678-681, 981-984)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:218-222",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          }
+        },
+        "view_kick": {
+          "minX": 0.0,
+          "maxX": 0.0,
+          "minY": 0.0,
+          "maxY": 0.0
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 2.5,
+          "minX": -0.5,
+          "maxX": 0.0,
+          "minY": -0.5,
+          "maxY": 0.5
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": true,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_zr68l.mdl",
+          "source": "game/neo/scripts/weapon_zr68l.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_zr68l.mdl",
+          "source": "game/neo/scripts/weapon_zr68l.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_zr68l.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "zr68l",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:33",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        },
+        {
+          "class": "VIP",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "zr68l",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:59",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": [
+        "weapon_bits.h display name 'ZR68-L (accurized)' (src/game/shared/neo/weapons/weapon_bits.h:34)."
+      ]
+    },
+    {
+      "id": "weapon_srs",
+      "name": "SRS",
+      "printname": {
+        "value": "SRS",
+        "source": "game/neo/scripts/weapon_srs.txt:6"
+      },
+      "category": {
+        "value": "sniper",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:30"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_srs.txt",
+      "stats": {
+        "damage": {
+          "value": 100,
+          "source": "game/neo/scripts/weapon_srs.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 148.5,
+          "source": "game/neo/scripts/weapon_srs.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "100 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 65.0,
+          "source": "game/neo/scripts/weapon_srs.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 1.4,
+          "source": "game/neo/scripts/weapon_srs.txt:17"
+        },
+        "rpm": {
+          "value": 43,
+          "source": "game/neo/scripts/weapon_srs.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 1.4 = 42.857"
+        },
+        "clip_size": {
+          "value": 5,
+          "source": "game/neo/scripts/weapon_srs.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_srs.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_SNIPER",
+          "source": "game/neo/scripts/weapon_srs.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_srs.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_srs.txt:49",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_srs.h:45",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi (bolt-action)"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_srs.cpp:47-64"
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:198-202",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_20DEGREES",
+            "cone_degrees": 20.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:114"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_PRECALCULATED",
+            "cone_degrees": 0.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:102"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          }
+        },
+        "view_kick": {
+          "minX": 0.0,
+          "maxX": 0.0,
+          "minY": 0.0,
+          "maxY": 0.0
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 1.5,
+          "minX": -0.5,
+          "maxX": 0.0,
+          "minY": -0.5,
+          "maxY": 0.5
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": true,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_srs.mdl",
+          "source": "game/neo/scripts/weapon_srs.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_srs.mdl",
+          "source": "game/neo/scripts/weapon_srs.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_srs.cpp:109-112"
+      },
+      "loadout": [
+        {
+          "class": "Assault",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "srs",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:42",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": [
+        "Hip spread up to 20 degrees; aimed min spread 0 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:198-202).",
+        "Empty clip does not dry-fire on hold (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:765-768)."
+      ],
+      "special": {
+        "bolt_action": {
+          "description": "After a shot, a bolt (ACT_VM_PULLBACK) animation is queued 0.08 s after firing once attack is released; cannot re-fire until CycleTime has passed since the last shot. Bolting can be cancelled by quick-switching; reload skips the separate bolt.",
+          "bolt_queue_delay_s": {
+            "value": 0.08,
+            "source": "src/game/shared/neo/weapons/weapon_srs.cpp:73"
+          },
+          "refire_gate": {
+            "value": "curtime >= lastAttack + CycleTime",
+            "source": "src/game/shared/neo/weapons/weapon_srs.cpp:55-60"
+          },
+          "cannot_aim_while_bolting": {
+            "value": true,
+            "source": "src/game/shared/neo/neo_player_shared.cpp:90-92"
+          },
+          "sources": [
+            "src/game/shared/neo/weapons/weapon_srs.cpp:66-107"
+          ]
+        }
+      }
+    },
+    {
+      "id": "weapon_supa7",
+      "name": "Murata Supa-7",
+      "printname": {
+        "value": "MURATA SUPA 7",
+        "source": "game/neo/scripts/weapon_supa7.txt:11"
+      },
+      "category": {
+        "value": "shotgun",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:31"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_supa7.txt",
+      "stats": {
+        "damage": {
+          "value": 18,
+          "source": "game/neo/scripts/weapon_supa7.txt:6",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 26.73,
+          "source": "game/neo/scripts/weapon_supa7.txt:6; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "18 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "pellets": {
+          "value": 8,
+          "source": "game/neo/scripts/weapon_supa7.txt:7"
+        },
+        "penetration": {
+          "value": 0.0,
+          "source": "src/game/shared/neo/weapons/weapon_supa7.cpp:343"
+        },
+        "cycle_time_s": {
+          "value": 0.8,
+          "source": "game/neo/scripts/weapon_supa7.txt:8"
+        },
+        "rpm": {
+          "value": 75,
+          "source": "game/neo/scripts/weapon_supa7.txt:8",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.8 = 75.000"
+        },
+        "clip_size": {
+          "value": 7,
+          "source": "game/neo/scripts/weapon_supa7.txt:22"
+        },
+        "reserve_ammo": {
+          "value": 28,
+          "source": "game/neo/scripts/weapon_supa7.txt:23",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_10G_SHELL",
+          "source": "game/neo/scripts/weapon_supa7.txt:27"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_supa7.txt:30",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 54,
+          "source": "game/neo/scripts/weapon_supa7.txt:50",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.7,
+          "source": "src/game/shared/neo/weapons/weapon_supa7.h:41",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi (pump)"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238"
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:203-209",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          }
+        },
+        "spread_slug": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_10DEGREES",
+            "cone_degrees": 10.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:112"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_shotgun.mdl",
+          "source": "game/neo/scripts/weapon_supa7.txt:14"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_shotgun.mdl",
+          "source": "game/neo/scripts/weapon_supa7.txt:15"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_supa7.cpp:545-548"
+      },
+      "loadout": [
+        {
+          "class": "Recon",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "supa7",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:34",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        },
+        {
+          "class": "Assault",
+          "rank": "Corporal",
+          "min_xp": 4,
+          "loadout_slot_id": "supa7",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:40",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+        },
+        {
+          "class": "Support",
+          "rank": "Private",
+          "min_xp": 0,
+          "loadout_slot_id": "supa7",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:47",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+        },
+        {
+          "class": "VIP",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "supa7",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:59",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": [
+        "No 'Penetration' key in script; buckshot pellets are fired with FireBulletsInfo_t penetration 0 (src/game/shared/neo/weapons/weapon_supa7.cpp:343, src/game/shared/shareddefs.h:818), so pellets do not penetrate. Only the slug penetrates (32).",
+        "Shotguns are excluded from the shot-manipulator recoil (src/game/shared/neo/neo_shot_manipulator.h:57-58).",
+        "Supa7 PrimaryAttack does not add accuracy penalty per shot; spread only grows from movement/airborne (src/game/shared/neo/weapons/weapon_supa7.cpp:305-370, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:585-603).",
+        "GetMinBurst/GetMaxBurst (1/3) in weapon_supa7.h:43-44 are NPC AI hooks, not a player fire mode.",
+        "Script key 'clip_size2' (line 24) is not the parsed key name ('clip2_size', src/game/shared/weapon_parse.cpp:385), so it is ignored."
+      ],
+      "special": {
+        "slug": {
+          "description": "Secondary attack loads a slug (AMMO_10G_SLUG) into the chamber; the next shot fires 1 projectile instead of 8 pellets, with slug spread table and penetration.",
+          "slug_reserve": {
+            "value": 7,
+            "source": "game/neo/scripts/weapon_supa7.txt:25"
+          },
+          "slug_ammo_type": {
+            "value": "AMMO_10G_SLUG",
+            "source": "game/neo/scripts/weapon_supa7.txt:28"
+          },
+          "slug_pellets": {
+            "value": 1,
+            "source": "src/game/shared/neo/weapons/weapon_supa7.cpp:329"
+          },
+          "slug_damage_multiplier": {
+            "value": 2.5,
+            "source": "src/game/server/hl2mp/hl2mp_player.cpp:715",
+            "note": "Applied when ammo type index == 13 (hard-coded, hl2mp_player.cpp:712); AMMO_10G_SLUG is index 13 (11 HL2MP types first, then AMMO_10G_SHELL=12, AMMO_10G_SLUG=13; src/game/shared/neo/neo_gamerules.cpp:744-754, 793-794; index starts at 1, src/game/shared/ammodef.cpp:287)."
+          },
+          "slug_damage": {
+            "value": 45.0,
+            "source": "game/neo/scripts/weapon_supa7.txt:6; src/game/server/hl2mp/hl2mp_player.cpp:715",
+            "derived": true,
+            "formula": "18 x 2.5"
+          },
+          "slug_effective_damage_body": {
+            "value": 66.825,
+            "source": "src/game/server/hl2mp/hl2mp_player.cpp:715; src/game/shared/neo/neo_gamerules.cpp:53",
+            "derived": true,
+            "formula": "18 x 2.5 x 1.485"
+          },
+          "slug_penetration": {
+            "value": 32.0,
+            "source": "src/game/shared/neo/weapons/weapon_supa7.cpp:346"
+          },
+          "spread_index": {
+            "value": "spreadInfo[m_bSlugLoaded] (0 = buckshot, 1 = slug)",
+            "source": "src/game/shared/neo/weapons/weapon_supa7.cpp:528-531"
+          }
+        },
+        "reload": {
+          "shell_insert_interval_s": {
+            "value": 0.5,
+            "source": "src/game/shared/neo/weapons/weapon_supa7.cpp:194"
+          },
+          "note": "Reloads one shell at a time."
+        }
+      }
+    },
+    {
+      "id": "weapon_aa13",
+      "name": "AA13",
+      "printname": {
+        "value": "AA13",
+        "source": "game/neo/scripts/weapon_aa13.txt:11"
+      },
+      "category": {
+        "value": "shotgun",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:7"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_aa13.txt",
+      "stats": {
+        "damage": {
+          "value": 25,
+          "source": "game/neo/scripts/weapon_aa13.txt:6",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 37.125,
+          "source": "game/neo/scripts/weapon_aa13.txt:6; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "25 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "pellets": {
+          "value": 5,
+          "source": "game/neo/scripts/weapon_aa13.txt:7"
+        },
+        "penetration": {
+          "value": 0.0,
+          "source": "src/game/shared/neo/weapons/weapon_aa13.cpp:108"
+        },
+        "cycle_time_s": {
+          "value": 0.333,
+          "source": "game/neo/scripts/weapon_aa13.txt:8"
+        },
+        "rpm": {
+          "value": 180,
+          "source": "game/neo/scripts/weapon_aa13.txt:8",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.333 = 180.180"
+        },
+        "clip_size": {
+          "value": 16,
+          "source": "game/neo/scripts/weapon_aa13.txt:22"
+        },
+        "reserve_ammo": {
+          "value": 48,
+          "source": "game/neo/scripts/weapon_aa13.txt:23",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_10G_SHELL",
+          "source": "game/neo/scripts/weapon_aa13.txt:26"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_aa13.txt:29",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 54,
+          "source": "game/neo/scripts/weapon_aa13.txt:51",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_aa13.h:32",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:119-122",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_aa13.mdl",
+          "source": "game/neo/scripts/weapon_aa13.txt:14"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_aa13.mdl",
+          "source": "game/neo/scripts/weapon_aa13.txt:15"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_aa13.cpp:126-129"
+      },
+      "loadout": [
+        {
+          "class": "Assault",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "aa13",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:42",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": [
+        "Full-auto shotgun (NEO_WEP_AA13 in IsAutomatic list).",
+        "No 'Penetration' key; pellets fired with FireBulletsInfo_t default penetration 0 (src/game/shared/neo/weapons/weapon_aa13.cpp:108, src/game/shared/shareddefs.h:818), so no penetration.",
+        "Constant 5-degree spread (min == max) and AA13 PrimaryAttack does not add accuracy penalty (src/game/shared/neo/weapons/weapon_aa13.cpp:53-124).",
+        "AA13 checks curtime - m_flLastAttackTime < CycleTime but never updates m_flLastAttackTime; effective rate limit is m_flNextPrimaryAttack (+CycleTime per shot, line 112). RPM assumed = 60/CycleTime."
+      ]
+    },
+    {
+      "id": "weapon_pz",
+      "name": "PZ252",
+      "printname": {
+        "value": "PZ252",
+        "source": "game/neo/scripts/weapon_pz.txt:6"
+      },
+      "category": {
+        "value": "MG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:25"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_pz.txt",
+      "stats": {
+        "damage": {
+          "value": 20,
+          "source": "game/neo/scripts/weapon_pz.txt:15",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 29.7,
+          "source": "game/neo/scripts/weapon_pz.txt:15; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "20 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 28.0,
+          "source": "game/neo/scripts/weapon_pz.txt:16"
+        },
+        "cycle_time_s": {
+          "value": 0.090909,
+          "source": "game/neo/scripts/weapon_pz.txt:17"
+        },
+        "rpm": {
+          "value": 660,
+          "source": "game/neo/scripts/weapon_pz.txt:17",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.090909 = 660.001"
+        },
+        "clip_size": {
+          "value": 100,
+          "source": "game/neo/scripts/weapon_pz.txt:21"
+        },
+        "reserve_ammo": {
+          "value": 200,
+          "source": "game/neo/scripts/weapon_pz.txt:22",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "AMMO_PZ",
+          "source": "game/neo/scripts/weapon_pz.txt:24"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_pz.txt:27",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_pz.txt:48",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.675,
+          "source": "src/game/shared/neo/weapons/weapon_pz.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235",
+          "note": "In CNEOBaseCombatWeapon::IsAutomatic() bit list; no burst mode exists for any weapon."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:174-178",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES / 2",
+            "cone_degrees": 0.5,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 0.0,
+          "minX": -0.25,
+          "maxX": -0.75,
+          "minY": -0.6,
+          "maxY": 0.6
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": true
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_pz.mdl",
+          "source": "game/neo/scripts/weapon_pz.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_pz.mdl",
+          "source": "game/neo/scripts/weapon_pz.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Recon and Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_pz.cpp:40-43"
+      },
+      "loadout": [
+        {
+          "class": "Support",
+          "rank": "Lieutenant",
+          "min_xp": 20,
+          "loadout_slot_id": "pz",
+          "source": "src/game/shared/neo/neo_weapon_loadout.cpp:48",
+          "xp_constant_source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+        }
+      ],
+      "notes": [
+        "Slowest movement scale of any loadout gun (0.675).",
+        "Draws tracers (src/game/shared/neo/weapons/weapon_pz.h:43)."
+      ]
+    },
+    {
+      "id": "weapon_balc",
+      "name": "BALC3",
+      "printname": {
+        "value": "BALC3",
+        "source": "game/neo/scripts/weapon_balc.txt:4"
+      },
+      "category": {
+        "value": "MG",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:8"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_balc.txt",
+      "stats": {
+        "damage": {
+          "value": 36,
+          "source": "game/neo/scripts/weapon_balc.txt:12",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 53.46,
+          "source": "game/neo/scripts/weapon_balc.txt:12; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "36 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 40.0,
+          "source": "game/neo/scripts/weapon_balc.txt:13"
+        },
+        "cycle_time_s": {
+          "value": 0.1,
+          "source": "game/neo/scripts/weapon_balc.txt:14"
+        },
+        "rpm": {
+          "value": 600,
+          "source": "game/neo/scripts/weapon_balc.txt:14",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.1 = 600.000"
+        },
+        "clip_size": {
+          "value": -1,
+          "source": "game/neo/scripts/weapon_balc.txt:18",
+          "note": "-1 = no clip."
+        },
+        "reserve_ammo": {
+          "value": 50,
+          "source": "game/neo/scripts/weapon_balc.txt:19",
+          "note": "Heat pool, not reserve ammo; see special.heat_system."
+        },
+        "ammo_type": {
+          "value": "AMMO_PRI",
+          "source": "game/neo/scripts/weapon_balc.txt:21"
+        },
+        "weight": {
+          "value": 3,
+          "source": "game/neo/scripts/weapon_balc.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_balc.txt:47",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 1.0,
+          "source": "src/game/shared/neo/weapons/weapon_balc.h:48",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "auto (primary mode)",
+            "charged grenade (alt mode)"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_balc.cpp:116-142",
+          "note": "Secondary attack toggles mode (src/game/shared/neo/weapons/weapon_balc.cpp:208-227); default is automatic (src/game/shared/neo/weapons/weapon_balc.cpp:89)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:123-127",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_6DEGREES",
+            "cone_degrees": 6.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:108"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_3DEGREES",
+            "cone_degrees": 3.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:105"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 1.0,
+          "adsFactor": 0.0,
+          "minX": -0.25,
+          "maxX": -0.75,
+          "minY": -0.6,
+          "maxY": 0.6
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": true
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_balc.mdl",
+          "source": "game/neo/scripts/weapon_balc.txt:7"
+        },
+        "nsf_viewmodel": null,
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "Juggernaut only",
+        "source": "src/game/shared/neo/weapons/weapon_balc.cpp:111-114"
+      },
+      "loadout": [],
+      "notes": [
+        "Juggernaut-only weapon, given by GiveDefaultItems (src/game/server/neo/neo_player.cpp:3474-3476); not a loadout choice.",
+        "No NSF viewmodel key, so both teams use v_balc.mdl (fallback at src/game/shared/neo/weapons/neo_weapon_parse.cpp:46-49).",
+        "Effective damage computed with the bullet modifier assumes primary-mode bullets go through the normal FireBullets path (BaseClass::PrimaryAttack, src/game/shared/neo/weapons/weapon_balc.cpp:125)."
+      ],
+      "special": {
+        "heat_system": {
+          "description": "No clip (clip_size -1). The 50 'default_clip' rounds act as a heat/energy pool: each shot consumes 1; at 0 the gun overheats and locks for 5 s, then refills to 50. While not overheated, 1 round regenerates every 0.35 s (0.1 s when submerged). Not reloadable, cannot be dropped.",
+          "capacity": {
+            "value": 50,
+            "source": "game/neo/scripts/weapon_balc.txt:19"
+          },
+          "cooling_interval_s": {
+            "value": 0.35,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:10"
+          },
+          "underwater_cooling_interval_s": {
+            "value": 0.1,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:11"
+          },
+          "overheat_lockout_s": {
+            "value": 5.0,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:12"
+          },
+          "mode_switch_time_s": {
+            "value": 0.2,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:17"
+          },
+          "sources": [
+            "src/game/shared/neo/weapons/weapon_balc.cpp:263-282",
+            "src/game/shared/neo/weapons/weapon_balc.cpp:287-306",
+            "src/game/shared/neo/weapons/weapon_balc.h:53-55"
+          ]
+        },
+        "charge_shot": {
+          "description": "In alt mode, hold attack for 1 s to charge, then fire a bouncing grenade_ar2 projectile (2000 u/s) that does radius damage.",
+          "charge_time_s": {
+            "value": 1.0,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:13"
+          },
+          "damage": {
+            "value": 270.0,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:16"
+          },
+          "damage_note": "Set directly via SetDamage (src/game/shared/neo/weapons/weapon_balc.cpp:183); sv_neo_exp_dmg_modifier is NOT applied here (unlike frag/detpack).",
+          "radius": {
+            "value": 256.0,
+            "source": "src/game/server/hl2/grenade_ar2.cpp:37",
+            "note": "sk_smg1_grenade_radius (NEO default), read at grenade_ar2.cpp:89; radius damage at grenade_ar2.cpp:255."
+          },
+          "projectile_speed": {
+            "value": 2000.0,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:173"
+          },
+          "refire_after_shot_s": {
+            "value": 0.35,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:14"
+          },
+          "ammo_cost": {
+            "value": 30,
+            "source": "src/game/shared/neo/weapons/weapon_balc.cpp:188",
+            "derived": true,
+            "formula": "int((default_clip 50 + 10) / BALC_CHARGE_SHOT_MAX 2)"
+          }
+        }
+      }
+    },
+    {
+      "id": "weapon_milso",
+      "name": "MilSO",
+      "printname": {
+        "value": "MilSO",
+        "source": "game/neo/scripts/weapon_milso.txt:4"
+      },
+      "category": {
+        "value": "pistol",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:19"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_milso.txt",
+      "stats": {
+        "damage": {
+          "value": 17,
+          "source": "game/neo/scripts/weapon_milso.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 25.245,
+          "source": "game/neo/scripts/weapon_milso.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "17 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 12.0,
+          "source": "game/neo/scripts/weapon_milso.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.212121,
+          "source": "game/neo/scripts/weapon_milso.txt:15"
+        },
+        "rpm": {
+          "value": 283,
+          "source": "game/neo/scripts/weapon_milso.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.212121 = 282.857"
+        },
+        "clip_size": {
+          "value": 12,
+          "source": "game/neo/scripts/weapon_milso.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 36,
+          "source": "game/neo/scripts/weapon_milso.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "Pistol",
+          "source": "game/neo/scripts/weapon_milso.txt:22"
+        },
+        "weight": {
+          "value": 2,
+          "source": "game/neo/scripts/weapon_milso.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 55,
+          "source": "game/neo/scripts/weapon_milso.txt:50",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_milso.h:40",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238",
+          "note": "Not in IsAutomatic() list, so IsSemiAuto(); trigger must be released between shots (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:678-681, 981-984)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:152-155",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": true,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_milso.mdl",
+          "source": "game/neo/scripts/weapon_milso.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_milso.mdl",
+          "source": "game/neo/scripts/weapon_milso.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_milso.cpp:40-43"
+      },
+      "loadout": [],
+      "notes": [
+        "Default sidearm for Recon and VIP (not a loadout choice).",
+        "Uses the HL2MP 'Pistol' ammo type (src/game/shared/neo/neo_gamerules.cpp:746).",
+        "Script has two 'VMAimFov' keys (lines 40 and 45); VMAimFov is not parsed by NEO code anyway.",
+        "Suppressed (NEO_WEP_SUPPRESSED bit): no muzzle flash/cloak flash (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1020), quieter AI sound 900 (src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:89, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1047), and no cloak disruption (src/game/server/neo/neo_player.cpp:2692)."
+      ],
+      "special": {
+        "class_default_for": [
+          {
+            "value": "Recon",
+            "source": "src/game/server/neo/neo_player.cpp:3454"
+          },
+          {
+            "value": "VIP",
+            "source": "src/game/server/neo/neo_player.cpp:3471"
+          }
+        ]
+      }
+    },
+    {
+      "id": "weapon_tachi",
+      "name": "Tachi",
+      "printname": {
+        "value": "TACHI",
+        "source": "game/neo/scripts/weapon_tachi.txt:6"
+      },
+      "category": {
+        "value": "pistol",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:32"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_tachi.txt",
+      "stats": {
+        "damage": {
+          "value": 17,
+          "source": "game/neo/scripts/weapon_tachi.txt:32",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 25.245,
+          "source": "game/neo/scripts/weapon_tachi.txt:32; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "17 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 19.0,
+          "source": "game/neo/scripts/weapon_tachi.txt:33"
+        },
+        "cycle_time_s": {
+          "value": 0.121212,
+          "source": "game/neo/scripts/weapon_tachi.txt:34"
+        },
+        "rpm": {
+          "value": 495,
+          "source": "game/neo/scripts/weapon_tachi.txt:34",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.121212 = 495.000"
+        },
+        "clip_size": {
+          "value": 15,
+          "source": "game/neo/scripts/weapon_tachi.txt:17"
+        },
+        "reserve_ammo": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_tachi.txt:18",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "Pistol",
+          "source": "game/neo/scripts/weapon_tachi.txt:20"
+        },
+        "weight": {
+          "value": 2,
+          "source": "game/neo/scripts/weapon_tachi.txt:23",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 55,
+          "source": "game/neo/scripts/weapon_tachi.txt:31",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_tachi.h:54",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi (default)",
+            "auto"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_tachi.h:59-62",
+          "note": "Starts in Single mode (src/game/shared/neo/weapons/weapon_tachi.cpp:56); secondary attack toggles Single/Auto with a 0.2 s switch delay (src/game/shared/neo/weapons/weapon_tachi.cpp:107-116). Client cvar cl_neo_tachi_prefer_auto makes it spawn in Auto (src/game/server/neo/neo_player.cpp:3395-3401)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:210-213",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_1DEGREES",
+            "cone_degrees": 1.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:103"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.25,
+          "maxX": 0.5,
+          "minY": -0.6,
+          "maxY": 0.6
+        },
+        "view_recoil": {
+          "hipFactor": 0,
+          "adsFactor": 0,
+          "minX": 0,
+          "maxX": 0,
+          "minY": 0,
+          "maxY": 0,
+          "note": "Not specified in handlingTable entry; zero factor means no client view-angle recoil (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:918-921)."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_tachi.mdl",
+          "source": "game/neo/scripts/weapon_tachi.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_tachi.mdl",
+          "source": "game/neo/scripts/weapon_tachi.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_tachi.cpp:120-123"
+      },
+      "loadout": [],
+      "notes": [
+        "Default sidearm for Assault (not a loadout choice).",
+        "Uses the HL2MP 'Pistol' ammo type (src/game/shared/neo/neo_gamerules.cpp:746).",
+        "GetMinBurst/GetMaxBurst (1/3) in weapon_tachi.h:56-57 are NPC AI hooks, not a burst fire mode."
+      ],
+      "special": {
+        "class_default_for": [
+          {
+            "value": "Assault",
+            "source": "src/game/server/neo/neo_player.cpp:3460"
+          }
+        ],
+        "firemode_switch_delay_s": {
+          "value": 0.2,
+          "source": "src/game/shared/neo/weapons/weapon_tachi.cpp:112"
+        }
+      }
+    },
+    {
+      "id": "weapon_kyla",
+      "name": "Kyla",
+      "printname": {
+        "value": "KYLA",
+        "source": "game/neo/scripts/weapon_kyla.txt:4"
+      },
+      "category": {
+        "value": "pistol",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:15"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_kyla.txt",
+      "stats": {
+        "damage": {
+          "value": 45,
+          "source": "game/neo/scripts/weapon_kyla.txt:13",
+          "note": "Base damage per bullet (script 'Damage', applied via src/game/server/hl2mp/hl2mp_player.cpp:710)."
+        },
+        "effective_damage_body": {
+          "value": 66.825,
+          "source": "game/neo/scripts/weapon_kyla.txt:13; src/game/shared/neo/neo_gamerules.cpp:53",
+          "derived": true,
+          "formula": "45 x sv_neo_wep_dmg_modifier 1.485"
+        },
+        "penetration": {
+          "value": 10.0,
+          "source": "game/neo/scripts/weapon_kyla.txt:14"
+        },
+        "cycle_time_s": {
+          "value": 0.363636,
+          "source": "game/neo/scripts/weapon_kyla.txt:15"
+        },
+        "rpm": {
+          "value": 165,
+          "source": "game/neo/scripts/weapon_kyla.txt:15",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.363636 = 165.000"
+        },
+        "clip_size": {
+          "value": 6,
+          "source": "game/neo/scripts/weapon_kyla.txt:19"
+        },
+        "reserve_ammo": {
+          "value": 18,
+          "source": "game/neo/scripts/weapon_kyla.txt:20",
+          "note": "'default_clip' is spawned as reserve ammo in addition to a full clip (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:276-277)."
+        },
+        "ammo_type": {
+          "value": "Pistol",
+          "source": "game/neo/scripts/weapon_kyla.txt:22"
+        },
+        "weight": {
+          "value": 2,
+          "source": "game/neo/scripts/weapon_kyla.txt:25",
+          "note": "Source engine 'weight' (auto-switch priority, src/game/shared/weapon_parse.cpp:388); does NOT affect movement speed."
+        },
+        "aim_fov": {
+          "value": 55,
+          "source": "game/neo/scripts/weapon_kyla.txt:45",
+          "note": "Absolute player FOV while aiming (iAimFOV, src/game/shared/neo/weapons/neo_weapon_parse.cpp:55; used by src/game/shared/neo/neo_player_shared.cpp:254). Lower = more zoom."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_kyla.h:30",
+          "note": "Multiplies the class move speed while this weapon is active (src/game/server/neo/neo_player.cpp:846-850)."
+        },
+        "fire_modes": {
+          "value": [
+            "semi"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:238",
+          "note": "Not in IsAutomatic() list, so IsSemiAuto(); trigger must be released between shots (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:678-681, 981-984)."
+        }
+      },
+      "handling": {
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:136-140",
+        "spread": {
+          "hip_min": {
+            "macro": "VECTOR_CONE_5DEGREES",
+            "cone_degrees": 5.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:107"
+          },
+          "hip_max": {
+            "macro": "VECTOR_CONE_7DEGREES",
+            "cone_degrees": 7.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:109"
+          },
+          "aim_min": {
+            "macro": "VECTOR_CONE_2DEGREES",
+            "cone_degrees": 2.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:104"
+          },
+          "aim_max": {
+            "macro": "VECTOR_CONE_4DEGREES",
+            "cone_degrees": 4.0,
+            "macro_source": "src/game/shared/basecombatweapon_shared.h:106"
+          }
+        },
+        "view_kick": {
+          "minX": 0.0,
+          "maxX": 0.0,
+          "minY": 0.0,
+          "maxY": 0.0
+        },
+        "view_recoil": {
+          "hipFactor": 10.5,
+          "adsFactor": 6.0,
+          "minX": -0.75,
+          "maxX": 0.0,
+          "minY": -0.5,
+          "maxY": 0.5
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "uses_tracers": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_klya9.mdl",
+          "source": "game/neo/scripts/weapon_kyla.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_klya9.mdl",
+          "source": "game/neo/scripts/weapon_kyla.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_kyla.cpp:50-53"
+      },
+      "loadout": [],
+      "notes": [
+        "Default sidearm for Support (not a loadout choice). Revolver: 6-round cylinder.",
+        "Script comment shows the damage was previously 11 ('Damage' \"45\" //\"11\", line 13).",
+        "Large client view recoil factors (hip 10.5, ADS 6.0).",
+        "Uses the HL2MP 'Pistol' ammo type (src/game/shared/neo/neo_gamerules.cpp:746)."
+      ],
+      "special": {
+        "class_default_for": [
+          {
+            "value": "Support",
+            "source": "src/game/server/neo/neo_player.cpp:3466"
+          }
+        ]
+      }
+    },
+    {
+      "id": "weapon_knife",
+      "name": "Knife",
+      "printname": {
+        "value": "Knife",
+        "source": "game/neo/scripts/weapon_knife.txt:6"
+      },
+      "category": {
+        "value": "melee",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:14",
+        "note": "WEP_TYPE_NIL in weapon_bits.h; categorised as melee (MeleeWeapon 1, game/neo/scripts/weapon_knife.txt:18)."
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_knife.txt",
+      "stats": {
+        "damage": {
+          "value": 25.0,
+          "source": "src/game/shared/neo/weapons/weapon_knife.cpp:64",
+          "note": "Hard-coded KNIFE_DAMAGE; script 'Damage' 15 (game/neo/scripts/weapon_knife.txt:25) is NOT used for the hit."
+        },
+        "backstab_damage": {
+          "value": 226,
+          "source": "src/game/shared/neo/weapons/weapon_knife.cpp:311",
+          "derived": true,
+          "formula": "MAX_HEALTH_FOR_CLASS[Support] 225 + 1 (src/game/shared/neo/neo_player_shared.h:232)"
+        },
+        "backstab_max_angle_rad": {
+          "value": 0.6435011,
+          "source": "src/game/shared/neo/weapons/weapon_knife.cpp:309",
+          "note": "~36.87 degrees between victim facing and attacker->victim direction (2D)."
+        },
+        "range": {
+          "value": 51.0,
+          "source": "src/game/shared/neo/weapons/weapon_knife.h:21"
+        },
+        "hull_half_extent": {
+          "value": 16.0,
+          "source": "src/game/shared/neo/weapons/weapon_knife.cpp:15",
+          "note": "Fallback hull trace if the line trace misses."
+        },
+        "cycle_time_s": {
+          "value": 0.545454,
+          "source": "game/neo/scripts/weapon_knife.txt:27"
+        },
+        "rpm": {
+          "value": 110,
+          "source": "game/neo/scripts/weapon_knife.txt:27",
+          "derived": true,
+          "formula": "60 / CycleTime = 60 / 0.545454 = 110.000"
+        },
+        "fire_modes": {
+          "value": [
+            "auto (hold to swing)"
+          ],
+          "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:226-235"
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_knife.h:57"
+        },
+        "weight": {
+          "value": 0,
+          "source": "game/neo/scripts/weapon_knife.txt:22"
+        },
+        "penetration": {
+          "value": 38.0,
+          "source": "game/neo/scripts/weapon_knife.txt:26",
+          "note": "Parsed but the knife does not fire bullets, so penetration is not used for melee."
+        }
+      },
+      "flags": {
+        "suppressed": false,
+        "scoped": false,
+        "can_aim": false,
+        "can_drop": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_knife.mdl",
+          "source": "game/neo/scripts/weapon_knife.txt:8"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_knife.mdl",
+          "source": "game/neo/scripts/weapon_knife.txt:9"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except VIP and Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_knife.cpp:107-110"
+      },
+      "loadout": [],
+      "class_default_for": [
+        {
+          "value": "Recon",
+          "source": "src/game/server/neo/neo_player.cpp:3453"
+        },
+        {
+          "value": "Assault",
+          "source": "src/game/server/neo/neo_player.cpp:3459"
+        },
+        {
+          "value": "Support",
+          "source": "src/game/server/neo/neo_player.cpp:3465"
+        }
+      ],
+      "notes": [
+        "sv_neo_wep_dmg_modifier is NOT applied (it is only applied in ModifyFireBulletsDamage on bullets, src/game/server/neo/neo_player.cpp:4056-4059).",
+        "AMBIGUOUS: knife damage goes through DispatchTraceAttack (src/game/shared/neo/weapons/weapon_knife.cpp:322), so hitgroup multipliers likely apply to both normal and backstab hits, but the hitgroup reported by the knife's line/hull trace was not verified.",
+        "No secondary attack (src/game/shared/neo/weapons/weapon_knife.h:43)."
+      ]
+    },
+    {
+      "id": "weapon_grenade",
+      "name": "Frag Grenade",
+      "printname": {
+        "value": "Frag Grenade",
+        "source": "game/neo/scripts/weapon_grenade.txt:5"
+      },
+      "category": {
+        "value": "grenade",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:11"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_grenade.txt",
+      "stats": {
+        "count": {
+          "value": 1,
+          "source": "game/neo/scripts/weapon_grenade.txt:16"
+        },
+        "ammo_type": {
+          "value": "AMMO_GRENADE",
+          "source": "game/neo/scripts/weapon_grenade.txt:19"
+        },
+        "blast_damage_base": {
+          "value": 270.0,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:27",
+          "note": "cvar sv_neo_grenade_blast_damage (cheat)."
+        },
+        "blast_damage_effective": {
+          "value": 400.95,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:259; src/game/shared/neo/neo_gamerules.cpp:54",
+          "derived": true,
+          "formula": "270 x sv_neo_exp_dmg_modifier 1.485 (at blast centre)"
+        },
+        "blast_radius": {
+          "value": 270.0,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:28"
+        },
+        "falloff": {
+          "value": "linear: damage - distance x (damage / radius)",
+          "source": "src/game/shared/gamerules.cpp:376,519-520"
+        },
+        "fuse_s": {
+          "value": 2.16,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:29",
+          "note": "Comment: measured as 2.15999... in original NT."
+        },
+        "max_throw_speed": {
+          "value": 750.0,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:26",
+          "note": "Throw speed = min((90 - adjusted pitch) x 6, 750) plus player velocity (src/game/shared/neo/weapons/weapon_grenade.cpp:241-253)."
+        },
+        "restitution": {
+          "value": 0.45,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:30"
+        },
+        "gravity_scale": {
+          "value": 0.4,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:31"
+        },
+        "friction": {
+          "value": 0.2,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:32"
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.h:46"
+        },
+        "weight": {
+          "value": 1,
+          "source": "game/neo/scripts/weapon_grenade.txt:23"
+        }
+      },
+      "flags": {
+        "can_aim": false,
+        "explosive": true
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_frag.mdl",
+          "source": "game/neo/scripts/weapon_grenade.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_frag.mdl",
+          "source": "game/neo/scripts/weapon_grenade.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:284-287"
+      },
+      "loadout": [],
+      "class_default_for": [
+        {
+          "value": "Assault",
+          "source": "src/game/server/neo/neo_player.cpp:3461"
+        }
+      ],
+      "notes": [
+        "Only droppable by a dead owner (src/game/shared/neo/weapons/weapon_grenade.cpp:273-277).",
+        "All tunables are FCVAR_CHEAT cvars; values are the defaults."
+      ]
+    },
+    {
+      "id": "weapon_smokegrenade",
+      "name": "Smoke Grenade",
+      "printname": {
+        "value": "Smoke Grenade",
+        "source": "game/neo/scripts/weapon_smokegrenade.txt:4"
+      },
+      "category": {
+        "value": "grenade",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:27"
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_smokegrenade.txt",
+      "stats": {
+        "count": {
+          "value": 2,
+          "source": "game/neo/scripts/weapon_smokegrenade.txt:15"
+        },
+        "ammo_type": {
+          "value": "AMMO_SMOKEGRENADE",
+          "source": "game/neo/scripts/weapon_smokegrenade.txt:18"
+        },
+        "damage": {
+          "value": 0,
+          "source": "src/game/shared/neo/weapons/weapon_smokegrenade.cpp:235"
+        },
+        "fuse_s": {
+          "value": 2.16,
+          "source": "src/game/shared/neo/weapons/weapon_smokegrenade.cpp:237",
+          "note": "Uses sv_neo_grenade_fuse_timer (src/game/shared/neo/weapons/weapon_grenade.cpp:29); also must have settled before detonating (src/game/server/neo/neo_smokegrenade.cpp:101)."
+        },
+        "smoke_duration_s": {
+          "value": 25.0,
+          "source": "src/game/server/neo/neo_smokegrenade.cpp:30"
+        },
+        "smoke_fade_start_end_s": {
+          "value": [
+            17,
+            25
+          ],
+          "source": "src/game/server/neo/neo_smokegrenade.cpp:159-160"
+        },
+        "los_blocker_size": {
+          "value": 140.0,
+          "source": "src/game/server/neo/neo_smokegrenade.cpp:32"
+        },
+        "los_blocker_delay_s": {
+          "value": 1.0,
+          "source": "src/game/server/neo/neo_smokegrenade.cpp:33"
+        },
+        "max_throw_speed": {
+          "value": 750.0,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.cpp:26",
+          "note": "Shares sv_neo_grenade_throw_intensity (src/game/shared/neo/weapons/weapon_smokegrenade.cpp:219-220)."
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_smokegrenade.h:45"
+        },
+        "weight": {
+          "value": 1,
+          "source": "game/neo/scripts/weapon_smokegrenade.txt:22"
+        }
+      },
+      "flags": {
+        "can_aim": false,
+        "explosive": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_smokenade.mdl",
+          "source": "game/neo/scripts/weapon_smokegrenade.txt:6"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_smokenade.mdl",
+          "source": "game/neo/scripts/weapon_smokegrenade.txt:7"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_smokegrenade.cpp:258-261"
+      },
+      "loadout": [],
+      "class_default_for": [
+        {
+          "value": "Support",
+          "source": "src/game/server/neo/neo_player.cpp:3467"
+        }
+      ],
+      "notes": [
+        "Smoke radius: the old sv_neo_smoke_bloom_radius code is inside #if(0) (src/game/server/neo/neo_smokegrenade.cpp:112-116); actual visual radius comes from particle FillVolume and was not determined."
+      ]
+    },
+    {
+      "id": "weapon_remotedet",
+      "name": "Detpack",
+      "printname": {
+        "value": "DetPac",
+        "source": "game/neo/scripts/weapon_remotedet.txt:4"
+      },
+      "category": {
+        "value": "explosive",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:9",
+        "note": "WEP_TYPE_NIL; flagged NEO_WEP_EXPLOSIVE (src/game/shared/neo/weapons/weapon_detpack.h:38)."
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_remotedet.txt",
+      "stats": {
+        "count": {
+          "value": 1,
+          "source": "game/neo/scripts/weapon_remotedet.txt:19",
+          "note": "clip_size 1; no default_clip key so default_clip = clip_size (src/game/shared/weapon_parse.cpp:386)."
+        },
+        "ammo_type": {
+          "value": "AMMO_DETPACK",
+          "source": "game/neo/scripts/weapon_remotedet.txt:20"
+        },
+        "blast_damage_base": {
+          "value": 300.0,
+          "source": "src/game/server/neo/neo_detpack.h:19"
+        },
+        "blast_damage_effective": {
+          "value": 445,
+          "source": "src/game/shared/neo/weapons/weapon_detpack.cpp:302; src/game/shared/neo/neo_gamerules.cpp:54; src/game/server/neo/neo_detpack.cpp:180; src/game/server/explode.cpp:384",
+          "derived": true,
+          "formula": "300 x 1.485 = 445.5, truncated to int 445 when passed as ExplosionCreate 'int magnitude'"
+        },
+        "blast_radius": {
+          "value": 350.0,
+          "source": "src/game/server/neo/neo_detpack.h:20"
+        },
+        "falloff": {
+          "value": "linear (env_explosion -> RadiusDamage)",
+          "source": "src/game/server/explode.cpp:348; src/game/shared/gamerules.cpp:519-520"
+        },
+        "trigger": {
+          "value": "remote detonation (second press after throwing)",
+          "source": "src/game/shared/neo/weapons/weapon_detpack.cpp:205-218"
+        },
+        "detonated_by_damage": {
+          "value": false,
+          "source": "src/game/server/neo/neo_detpack.cpp:172-176"
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_detpack.h:54"
+        },
+        "weight": {
+          "value": 1,
+          "source": "game/neo/scripts/weapon_remotedet.txt:24"
+        }
+      },
+      "flags": {
+        "can_aim": false,
+        "explosive": true
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/weapons/v_jinrai_detpack.mdl",
+          "source": "game/neo/scripts/weapon_remotedet.txt:7"
+        },
+        "nsf_viewmodel": {
+          "value": "models/weapons/v_nsf_detpack.mdl",
+          "source": "game/neo/scripts/weapon_remotedet.txt:8"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_detpack.cpp:328-331"
+      },
+      "loadout": [],
+      "class_default_for": [
+        {
+          "value": "Recon",
+          "source": "src/game/server/neo/neo_player.cpp:3455",
+          "note": "Only if effective XP >= sv_neo_detpack_xp_limit (default 4 = Corporal) (src/game/server/neo/neo_player.cpp:3412-3417; src/game/shared/neo/weapons/weapon_detpack.cpp:71)."
+        }
+      ],
+      "unlock_xp": {
+        "value": 4,
+        "source": "src/game/shared/neo/weapons/weapon_detpack.cpp:71",
+        "note": "cvar sv_neo_detpack_xp_limit; -1 disables the requirement."
+      },
+      "notes": [
+        "Entity/script name is weapon_remotedet (src/game/shared/neo/weapons/weapon_detpack.cpp:58), even though the class is CWeaponDetpack. The HL2 'remotedet' name is therefore a real NT weapon.",
+        "Throw: thrown with very low velocity (forward unit vector + player velocity, src/game/shared/neo/weapons/weapon_detpack.cpp:296)."
+      ]
+    },
+    {
+      "id": "weapon_ghost",
+      "name": "Ghost",
+      "printname": {
+        "value": "Ghost",
+        "source": "game/neo/scripts/weapon_ghost.txt:6"
+      },
+      "category": {
+        "value": "special",
+        "source": "src/game/shared/neo/weapons/weapon_bits.h:10",
+        "note": "WEP_TYPE_NIL; CTG objective item."
+      },
+      "status": "in_game",
+      "script": "game/neo/scripts/weapon_ghost.txt",
+      "stats": {
+        "enemy_detection_range_m": {
+          "value": 45.72,
+          "source": "src/game/shared/neo/neo_player_shared.cpp:62",
+          "note": "sv_neo_ghost_view_distance."
+        },
+        "enemy_detection_range_units": {
+          "value": 1800.0,
+          "source": "src/game/shared/neo/neo_player_shared.cpp:62; src/public/vphysics_interface.h:43; src/game/shared/neo/weapons/weapon_ghost.cpp:326-329",
+          "derived": true,
+          "formula": "45.72 m / 0.0254 m per inch"
+        },
+        "movement_speed_scale": {
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_ghost.h:74"
+        },
+        "weight": {
+          "value": 4,
+          "source": "game/neo/scripts/weapon_ghost.txt:25"
+        }
+      },
+      "flags": {
+        "can_aim": false
+      },
+      "team_variants": {
+        "jinrai_viewmodel": {
+          "value": "models/gameplay/v_jinrai_ghost.mdl",
+          "source": "game/neo/scripts/weapon_ghost.txt:9"
+        },
+        "nsf_viewmodel": {
+          "value": "models/gameplay/v_nsf_ghost.mdl",
+          "source": "game/neo/scripts/weapon_ghost.txt:10"
+        },
+        "note": "Team difference is cosmetic only: Jinrai uses 'viewmodel', NSF uses 'team2viewmodel' (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:263-264); stats come from the single script."
+      },
+      "pickup_classes": {
+        "value": "All classes except Juggernaut",
+        "source": "src/game/shared/neo/weapons/weapon_ghost.cpp:332-335"
+      },
+      "loadout": [],
+      "notes": [
+        "Does not shoot. Script Damage 1 / CycleTime 0.11 / clip 1 are placeholders.",
+        "CanAim() returns false (src/game/shared/neo/weapons/weapon_ghost.h:67)."
+      ]
+    }
+  ],
+  "loadout_system": {
+    "rank_xp_thresholds": {
+      "Rankless Dog": {
+        "value": "< 0",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:412-415"
+      },
+      "Private": {
+        "value": 0,
+        "source": "src/game/shared/neo/neo_weapon_loadout.h:11"
+      },
+      "Corporal": {
+        "value": 4,
+        "source": "src/game/shared/neo/neo_weapon_loadout.h:12"
+      },
+      "Sergeant": {
+        "value": 10,
+        "source": "src/game/shared/neo/neo_weapon_loadout.h:13"
+      },
+      "Lieutenant": {
+        "value": 20,
+        "source": "src/game/shared/neo/neo_weapon_loadout.h:14"
+      }
+    },
+    "xp_any": {
+      "value": -255,
+      "source": "src/game/shared/neo/neo_weapon_loadout.h:10",
+      "note": "XP_ANY: always available."
+    },
+    "how_unlock_works": "A class loadout is an ordered list; the player can choose slots up to the first one whose XP price exceeds their XP (src/game/shared/neo/neo_weapon_loadout.cpp:89-109, src/game/server/neo/neo_player.cpp:3529-3530). The loadout gives entity m_szWeaponEntityName (src/game/server/neo/neo_player.cpp:3500).",
+    "class_defaults": {
+      "Recon": {
+        "value": [
+          "weapon_knife",
+          "weapon_milso",
+          "weapon_remotedet (XP >= 4)"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3452-3457"
+      },
+      "Assault": {
+        "value": [
+          "weapon_knife",
+          "weapon_tachi",
+          "weapon_grenade"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3458-3463"
+      },
+      "Support": {
+        "value": [
+          "weapon_knife",
+          "weapon_kyla",
+          "weapon_smokegrenade"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3464-3469"
+      },
+      "VIP": {
+        "value": [
+          "weapon_milso"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3470-3473"
+      },
+      "Juggernaut": {
+        "value": [
+          "weapon_balc"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3474-3477"
+      }
+    },
+    "pickup_rule": {
+      "value": "BumpWeapon rejects weapons whose CanBePickedUpByClass() is false",
+      "source": "src/game/server/neo/neo_player.cpp:2810-2815"
+    },
+    "unused_xp_cost_note": "Per-weapon GetNeoWepXPCost() overrides (e.g. 20 for AA13/PZ/SRS/BALC) are not called anywhere; loadout pricing comes only from neo_weapon_loadout.cpp. Detpack XP gate uses the sv_neo_detpack_xp_limit cvar directly.",
+    "loadout_change_window_s": {
+      "value": 25.0,
+      "source": "src/game/server/neo/neo_player.cpp:3485",
+      "note": "sv_neo_time_alive_until_cant_change_loadout (outside warmup/countdown)."
+    }
+  },
+  "damage_model": {
+    "damage_formula": {
+      "description": "Bullet damage to a player = script Damage x sv_neo_wep_dmg_modifier x hitgroup multiplier (x penetration falloff if it passed through a surface). The fraction is accumulated per attacker and added as whole HP.",
+      "weapon_damage_source": {
+        "value": "script 'Damage' (default 42 if missing)",
+        "source": "src/game/shared/neo/weapons/neo_weapon_parse.cpp:38"
+      },
+      "weapon_damage_applied_at": {
+        "value": "CHL2MP_Player::FireBullets sets m_flDamage = m_iPlayerDamage",
+        "source": "src/game/server/hl2mp/hl2mp_player.cpp:710"
+      },
+      "global_bullet_damage_modifier": {
+        "value": 1.485,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:53",
+        "note": "sv_neo_wep_dmg_modifier, FCVAR_REPLICATED (not cheat); applied in ModifyFireBulletsDamage (src/game/server/neo/neo_player.cpp:4056-4059, called at src/game/shared/baseentity_shared.cpp:2038)."
+      },
+      "global_explosive_damage_modifier": {
+        "value": 1.485,
+        "source": "src/game/shared/neo/neo_gamerules.cpp:54",
+        "note": "sv_neo_exp_dmg_modifier; applied to frag (src/game/shared/neo/weapons/weapon_grenade.cpp:259) and detpack (src/game/shared/neo/weapons/weapon_detpack.cpp:302), not to BALC charge shot."
+      },
+      "fractional_damage": {
+        "value": "whole part applied; fractional part accumulated per attacker and added as +1 when it reaches 1.0",
+        "source": "src/game/server/neo/neo_player.cpp:3320-3330"
+      }
+    },
+    "hitgroup_multipliers": {
+      "head": {
+        "value": 1.0,
+        "source": "src/game/server/player.cpp:197",
+        "also": "game/neo/cfg/skill.cfg:11"
+      },
+      "chest": {
+        "value": 1.0,
+        "source": "src/game/server/player.cpp:198",
+        "also": "game/neo/cfg/skill.cfg:12"
+      },
+      "stomach": {
+        "value": 0.75,
+        "source": "src/game/server/player.cpp:199",
+        "also": "game/neo/cfg/skill.cfg:13"
+      },
+      "arms": {
+        "value": 0.75,
+        "source": "src/game/server/player.cpp:200",
+        "also": "game/neo/cfg/skill.cfg:14"
+      },
+      "legs": {
+        "value": 0.6,
+        "source": "src/game/server/player.cpp:201",
+        "also": "game/neo/cfg/skill.cfg:15"
+      },
+      "generic": {
+        "value": 1.0,
+        "source": "src/game/server/player.cpp:1006-1007",
+        "note": "HITGROUP_GENERIC: no scaling."
+      },
+      "applied_at": "src/game/server/player.cpp:1004-1027 (CBasePlayer::TraceAttack; not overridden by CHL2MP_Player/CNEO_Player)",
+      "note": "Under #ifdef NEO the head multiplier is 1.0 (HL2 default is 2.0), so there is NO extra headshot damage in code. skill.cfg sets the same values."
+    },
+    "limb_passthrough": {
+      "value": false,
+      "source": "src/game/shared/neo/neo_player_shared.cpp:858",
+      "note": "sv_neo_hitboxgroup_pen (default 0). If enabled, an arm/leg hit is re-traced against head/chest/stomach and uses that hitgroup if hit (neo_player_shared.cpp:902-923)."
+    },
+    "armor": {
+      "value": null,
+      "note": "No armor-based damage reduction found in NEO damage code (no ScaleDamage/armor use in neo_player.cpp, neo_gamerules.cpp or hl2mp player). ArmorValue is only copied on spectator takeover (src/game/server/neo/neo_player.cpp:4208). Class durability differs through max health instead."
+    },
+    "class_max_health": {
+      "Recon": {
+        "value": 100,
+        "source": "src/game/shared/neo/neo_player_shared.h:230"
+      },
+      "Assault": {
+        "value": 120,
+        "source": "src/game/shared/neo/neo_player_shared.h:231"
+      },
+      "Support": {
+        "value": 225,
+        "source": "src/game/shared/neo/neo_player_shared.h:232"
+      },
+      "VIP": {
+        "value": 100,
+        "source": "src/game/shared/neo/neo_player_shared.h:233"
+      },
+      "Juggernaut": {
+        "value": 990,
+        "source": "src/game/shared/neo/neo_player_shared.h:234"
+      }
+    },
+    "range_falloff": {
+      "value": null,
+      "note": "No distance-based damage falloff for bullets: FireBullets uses info.m_flDamage directly (src/game/shared/baseentity_shared.cpp:2003-2032), and the trace length is MAX_TRACE_LENGTH (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1067). Damage only drops via penetration.",
+      "source": "src/game/shared/baseentity_shared.cpp:2003-2032"
+    },
+    "explosive_falloff": {
+      "value": "linear from full damage at centre to 0 at radius",
+      "source": "src/game/shared/gamerules.cpp:376,519-520"
+    },
+    "penetration": {
+      "max_depth_units": {
+        "value": 12.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:9"
+      },
+      "formula_pen_used": {
+        "value": "penUsed = (thickness traversed, up to 12 units) / resistance_value",
+        "source": "src/game/shared/baseentity_shared.cpp:2336",
+        "note": "The table is named PENETRATION_RESISTANCE but is used as a divisor: HIGHER value = EASIER to penetrate (dirt/sand 0.2 are hardest, flesh 0.6, metal 0.5, glass 0.9)."
+      },
+      "penetrates_if": {
+        "value": "penUsed <= weapon penetration",
+        "source": "src/game/shared/baseentity_shared.cpp:2337-2340"
+      },
+      "damage_after": {
+        "value": "damage x max(0.25, 1 - penUsed / penetration)",
+        "source": "src/game/shared/baseentity_shared.cpp:2366"
+      },
+      "remaining_penetration": {
+        "value": "penetration - penUsed",
+        "source": "src/game/shared/baseentity_shared.cpp:2369"
+      },
+      "through_players": {
+        "value": false,
+        "source": "src/game/shared/baseentity_shared.cpp:2264-2270",
+        "note": "Bullets never pass through players."
+      },
+      "breakable_glass_fake_thickness": {
+        "value": 2.3,
+        "source": "src/game/shared/baseentity_shared.cpp:2320"
+      },
+      "no_penetration_weapons": "Penetration 0 => never penetrates (src/game/shared/baseentity_shared.cpp:2331): AA13 and Supa-7 buckshot."
+    },
+    "accuracy_model": {
+      "description": "Spread lerps between min and max (hip or aim table) by accuracy penalty in [0,1].",
+      "spread_lerp": {
+        "value": "cone = lerp(min, max, penalty)",
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:854-879"
+      },
+      "penalty_per_shot": {
+        "value": 0.8,
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:280",
+        "note": "x sv_neo_accuracy_penalty_scale (1.0, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:78); no weapon overrides it."
+      },
+      "max_penalty": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.h:281"
+      },
+      "decay_per_s": {
+        "value": 1.2,
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:576",
+        "note": "+1.0 while crouched (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:578-581)."
+      },
+      "crouch_extra_decay_per_s": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:578-581",
+        "note": "Added to decay_per_s while the owner is ducking (FL_DUCKING)."
+      },
+      "airborne_penalty_per_s": {
+        "value": 3.0,
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:593"
+      },
+      "moving_unaimed_penalty_per_s": {
+        "value": 2.0,
+        "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:596-599",
+        "note": "When not aiming and 2D speed > 5."
+      },
+      "cone_note": "VECTOR_CONE_N DEGREES components are sin(N/2) (src/game/shared/basecombatweapon_shared.h:101); cone_degrees is the full cone angle N. PRECALCULATED = 0 (perfect).",
+      "view_kick_note": "view_kick = server ViewPunch range in degrees (x=pitch, y=yaw) per shot (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:899-907). view_recoil = client-only view-angle change: minX..maxX / minY..maxY scaled by hipFactor or adsFactor (src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:916-929).",
+      "shot_manipulator_recoil": {
+        "note": "Extra vertical bullet-direction recoil from CNEOShotManipulator. Per-weapon sv_neo_<weapon>_recoil_scale cvars all default 0 (disabled) for the listed weapons (src/game/shared/neo/neo_shot_manipulator.cpp:19-36). Weapons WITHOUT a cvar (weapon_srs, weapon_zr68l, weapon_balc) fall back to sv_neo_recoil_capscale = 1 and sv_neo_recoil_capbullets = 10 (neo_shot_manipulator.cpp:9-10, 97-105, 135-146): up to 1.0 degree after 10 consecutive shots (shot count resets after 0.5 s without firing, src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:986-993). AA13/Supa-7 are excluded (src/game/shared/neo/neo_shot_manipulator.h:57-58). Unverified in-game; derived from code reading only.",
+        "source": "src/game/shared/neo/neo_shot_manipulator.cpp:63-147"
+      }
+    },
+    "movement": {
+      "description": "Max speed = class speed x active weapon movement_speed_scale (x crouch/walk/sprint modifiers).",
+      "source": "src/game/server/neo/neo_player.cpp:844-870",
+      "base_speed": {
+        "value": 200,
+        "source": "src/game/shared/neo/neo_player_shared.h:30"
+      },
+      "class_modifier": {
+        "Recon": {
+          "value": 1.0,
+          "source": "src/game/shared/neo/neo_player_shared.h:33"
+        },
+        "Assault": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/neo_player_shared.h:34"
+        },
+        "Support": {
+          "value": 0.8,
+          "source": "src/game/shared/neo/neo_player_shared.h:35"
+        }
+      },
+      "crouch_walk_modifier": {
+        "value": 0.75,
+        "source": "src/game/shared/neo/neo_player_shared.h:45"
+      },
+      "note": "VIP and Juggernaut base speed = Assault base speed (src/game/shared/neo/neo_player_shared.h:65,70)."
+    }
+  },
+  "penetration_materials": [
+    {
+      "material": "ANTLION",
+      "char": "A",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:13"
+      },
+      "note": "Index 0 is skipped by the 'material > 0' check (src/game/shared/baseentity_shared.cpp:2300), leaving resistance 0 => no penetration.",
+      "hl2_only": {
+        "value": true,
+        "source": "src/game/shared/decals.h:15; game/neo/scripts/surfaceproperties_hl2.txt:91-93",
+        "note": "Only HL2's antlion surface uses it, in the HL2 surface file NT;RE loads."
+      }
+    },
+    {
+      "material": "BLOODYFLESH",
+      "char": "B",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:14"
+      },
+      "hl2_only": {
+        "value": true,
+        "source": "src/game/shared/decals.h:16",
+        "note": "Treated as HL2-only by maintainer decision: no NT;RE content is known to use it. The engine's base surfaceproperties.txt, which defines it, isn't in either repository, so this isn't confirmed from source."
+      }
+    },
+    {
+      "material": "CONCRETE",
+      "char": "C",
+      "resistance_value": {
+        "value": 0.3,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:15"
+      }
+    },
+    {
+      "material": "DIRT",
+      "char": "D",
+      "resistance_value": {
+        "value": 0.2,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:16"
+      }
+    },
+    {
+      "material": "EGGSHELL",
+      "char": "E",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:17"
+      },
+      "hl2_only": {
+        "value": true,
+        "source": "src/game/shared/decals.h:19",
+        "note": "SDK comment: 'the egg sacs in the tunnels in ep2'."
+      }
+    },
+    {
+      "material": "FLESH",
+      "char": "F",
+      "resistance_value": {
+        "value": 0.6,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:18"
+      }
+    },
+    {
+      "material": "GRATE",
+      "char": "G",
+      "resistance_value": {
+        "value": 0.75,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:19"
+      }
+    },
+    {
+      "material": "ALIENFLESH",
+      "char": "H",
+      "resistance_value": {
+        "value": 0.6,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:20"
+      },
+      "hl2_only": {
+        "value": true,
+        "source": "src/game/shared/decals.h:22; game/neo/scripts/surfaceproperties_hl2.txt:91-93",
+        "note": "HL2 alien flesh. In NT;RE's files, only HL2's antlion surface is based on it."
+      }
+    },
+    {
+      "material": "CLIP",
+      "char": "I",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:21"
+      }
+    },
+    {
+      "material": "BLOCKBULLETS",
+      "char": "J",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:22"
+      },
+      "note": "Never penetrable regardless of table value (src/game/shared/baseentity_shared.cpp:2216-2240)."
+    },
+    {
+      "material": "UNUSED",
+      "char": "K",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:23"
+      },
+      "note": "Unused material slot."
+    },
+    {
+      "material": "PLASTIC",
+      "char": "L",
+      "resistance_value": {
+        "value": 0.8,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:24"
+      }
+    },
+    {
+      "material": "METAL",
+      "char": "M",
+      "resistance_value": {
+        "value": 0.5,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:25"
+      }
+    },
+    {
+      "material": "SAND",
+      "char": "N",
+      "resistance_value": {
+        "value": 0.2,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:26"
+      }
+    },
+    {
+      "material": "FOLIAGE",
+      "char": "O",
+      "resistance_value": {
+        "value": 0.8,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:27"
+      }
+    },
+    {
+      "material": "COMPUTER",
+      "char": "P",
+      "resistance_value": {
+        "value": 0.5,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:28"
+      }
+    },
+    {
+      "material": "UNUSED",
+      "char": "Q",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:29"
+      },
+      "note": "Unused material slot."
+    },
+    {
+      "material": "UNUSED",
+      "char": "R",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:30"
+      },
+      "note": "Unused material slot."
+    },
+    {
+      "material": "SLOSH",
+      "char": "S",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:31"
+      }
+    },
+    {
+      "material": "TILE",
+      "char": "T",
+      "resistance_value": {
+        "value": 0.5,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:32"
+      }
+    },
+    {
+      "material": "UNUSED",
+      "char": "U",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:33"
+      },
+      "note": "Unused material slot."
+    },
+    {
+      "material": "VENT",
+      "char": "V",
+      "resistance_value": {
+        "value": 0.75,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:34"
+      }
+    },
+    {
+      "material": "WOOD",
+      "char": "W",
+      "resistance_value": {
+        "value": 0.75,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:35"
+      }
+    },
+    {
+      "material": "UNUSED",
+      "char": "X",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:36"
+      },
+      "note": "Unused material slot."
+    },
+    {
+      "material": "GLASS",
+      "char": "Y",
+      "resistance_value": {
+        "value": 0.9,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:37"
+      }
+    },
+    {
+      "material": "WARPSHIELD",
+      "char": "Z",
+      "resistance_value": {
+        "value": 1.0,
+        "source": "src/game/shared/neo/neo_penetration_resistance.h:38"
+      },
+      "hl2_only": {
+        "value": true,
+        "source": "src/game/shared/decals.h:44",
+        "note": "SDK comment: the jello effect for the HL2: Episode Two advisor shield."
+      }
+    }
+  ],
+  "ammo_types": [
+    {
+      "name": "AMMO_10G_SHELL",
+      "damage_type": "DMG_BULLET | DMG_BUCKSHOT",
+      "index_derived": 12,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:793",
+      "used_by": [
+        "weapon_supa7",
+        "weapon_aa13"
+      ]
+    },
+    {
+      "name": "AMMO_10G_SLUG",
+      "damage_type": "DMG_BULLET",
+      "index_derived": 13,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:794",
+      "used_by": [
+        "weapon_supa7 (slug)"
+      ]
+    },
+    {
+      "name": "AMMO_GRENADE",
+      "damage_type": "DMG_BLAST",
+      "index_derived": 14,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:795",
+      "used_by": [
+        "weapon_grenade"
+      ]
+    },
+    {
+      "name": "AMMO_SMOKEGRENADE",
+      "damage_type": "DMG_BLAST",
+      "index_derived": 15,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:796",
+      "used_by": [
+        "weapon_smokegrenade"
+      ]
+    },
+    {
+      "name": "AMMO_DETPACK",
+      "damage_type": "DMG_BLAST",
+      "index_derived": 16,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:797",
+      "used_by": [
+        "weapon_remotedet"
+      ]
+    },
+    {
+      "name": "AMMO_PRI",
+      "damage_type": "DMG_BULLET",
+      "index_derived": 17,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:798",
+      "used_by": [
+        "most rifles/SMGs",
+        "weapon_balc"
+      ]
+    },
+    {
+      "name": "AMMO_PZ",
+      "damage_type": "DMG_BULLET",
+      "index_derived": 18,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:799",
+      "used_by": [
+        "weapon_pz"
+      ]
+    },
+    {
+      "name": "AMMO_SNIPER",
+      "damage_type": "DMG_BULLET",
+      "index_derived": 19,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:800",
+      "used_by": [
+        "weapon_srs"
+      ]
+    },
+    {
+      "name": "AMMO_SMAC",
+      "damage_type": "DMG_BULLET",
+      "index_derived": 20,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:801",
+      "used_by": [
+        "weapon_smac"
+      ]
+    },
+    {
+      "name": "Pistol",
+      "damage_type": "DMG_BULLET",
+      "index_derived": 3,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:746",
+      "used_by": [
+        "weapon_milso",
+        "weapon_tachi",
+        "weapon_kyla"
+      ],
+      "note": "Legacy HL2MP ammo type, still used by NT pistols."
+    }
+  ],
+  "ammo_meta": {
+    "player_damage_cvar": {
+      "value": 0,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:729",
+      "note": "sk_plr_dmg_neo = 0 for all ammo types, so ammo defs carry no damage; damage comes from the weapon script."
+    },
+    "max_ammo_cvar": {
+      "value": 10000,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:728",
+      "note": "sk_max_neo_ammo for all types."
+    },
+    "index_note": "index_derived = registration order (HL2MP's 11 types at src/game/shared/neo/neo_gamerules.cpp:744-754 first, then NEO types), starting at 1 (src/game/shared/ammodef.cpp:287). Only index 13 matters in code (Supa-7 slug check)."
+  },
+  "excluded": {
+    "hl2_leftovers_with_scripts_not_used_by_nt": [
+      "weapon_357",
+      "weapon_ar2",
+      "weapon_crossbow",
+      "weapon_crowbar",
+      "weapon_cubemap",
+      "weapon_frag",
+      "weapon_physcannon",
+      "weapon_pistol",
+      "weapon_rpg",
+      "weapon_shotgun",
+      "weapon_slam",
+      "weapon_smg1",
+      "weapon_stunstick"
+    ],
+    "reason": "Not in FOR_LIST_WEAPONS (src/game/shared/neo/weapons/weapon_bits.h:6-40), no NEO class in src/game/shared/neo/weapons/, and not in any loadout.",
+    "kept_despite_hl2_name": "weapon_remotedet is the NT Detpack (src/game/shared/neo/weapons/weapon_detpack.cpp:58).",
+    "stub": {
+      "id": "weapon_proxmine",
+      "note": "Listed in weapon_bits.h (src/game/shared/neo/weapons/weapon_bits.h:24) but weapon_proxmine.cpp/.h are empty stubs with no entity and no script."
+    }
+  }
+}

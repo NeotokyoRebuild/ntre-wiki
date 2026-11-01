@@ -1,0 +1,2240 @@
+{
+  "meta": {
+    "neo_commit": "120006db",
+    "generated": "2026-10-26",
+    "source_repo": "NeotokyoRebuild/neo (local checkout)",
+    "units": "Speeds in Hammer units per second (u/s), distances in Hammer units, AUX/cloak in raw power units. Source citations are 'path:line' or 'path:start-end' relative to the repo root.",
+    "conventions": [
+      "Values tagged \"derived\": true are worked out arithmetically from cited constants; the \"formula\" gives the working.",
+      "Class speeds below are BEFORE the active weapon's speed scale is applied. Effective in-game speed = class speed x weapon speed scale (see movement.weapon_speed_scale).",
+      "Where client and server code differ, both are recorded in notes."
+    ]
+  },
+  "teams": [
+    {
+      "id": "jinrai",
+      "name": "Jinrai",
+      "team_index": {
+        "value": 2,
+        "source": "src/game/shared/neo/neo_player_shared.h:400-403",
+        "note": "TEAM_JINRAI = LAST_SHARED_TEAM + 1; LAST_SHARED_TEAM = TEAM_SPECTATOR = 1 (src/game/shared/shareddefs.h:331-333)"
+      },
+      "display_string": {
+        "value": "Jinrai",
+        "source": "src/game/shared/neo/neo_player_shared.h:408"
+      },
+      "hud_color_rgba": {
+        "value": [
+          154,
+          255,
+          154,
+          255
+        ],
+        "source": "src/game/shared/neo/neo_player_shared.h:253,258"
+      },
+      "player_models": {
+        "recon": {
+          "value": [
+            "models/player/jinrai_msf.mdl",
+            "models/player/jinrai_msf2.mdl",
+            "models/player/jinrai_msf3.mdl"
+          ],
+          "source": "src/game/server/neo/neo_model_manager.cpp:35-38"
+        },
+        "assault": {
+          "value": [
+            "models/player/jinrai_mam.mdl",
+            "models/player/jinrai_mam2.mdl",
+            "models/player/jinrai_mam3.mdl"
+          ],
+          "source": "src/game/server/neo/neo_model_manager.cpp:40-43"
+        },
+        "support": {
+          "value": [
+            "models/player/jinrai_mhm.mdl",
+            "models/player/jinrai_mhm2.mdl",
+            "models/player/jinrai_mhm3.mdl"
+          ],
+          "source": "src/game/server/neo/neo_model_manager.cpp:45-48"
+        }
+      },
+      "spawn_side": {
+        "value": "info_player_attacker on even rounds, info_player_defender on odd rounds (falls back to info_player_start if the entity is missing)",
+        "source": "src/game/server/neo/neo_player.cpp:3027,3042-3057"
+      }
+    },
+    {
+      "id": "nsf",
+      "name": "NSF",
+      "team_index": {
+        "value": 3,
+        "source": "src/game/shared/neo/neo_player_shared.h:400-403"
+      },
+      "display_string": {
+        "value": "NSF",
+        "source": "src/game/shared/neo/neo_player_shared.h:409"
+      },
+      "hud_color_rgba": {
+        "value": [
+          154,
+          205,
+          255,
+          255
+        ],
+        "source": "src/game/shared/neo/neo_player_shared.h:254,257"
+      },
+      "player_models": {
+        "recon": {
+          "value": [
+            "models/player/nsf_gsf.mdl",
+            "models/player/nsf_gsf2.mdl",
+            "models/player/nsf_gsf3.mdl"
+          ],
+          "source": "src/game/server/neo/neo_model_manager.cpp:16-19"
+        },
+        "assault": {
+          "value": [
+            "models/player/nsf_gam.mdl",
+            "models/player/nsf_gam2.mdl",
+            "models/player/nsf_gam3.mdl"
+          ],
+          "source": "src/game/server/neo/neo_model_manager.cpp:21-24"
+        },
+        "support": {
+          "value": [
+            "models/player/nsf_ghm.mdl",
+            "models/player/nsf_ghm2.mdl",
+            "models/player/nsf_ghm3.mdl"
+          ],
+          "source": "src/game/server/neo/neo_model_manager.cpp:26-29"
+        }
+      },
+      "spawn_side": {
+        "value": "info_player_defender on even rounds, info_player_attacker on odd rounds (falls back to info_player_start if the entity is missing)",
+        "source": "src/game/server/neo/neo_player.cpp:3047-3057"
+      }
+    }
+  ],
+  "teams_notes": [
+    "No team-specific gameplay stat differences (health, speed, AUX, cloak, vision) were found; teams differ only in player models, HUD color, and attacker/defender spawn alternation.",
+    "Each class has 3 skins per team (NEO_SKIN_FIRST/SECOND/THIRD), chosen via the 'SetVariant' command. Source: src/game/shared/neo/neo_enums.h:3-9, src/game/server/neo/neo_player.cpp:453-482,510.",
+    "VIP and Juggernaut use a single team-independent model: models/player/vip.mdl and models/player/jgr.mdl. Source: src/game/server/neo/neo_model_manager.cpp:375,379,543-551."
+  ],
+  "classes": [
+    {
+      "id": "recon",
+      "name": "Recon",
+      "enum_value": {
+        "value": 0,
+        "source": "src/game/shared/neo/neo_enums.h:15"
+      },
+      "selectable": true,
+      "stats": {
+        "max_health": {
+          "value": 100,
+          "source": "src/game/shared/neo/neo_player_shared.h:229-230"
+        },
+        "armor": {
+          "value": null,
+          "note": "No per-class armor or damage-reduction code found. Health is the only per-class durability stat."
+        },
+        "run_speed": {
+          "value": 200,
+          "derived": true,
+          "formula": "NEO_BASE_SPEED(200) x NEO_RECON_MODIFIER(1)",
+          "source": "src/game/shared/neo/neo_player_shared.h:30,33,50"
+        },
+        "sprint_speed": {
+          "value": 270,
+          "derived": true,
+          "formula": "200 x NEO_RECON_SPRINT_MODIFIER(1.35)",
+          "source": "src/game/shared/neo/neo_player_shared.h:38,51; src/game/server/neo/neo_player.cpp:866-867"
+        },
+        "crouch_speed": {
+          "value": 150,
+          "derived": true,
+          "formula": "200 x NEO_CROUCH_WALK_MODIFIER(0.75)",
+          "source": "src/game/shared/neo/neo_player_shared.h:45,52"
+        },
+        "walk_speed": {
+          "value": 150,
+          "derived": true,
+          "formula": "same as crouch speed",
+          "source": "src/game/shared/neo/neo_player_shared.h:53"
+        },
+        "crouch_walk_speed": {
+          "value": 112.5,
+          "derived": true,
+          "formula": "200 x 0.75 (crouch) x 0.75 (walk); the two modifiers stack",
+          "source": "src/game/server/neo/neo_player.cpp:853-861"
+        },
+        "aim_speed": {
+          "value": 120,
+          "derived": true,
+          "formula": "200 x NEO_AIM_MODIFIER(0.6)",
+          "source": "src/game/shared/neo/neo_player_shared.h:43; src/game/server/neo/neo_player.cpp:882-885"
+        },
+        "can_sprint": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:3750-3758"
+        },
+        "jump_height": {
+          "value": 54,
+          "unit": "units",
+          "note": "Jump velocity sqrt(2*800*54) = 293.94 u/s (1.5x the default 36-unit jump).",
+          "source": "src/game/shared/gamemovement.cpp:2632-2633,2647-2648"
+        },
+        "post_jump_slowdown": {
+          "value": false,
+          "source": "src/game/server/neo/neo_player.cpp:889-898"
+        },
+        "aux_regen_per_sec": {
+          "value": 5.0,
+          "note": "2.5/s while sprinting",
+          "source": "src/game/server/hl2/hl2_player.cpp:424-429"
+        },
+        "aux_sprint_drain_per_sec": {
+          "value": 0,
+          "note": "Sprinting does not drain Recon AUX: the sprint device drain is cancelled for Recon while moving.",
+          "source": "src/game/server/hl2/hl2_player.cpp:2056-2062"
+        },
+        "cloak_capacity": {
+          "value": 13.0,
+          "unit": "seconds of cloak (drains 1.0/s)",
+          "source": "src/game/server/neo/neo_player.cpp:3836-3837"
+        },
+        "cloak_regen_per_sec": {
+          "value": 0.55,
+          "source": "src/game/server/neo/neo_player.cpp:3787-3788"
+        },
+        "standing_hull_height": {
+          "value": 64,
+          "derived": true,
+          "formula": "base 70 + NEO_RECON_MAXHULL_OFFSET.z(-6)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:391; src/game/shared/shareddefs.h:89"
+        },
+        "crouch_hull_height": {
+          "value": 46,
+          "derived": true,
+          "formula": "base 59 + NEO_RECON_DUCK_MAXHULL_OFFSET.z(-13)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:394; src/game/shared/shareddefs.h:90"
+        },
+        "eye_height": {
+          "value": 57,
+          "derived": true,
+          "formula": "base view 60 + NEO_RECON_VIEW_OFFSET.z(-3)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:388; src/game/shared/shareddefs.h:88,108"
+        }
+      },
+      "default_items": {
+        "value": [
+          "weapon_knife",
+          "weapon_milso",
+          "weapon_remotedet (only if XP >= sv_neo_detpack_xp_limit, default 4)"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3408-3417,3452-3457; src/game/shared/neo/weapons/weapon_detpack.cpp:71-72"
+      },
+      "abilities": [
+        {
+          "id": "thermoptic_camo",
+          "name": "Thermoptic camouflage",
+          "summary": "13 power units of cloak, drains 1/s, recharges 0.55/s when uncloaked. See top-level 'cloak'.",
+          "source": "src/game/server/neo/neo_player.cpp:3780-3844"
+        },
+        {
+          "id": "super_jump",
+          "name": "Super jump",
+          "summary": "Hold sprint and press jump to add a horizontal boost equal to your current max speed, on top of a normal jump. Costs 45 AUX. See top-level 'super_jump'.",
+          "source": "src/game/server/neo/neo_player.cpp:1144-1155,1565-1624; src/game/shared/neo/neo_player_shared.cpp:942-974"
+        },
+        {
+          "id": "free_sprint",
+          "name": "Sprint without AUX drain",
+          "summary": "Recon sprint does not drain AUX, and AUX keeps recharging at 2.5/s while sprinting. Stopping a sprint also skips the 0.5 AUX penalty that other classes pay.",
+          "source": "src/game/server/hl2/hl2_player.cpp:424-429,2056-2062,2215-2220,2282-2285"
+        },
+        {
+          "id": "no_jump_slowdown",
+          "name": "No post-jump slowdown",
+          "summary": "Recon is the only class that does not get the speed penalty after landing a jump.",
+          "source": "src/game/server/neo/neo_player.cpp:890"
+        }
+      ],
+      "vision": {
+        "value": "night_vision",
+        "material": "dev/neo_nightvision",
+        "source": "src/game/client/viewpostprocess.cpp:2352-2355"
+      },
+      "notes": [
+        "Bots assume a 72-unit maximum crouch-jump height for Recon. This is a navigation heuristic (jump height + stand/crouch hull difference), not a measured value. Source: src/game/shared/neo/neo_player_shared.h:117-167."
+      ]
+    },
+    {
+      "id": "assault",
+      "name": "Assault",
+      "enum_value": {
+        "value": 1,
+        "source": "src/game/shared/neo/neo_enums.h:16"
+      },
+      "selectable": true,
+      "stats": {
+        "max_health": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:229,231"
+        },
+        "armor": {
+          "value": null,
+          "note": "No per-class armor or damage-reduction code found."
+        },
+        "run_speed": {
+          "value": 160,
+          "derived": true,
+          "formula": "200 x NEO_ASSAULT_MODIFIER(0.8)",
+          "source": "src/game/shared/neo/neo_player_shared.h:34,55"
+        },
+        "sprint_speed": {
+          "value": 256,
+          "derived": true,
+          "formula": "160 x NEO_ASSAULT_SPRINT_MODIFIER(1.6)",
+          "source": "src/game/shared/neo/neo_player_shared.h:39,56; src/game/server/neo/neo_player.cpp:869-872"
+        },
+        "crouch_speed": {
+          "value": 120,
+          "derived": true,
+          "formula": "160 x 0.75",
+          "source": "src/game/shared/neo/neo_player_shared.h:57"
+        },
+        "walk_speed": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:58"
+        },
+        "crouch_walk_speed": {
+          "value": 90,
+          "derived": true,
+          "formula": "160 x 0.75 x 0.75",
+          "source": "src/game/server/neo/neo_player.cpp:853-861"
+        },
+        "aim_speed": {
+          "value": 96,
+          "derived": true,
+          "formula": "160 x 0.6",
+          "source": "src/game/server/neo/neo_player.cpp:882-885"
+        },
+        "can_sprint": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:3750-3758"
+        },
+        "jump_height": {
+          "value": 36,
+          "unit": "units",
+          "note": "Jump velocity 240 u/s.",
+          "source": "src/game/shared/gamemovement.cpp:2638-2639; src/game/shared/gamemovement.h:25"
+        },
+        "post_jump_slowdown": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:889-898"
+        },
+        "aux_regen_per_sec": {
+          "value": 2.5,
+          "note": "0 while sprinting",
+          "source": "src/game/server/hl2/hl2_player.cpp:430-435"
+        },
+        "aux_sprint_drain_per_sec": {
+          "value": 5.0,
+          "note": "Only drains while horizontally moving. Each time sprint stops, an extra 0.5 AUX is taken.",
+          "source": "src/game/server/hl2/hl2_player.cpp:448,2040,2051-2055,2227"
+        },
+        "cloak_capacity": {
+          "value": 8.0,
+          "unit": "seconds of cloak (drains 1.0/s)",
+          "source": "src/game/server/neo/neo_player.cpp:3838-3839"
+        },
+        "cloak_regen_per_sec": {
+          "value": 0.25,
+          "source": "src/game/server/neo/neo_player.cpp:3790-3791"
+        },
+        "standing_hull_height": {
+          "value": 65,
+          "derived": true,
+          "formula": "70 + (-5)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:391; src/game/shared/shareddefs.h:94"
+        },
+        "crouch_hull_height": {
+          "value": 48,
+          "derived": true,
+          "formula": "59 + (-11)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:394; src/game/shared/shareddefs.h:95"
+        },
+        "eye_height": {
+          "value": 57.5,
+          "derived": true,
+          "formula": "60 + (-2.5)",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:388; src/game/shared/shareddefs.h:93,108"
+        }
+      },
+      "default_items": {
+        "value": [
+          "weapon_knife",
+          "weapon_tachi",
+          "weapon_grenade"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3458-3463"
+      },
+      "abilities": [
+        {
+          "id": "thermoptic_camo",
+          "name": "Thermoptic camouflage",
+          "summary": "8 power units of cloak, drains 1/s, recharges 0.25/s when uncloaked.",
+          "source": "src/game/server/neo/neo_player.cpp:3780-3844"
+        }
+      ],
+      "vision": {
+        "value": "motion_vision",
+        "material": "dev/neo_motionvision",
+        "source": "src/game/client/viewpostprocess.cpp:2356-2358"
+      },
+      "notes": [
+        "Assault is the default class for a freshly constructed player when the game mode forces no class. Source: src/game/server/neo/neo_player.cpp:573.",
+        "Assault sprint gives the largest sprint multiplier (1.6x), but Recon's higher base speed makes Recon sprint faster in absolute terms (270 vs 256 u/s)."
+      ]
+    },
+    {
+      "id": "support",
+      "name": "Support",
+      "enum_value": {
+        "value": 2,
+        "source": "src/game/shared/neo/neo_enums.h:17"
+      },
+      "selectable": true,
+      "stats": {
+        "max_health": {
+          "value": 225,
+          "source": "src/game/shared/neo/neo_player_shared.h:229,232"
+        },
+        "armor": {
+          "value": null,
+          "note": "No armor or damage-reduction code found. The high HP is the only durability bonus. A knife backstab deals exactly 226 damage, MAX_HEALTH_FOR_CLASS[SUPPORT]+1, so it one-shots any class (src/game/shared/neo/weapons/weapon_knife.cpp:309-320)."
+        },
+        "run_speed": {
+          "value": 160,
+          "derived": true,
+          "formula": "200 x NEO_SUPPORT_MODIFIER(0.8)",
+          "source": "src/game/shared/neo/neo_player_shared.h:35,60"
+        },
+        "sprint_speed": {
+          "value": null,
+          "note": "Support cannot sprint. NEO_SUPPORT_SPRINT_SPEED (216 = 160 x 1.35) exists but is commented 'Redundant, but for future usecases'.",
+          "source": "src/game/server/neo/neo_player.cpp:3750-3755; src/game/client/neo/c_neo_player.cpp:1580-1585; src/game/shared/neo/neo_player_shared.h:40,61"
+        },
+        "crouch_speed": {
+          "value": 120,
+          "derived": true,
+          "formula": "160 x 0.75",
+          "source": "src/game/shared/neo/neo_player_shared.h:62"
+        },
+        "walk_speed": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:63"
+        },
+        "crouch_walk_speed": {
+          "value": 90,
+          "derived": true,
+          "formula": "160 x 0.75 x 0.75",
+          "source": "src/game/server/neo/neo_player.cpp:853-861"
+        },
+        "aim_speed": {
+          "value": 96,
+          "derived": true,
+          "formula": "160 x 0.6",
+          "source": "src/game/server/neo/neo_player.cpp:882-885"
+        },
+        "can_sprint": {
+          "value": false,
+          "source": "src/game/server/neo/neo_player.cpp:3752-3755"
+        },
+        "jump_height": {
+          "value": 36,
+          "unit": "units",
+          "source": "src/game/shared/gamemovement.cpp:2638-2639"
+        },
+        "post_jump_slowdown": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:889-898"
+        },
+        "aux_regen_per_sec": {
+          "value": 0,
+          "note": "Falls to the default case (0). Support has no AUX consumers.",
+          "source": "src/game/server/hl2/hl2_player.cpp:440-443"
+        },
+        "cloak_capacity": {
+          "value": 0,
+          "note": "Support cannot cloak.",
+          "source": "src/game/server/neo/neo_player.cpp:1263-1266,3840-3843"
+        },
+        "standing_hull_height": {
+          "value": 70,
+          "derived": true,
+          "formula": "70 + 0",
+          "source": "src/game/shared/neo/neo_gamerules.cpp:385-391; src/game/shared/shareddefs.h:99"
+        },
+        "crouch_hull_height": {
+          "value": 59,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:394; src/game/shared/shareddefs.h:100"
+        },
+        "eye_height": {
+          "value": 60,
+          "source": "src/game/shared/neo/neo_gamerules.cpp:388; src/game/shared/shareddefs.h:98"
+        }
+      },
+      "default_items": {
+        "value": [
+          "weapon_knife",
+          "weapon_kyla",
+          "weapon_smokegrenade"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:3464-3469"
+      },
+      "abilities": [
+        {
+          "id": "thermal_see_through_smoke",
+          "name": "Thermal vision sees through smoke",
+          "summary": "While thermal vision is on, the smoke fog screen overlay is suppressed. Support bots get line of sight through smoke.",
+          "source": "src/game/client/smoke_fog_overlay.cpp:145-156; src/game/server/NextBot/NextBotVisionInterface.cpp:754-760"
+        }
+      ],
+      "vision": {
+        "value": "thermal_vision",
+        "material": "dev/neo_thermalvision",
+        "source": "src/game/client/viewpostprocess.cpp:2359-2361"
+      },
+      "notes": [
+        "The code does not give Support any resistance or armor beyond its 225 HP."
+      ]
+    },
+    {
+      "id": "vip",
+      "name": "VIP",
+      "enum_value": {
+        "value": 3,
+        "source": "src/game/shared/neo/neo_enums.h:21"
+      },
+      "selectable": false,
+      "selectable_note": "Assigned by the VIP game mode, not from the class menu (the setclass command clamps to Recon..Support).",
+      "selectable_source": "src/game/server/neo/neo_player.cpp:437; src/game/shared/neo/neo_gamerules.cpp:2274-2277",
+      "stats": {
+        "max_health": {
+          "value": 100,
+          "source": "src/game/shared/neo/neo_player_shared.h:229,233"
+        },
+        "armor": {
+          "value": null,
+          "note": "None found."
+        },
+        "run_speed": {
+          "value": 160,
+          "derived": true,
+          "formula": "= NEO_ASSAULT_BASE_SPEED",
+          "source": "src/game/shared/neo/neo_player_shared.h:65"
+        },
+        "sprint_speed": {
+          "value": 256,
+          "derived": true,
+          "formula": "= NEO_ASSAULT_SPRINT_SPEED",
+          "source": "src/game/shared/neo/neo_player_shared.h:66; src/game/server/neo/neo_player.cpp:870-872"
+        },
+        "crouch_speed": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:67"
+        },
+        "walk_speed": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:68"
+        },
+        "aim_speed": {
+          "value": 96,
+          "derived": true,
+          "formula": "160 x 0.6",
+          "source": "src/game/server/neo/neo_player.cpp:882-885"
+        },
+        "can_sprint": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:3750-3758"
+        },
+        "jump_height": {
+          "value": 36,
+          "unit": "units",
+          "source": "src/game/shared/gamemovement.cpp:2638-2639"
+        },
+        "post_jump_slowdown": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:889-898"
+        },
+        "aux_regen_per_sec": {
+          "value": 2.5,
+          "source": "src/game/server/hl2/hl2_player.cpp:436-437"
+        },
+        "aux_sprint_drain_per_sec": {
+          "value": 5.0,
+          "source": "src/game/server/hl2/hl2_player.cpp:448,2040"
+        },
+        "cloak_capacity": {
+          "value": 0,
+          "source": "src/game/server/neo/neo_player.cpp:1263-1266,3840-3843"
+        },
+        "air_friction": {
+          "value": 0.5,
+          "note": "Objective players (ghost carrier, VIP, Juggernaut) use sv_neo_airfriction_objective instead of sv_neo_airfriction (0).",
+          "source": "src/game/shared/gamemovement.cpp:1725,1756; src/game/server/neo/neo_player.cpp:2944-2947"
+        },
+        "standing_hull_height": {
+          "value": 65,
+          "note": "Uses the Assault offsets (the macro's else-branch).",
+          "source": "src/game/shared/shareddefs.h:94,111"
+        }
+      },
+      "default_items": {
+        "value": [
+          "weapon_milso"
+        ],
+        "note": "Loadout primary slot 0 is the SMAC.",
+        "source": "src/game/server/neo/neo_player.cpp:3470-3473; src/game/shared/neo/neo_weapon_loadout.cpp:55-61"
+      },
+      "abilities": [],
+      "vision": {
+        "value": null,
+        "note": "VIP cannot toggle vision modes.",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:792-795"
+      },
+      "notes": [
+        "Player model: models/player/vip.mdl. Source: src/game/server/neo/neo_model_manager.cpp:375,543-546.",
+        "VIP can capture at a ghost cap point (counts like a ghost carrier). Source: src/game/shared/neo/neo_ghost_cap_point.cpp:240."
+      ]
+    },
+    {
+      "id": "juggernaut",
+      "name": "Juggernaut",
+      "enum_value": {
+        "value": 4,
+        "source": "src/game/shared/neo/neo_enums.h:22"
+      },
+      "selectable": false,
+      "selectable_note": "You cannot spawn as Juggernaut. A player becomes the Juggernaut by holding +use on a neo_juggernaut entity for 5 s within 150 units (22500 squared). On death the player's next spawn class reverts.",
+      "selectable_source": "src/game/shared/neo/neo_enums.h:25; src/game/shared/neo/neo_juggernaut.cpp:14-15,150-222; src/game/server/neo/neo_player.cpp:4061-4098",
+      "stats": {
+        "max_health": {
+          "value": 990,
+          "source": "src/game/shared/neo/neo_player_shared.h:229,234"
+        },
+        "armor": {
+          "value": null,
+          "note": "None found. Juggernaut does not bleed (DONT_BLEED) and cannot be gibbed.",
+          "source": "src/game/server/neo/neo_player.cpp:4094-4096"
+        },
+        "run_speed": {
+          "value": 160,
+          "derived": true,
+          "formula": "= NEO_ASSAULT_BASE_SPEED",
+          "source": "src/game/shared/neo/neo_player_shared.h:70"
+        },
+        "sprint_speed": {
+          "value": 256,
+          "derived": true,
+          "formula": "CalculateSpeed applies NEO_ASSAULT_SPRINT_MODIFIER(1.6) to 160",
+          "source": "src/game/server/neo/neo_player.cpp:869-872; src/game/client/neo/c_neo_player.cpp:858-861",
+          "note": "AMBIGUOUS. NEO_JUGGERNAUT_SPRINT_SPEED is defined as NEO_RECON_SPRINT_SPEED (270) and returned by GetSprintSpeed() (src/game/shared/neo/neo_player_shared.h:71; src/game/server/neo/neo_player.cpp:3929-3930), but the per-tick CalculateSpeed(), which sets max speed each PreThink, uses 160 x 1.6 = 256. 270 is only used by bot locomotion and by weapon Deploy's one-off SetMaxSpeed. 256 is likely the in-game value, but this is not verified in play."
+        },
+        "crouch_speed": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:72"
+        },
+        "walk_speed": {
+          "value": 120,
+          "source": "src/game/shared/neo/neo_player_shared.h:73"
+        },
+        "can_sprint": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:3750-3758"
+        },
+        "jump_height": {
+          "value": 50.4,
+          "unit": "units",
+          "note": "1.4x the default; jump velocity 283.97 u/s.",
+          "source": "src/game/shared/gamemovement.cpp:2635-2636,2650-2651"
+        },
+        "post_jump_slowdown": {
+          "value": true,
+          "source": "src/game/server/neo/neo_player.cpp:889-898"
+        },
+        "aux_regen_per_sec": {
+          "value": 10.0,
+          "source": "src/game/server/hl2/hl2_player.cpp:438-439"
+        },
+        "aux_sprint_drain_per_sec": {
+          "value": 5.0,
+          "source": "src/game/server/hl2/hl2_player.cpp:448,2040"
+        },
+        "cloak_capacity": {
+          "value": 0,
+          "source": "src/game/server/neo/neo_player.cpp:3832-3844"
+        },
+        "air_friction": {
+          "value": 0.5,
+          "source": "src/game/shared/gamemovement.cpp:1725,1756"
+        },
+        "standing_hull_height": {
+          "value": 88,
+          "derived": true,
+          "formula": "70 + 18",
+          "source": "src/game/shared/shareddefs.h:104; src/game/shared/neo/neo_gamerules.cpp:391"
+        },
+        "crouch_hull_height": {
+          "value": 75,
+          "derived": true,
+          "formula": "59 + 16",
+          "source": "src/game/shared/shareddefs.h:105"
+        },
+        "eye_height": {
+          "value": 75,
+          "derived": true,
+          "formula": "60 + 15",
+          "source": "src/game/shared/shareddefs.h:103,108"
+        },
+        "lean_camera_roll_deg": {
+          "value": 15,
+          "note": "third-person lean 20 deg (others use convars, 20/35)",
+          "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:444,457"
+        }
+      },
+      "default_items": {
+        "value": [
+          "weapon_balc"
+        ],
+        "note": "The BALC can only be picked up by Juggernaut; grenade, ghost, MPN and others exclude Juggernaut.",
+        "source": "src/game/server/neo/neo_player.cpp:3474-3477; src/game/shared/neo/weapons/weapon_balc.cpp:111-114; src/game/shared/neo/weapons/weapon_grenade.cpp:284-287"
+      },
+      "abilities": [
+        {
+          "id": "full_aux_on_activation",
+          "name": "Full AUX on activation",
+          "summary": "AUX is set to 100 and health to 990 when the player becomes Juggernaut.",
+          "source": "src/game/server/neo/neo_player.cpp:4091-4093"
+        }
+      ],
+      "vision": {
+        "value": "night_vision",
+        "material": "dev/neo_nightvision",
+        "source": "src/game/client/viewpostprocess.cpp:2352-2355"
+      },
+      "notes": [
+        "On death, a neo_juggernaut entity respawns at the corpse position with a non-damaging explosion effect. Source: src/game/server/neo/neo_player.cpp:4100-4127; src/game/shared/neo/neo_juggernaut.cpp:111-118.",
+        "Juggernaut position is always networked to all clients (shown on the compass). Source: src/game/server/neo/neo_player.cpp:3946-3950.",
+        "Activating player is frozen (FL_FROZEN) while holding use; releasing +use or moving more than 150 units away cancels. Source: src/game/shared/neo/neo_juggernaut.cpp:174,183-196.",
+        "Player model: models/player/jgr.mdl. Uses distinct JGR56 footstep sounds. Source: src/game/server/neo/neo_model_manager.cpp:379; src/game/server/neo/neo_player.cpp:4129-4158."
+      ]
+    }
+  ],
+  "movement": {
+    "base_speed": {
+      "value": 200,
+      "source": "src/game/shared/neo/neo_player_shared.h:30"
+    },
+    "speed_formula": {
+      "value": "speed = classNormSpeed x activeWeaponSpeedScale; x0.75 if crouched; x0.75 if walk held (stacks); x classSprintMod if sprinting (Recon 1.35; Assault/VIP/Juggernaut 1.6; Support 1.35 but cannot sprint); x0.6 if aiming; then max(speed, 55); then for non-Recon within 1.15 s of a jump: speed = max(75, speed x (1 - (1.15 - t) x 1.75)).",
+      "source": "src/game/server/neo/neo_player.cpp:844-900",
+      "client_source": "src/game/client/neo/c_neo_player.cpp:833-889",
+      "note": "Server and client CalculateSpeed are identical."
+    },
+    "crouch_walk_modifier": {
+      "value": 0.75,
+      "source": "src/game/shared/neo/neo_player_shared.h:45"
+    },
+    "aim_modifier": {
+      "value": 0.6,
+      "source": "src/game/shared/neo/neo_player_shared.h:43"
+    },
+    "minimum_speed_floor": {
+      "value": 55,
+      "source": "src/game/server/neo/neo_player.cpp:887"
+    },
+    "post_jump_slowdown": {
+      "duration_sec": {
+        "value": 1.15,
+        "source": "src/game/server/neo/neo_player.cpp:893"
+      },
+      "factor": {
+        "value": 1.75,
+        "source": "src/game/server/neo/neo_player.cpp:896"
+      },
+      "floor": {
+        "value": 75,
+        "source": "src/game/server/neo/neo_player.cpp:896"
+      },
+      "applies_to": {
+        "value": [
+          "assault",
+          "support",
+          "vip",
+          "juggernaut"
+        ],
+        "source": "src/game/server/neo/neo_player.cpp:890"
+      }
+    },
+    "backpedal_modifier": {
+      "value": 0.75,
+      "note": "Backward (negative forward) input is scaled by 0.75 on the ground.",
+      "source": "src/game/shared/gamemovement.cpp:2013-2016"
+    },
+    "weapon_speed_scale": {
+      "note": "Multiplies the class speed while the weapon is the active weapon.",
+      "values": [
+        {
+          "weapon": "BALC",
+          "value": 1.0,
+          "source": "src/game/shared/neo/weapons/weapon_balc.h:48"
+        },
+        {
+          "weapon": "Knife",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_knife.h:57"
+        },
+        {
+          "weapon": "Milso",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_milso.h:40"
+        },
+        {
+          "weapon": "Tachi",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_tachi.h:54"
+        },
+        {
+          "weapon": "Kyla",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_kyla.h:30"
+        },
+        {
+          "weapon": "Grenade",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_grenade.h:46"
+        },
+        {
+          "weapon": "Smoke grenade",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_smokegrenade.h:45"
+        },
+        {
+          "weapon": "Detpack",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_detpack.h:54"
+        },
+        {
+          "weapon": "Ghost",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_ghost.h:74"
+        },
+        {
+          "weapon": "MPN45 Unsilenced (entity weapon_mpn_unsilenced)",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_mpn.h:40; src/game/shared/neo/weapons/weapon_mpn.cpp:21"
+        },
+        {
+          "weapon": "MPN45 (silenced; entity weapon_mpn, the loadout MPN45)",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_mpns.h:40; src/game/shared/neo/weapons/weapon_mpns.cpp:21"
+        },
+        {
+          "weapon": "SRM",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_srm.h:40"
+        },
+        {
+          "weapon": "SRM (silenced)",
+          "value": 0.85,
+          "source": "src/game/shared/neo/weapons/weapon_srms.h:40"
+        },
+        {
+          "weapon": "Jitte",
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_jitte.h:40"
+        },
+        {
+          "weapon": "Jitte (with scope)",
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_jittes.h:40"
+        },
+        {
+          "weapon": "SMAC",
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_smac.h:40"
+        },
+        {
+          "weapon": "ZR68C",
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_zr68c.h:40"
+        },
+        {
+          "weapon": "PBK56 (build-flag gated)",
+          "value": 0.8,
+          "source": "src/game/shared/neo/weapons/weapon_pbk56s.h:39"
+        },
+        {
+          "weapon": "ZR68-S (silenced)",
+          "value": 0.775,
+          "source": "src/game/shared/neo/weapons/weapon_zr68s.h:40"
+        },
+        {
+          "weapon": "ZR68-L (accurized)",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_zr68l.h:40"
+        },
+        {
+          "weapon": "MX",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_mx.h:40"
+        },
+        {
+          "weapon": "MX Silenced",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_mxs.h:40"
+        },
+        {
+          "weapon": "Mosok (weapon_m41)",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_m41.h:40"
+        },
+        {
+          "weapon": "Mosok scoped (entity weapon_m41l)",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_m41l.h:37,40"
+        },
+        {
+          "weapon": "Mosok silenced (entity weapon_m41s)",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_m41s.h:37,40"
+        },
+        {
+          "weapon": "AA13",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_aa13.h:32"
+        },
+        {
+          "weapon": "SRS",
+          "value": 0.725,
+          "source": "src/game/shared/neo/weapons/weapon_srs.h:45"
+        },
+        {
+          "weapon": "Murata Supa-7",
+          "value": 0.7,
+          "source": "src/game/shared/neo/weapons/weapon_supa7.h:41"
+        },
+        {
+          "weapon": "PZ252",
+          "value": 0.675,
+          "source": "src/game/shared/neo/weapons/weapon_pz.h:40"
+        }
+      ]
+    },
+    "ghost_carrier": {
+      "can_sprint": {
+        "value": false,
+        "source": "src/game/server/neo/neo_player.cpp:3729-3734; src/game/client/neo/c_neo_player.cpp:1561-1566,1580-1585"
+      },
+      "can_super_jump": {
+        "value": false,
+        "source": "src/game/shared/neo/neo_player_shared.cpp:951-952"
+      },
+      "speed_scale_when_ghost_active": {
+        "value": 0.85,
+        "source": "src/game/shared/neo/weapons/weapon_ghost.h:74"
+      },
+      "air_friction": {
+        "value": 0.5,
+        "source": "src/game/shared/gamemovement.cpp:1725,1756"
+      },
+      "always_networked": {
+        "value": true,
+        "note": "The ghost carrier's position is sent to all clients for the beacon.",
+        "source": "src/game/server/neo/neo_player.cpp:3941-3944"
+      }
+    },
+    "jump": {
+      "default_jump_height": {
+        "value": 36,
+        "unit": "units",
+        "source": "src/game/shared/gamemovement.h:24-25"
+      },
+      "class_multipliers": {
+        "value": {
+          "recon": 1.5,
+          "juggernaut": 1.4,
+          "others": 1.0
+        },
+        "source": "src/game/shared/gamemovement.cpp:2645-2656"
+      },
+      "precomputed_jump_velocity": {
+        "value": {
+          "recon": 293.9387691339814,
+          "juggernaut": 283.9718295887816,
+          "others": 240.0
+        },
+        "note": "Used because g_bMovementOptimizations = true (gamemovement.cpp:74); assumes sv_gravity 800.",
+        "source": "src/game/shared/gamemovement.cpp:2628-2642"
+      },
+      "gravity_default": {
+        "value": 800,
+        "source": "src/game/shared/movevars_shared.cpp:19-23,37"
+      },
+      "crouch_jump": {
+        "value": "If crouched or mid-duck, the jump sets vertical velocity to the jump value instead of adding to it. Standard Source behavior; no NEO-specific crouch-jump bonus found.",
+        "source": "src/game/shared/gamemovement.cpp:2663-2678"
+      },
+      "jump_buffer_convar": {
+        "value": "sv_neo_jumpbuffer (default 0, cheat) enables Quake-style jump buffering",
+        "source": "src/game/shared/gamemovement.cpp:1727,2562-2569"
+      },
+      "bot_crouch_jump_heights": {
+        "value": {
+          "recon": 72.0,
+          "assault_vip": 53.0,
+          "support": 47.0,
+          "juggernaut": 63.4
+        },
+        "note": "Theoretical values used by bot navigation only (jump height + stand/crouch hull difference).",
+        "source": "src/game/shared/neo/neo_player_shared.h:117-167"
+      }
+    },
+    "fall_damage": {
+      "enabled_convar": {
+        "value": "mp_falldamage",
+        "default": "1",
+        "source": "src/game/server/game.cpp:35-36"
+      },
+      "max_safe_fall_speed": {
+        "value": 580,
+        "unit": "u/s",
+        "source": "src/game/shared/shareddefs.h:466"
+      },
+      "fatal_fall_speed_constant": {
+        "value": 1024,
+        "unit": "u/s",
+        "source": "src/game/shared/shareddefs.h:465"
+      },
+      "formula": {
+        "value": "damage = (fallSpeed - 580) x (100 / (1024 - 580)) x sv_neo_falldmg_scale(0.25), about 0.0563 HP per u/s above 580",
+        "source": "src/game/shared/neo/neo_gamerules.cpp:4274-4287; src/game/shared/shareddefs.h:472"
+      },
+      "notes": [
+        "Because of the 0.25 scale, landing at the nominal 'fatal' speed of 1024 u/s deals only about 25 damage. The damage is linear and uncapped above that.",
+        "The screen punch on hard landings is scaled to 0.1x of HL2DM. Source: src/game/shared/gamemovement.cpp:4241-4250."
+      ]
+    },
+    "leaning": {
+      "allowed_when": {
+        "value": "alive, not frozen, on ground, not sprinting; pressing both lean keys cancels",
+        "source": "src/game/server/neo/neo_player.cpp:826-842; src/game/shared/neo/neo_predicted_viewmodel.cpp:319,408-419"
+      },
+      "peek_left_units": {
+        "value": 7.5,
+        "convar": "neo_lean_peek_left_amount",
+        "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:147"
+      },
+      "peek_right_units": {
+        "value": 15.0,
+        "convar": "neo_lean_peek_right_amount",
+        "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:148"
+      },
+      "camera_roll_deg": {
+        "value": 20,
+        "convar": "neo_lean_fp_angle",
+        "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:149"
+      },
+      "thirdperson_roll_deg": {
+        "value": 35,
+        "convar": "neo_lean_tp_angle",
+        "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:150"
+      },
+      "time_to_full_lean_sec": {
+        "value": 0.2,
+        "convar": "neo_lean_speed",
+        "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:146"
+      },
+      "eye_lowering_units": {
+        "value": 2,
+        "convar": "neo_lean_fp_lower_eyes",
+        "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:151"
+      },
+      "notes": [
+        "Lean distance is reduced if there is not enough free room (freeRoomForLean). Source: src/game/shared/neo/neo_predicted_viewmodel.cpp:411-414.",
+        "Left and right peek distances are asymmetric (7.5 vs 15). The convar comments say this matches original NT."
+      ]
+    },
+    "aiming": {
+      "blocked_while_sprinting": {
+        "value": true,
+        "source": "src/game/shared/neo/neo_player_shared.cpp:476-479"
+      },
+      "zoom_transition_time_sec": {
+        "value": 0.115,
+        "source": "src/game/shared/neo/neo_player_shared.h:241; src/game/server/neo/neo_player.cpp:1839"
+      },
+      "fallback_aim_fov_offset": {
+        "value": 30,
+        "note": "Used only if the weapon is not a NEO weapon; otherwise the weapon script's iAimFOV is used.",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:250-255"
+      }
+    },
+    "footsteps": {
+      "min_speed_for_steps": {
+        "value": 50,
+        "unit": "u/s",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:384"
+      },
+      "silent_rule": {
+        "value": "While walking or aiming, footsteps are silent if speed <= 70% of the class run speed (or of crouch speed when ducked).",
+        "source": "src/game/shared/neo/neo_player_shared.cpp:391-404"
+      },
+      "freezetime_silent": {
+        "value": true,
+        "source": "src/game/shared/neo/neo_player_shared.cpp:360-361"
+      }
+    },
+    "air_friction": {
+      "sv_neo_airfriction": {
+        "value": 0,
+        "source": "src/game/shared/gamemovement.cpp:1724"
+      },
+      "sv_neo_airfriction_objective": {
+        "value": 0.5,
+        "source": "src/game/shared/gamemovement.cpp:1725"
+      },
+      "mechanic": {
+        "value": "In the air, only speed above the class run speed (with weapon scale) bleeds off: drop = overspeed x friction x frametime.",
+        "source": "src/game/shared/gamemovement.cpp:1732-1770"
+      }
+    },
+    "prone": {
+      "value": null,
+      "note": "No prone stance exists in the movement or player code."
+    }
+  },
+  "aux_power": {
+    "description": "AUX is HL2 'suit power' (m_flSuitPower). In NEO it covers sprinting and the Recon super jump only. Cloak uses a separate pool (m_cloakPower).",
+    "description_source": "src/game/client/hl2/c_hl2_playerlocaldata.h:34",
+    "max": {
+      "value": 100,
+      "source": "src/game/server/hl2/hl2_player.cpp:2136,2173-2176"
+    },
+    "sprint_drain_per_sec": {
+      "value": 5.0,
+      "note": "100 units in 20 s. No drain while horizontal velocity is 0. Recon is exempt while moving.",
+      "source": "src/game/server/hl2/hl2_player.cpp:447-448,2040-2062"
+    },
+    "sprint_start_minimum": {
+      "value": 2.0,
+      "source": "src/game/shared/neo/neo_player_shared.h:181; src/game/server/hl2/hl2_player.cpp:547"
+    },
+    "sprint_stop_penalty": {
+      "value": 0.5,
+      "derived": true,
+      "formula": "drain rate 5.0 x 0.1, taken when the sprint device is removed",
+      "note": "Skipped for Recon.",
+      "source": "src/game/server/hl2/hl2_player.cpp:2215-2228"
+    },
+    "regen_per_sec": {
+      "value": {
+        "recon": 5.0,
+        "recon_while_sprinting": 2.5,
+        "assault": 2.5,
+        "assault_while_sprinting": 0.0,
+        "vip": 2.5,
+        "juggernaut": 10.0,
+        "support": 0.0
+      },
+      "source": "src/game/server/hl2/hl2_player.cpp:416-444",
+      "client_source": "src/game/client/hl2mp/c_hl2mp_player.cpp:128-155"
+    },
+    "regen_delay_sec": {
+      "value": 0.5,
+      "note": "Recharge starts 0.5 s after all suit devices turn off.",
+      "source": "src/game/server/hl2/hl2_player.cpp:2259,2272-2277,2302-2305"
+    },
+    "super_jump_cost": {
+      "value": 45.0,
+      "source": "src/game/shared/neo/neo_player_shared.h:178"
+    },
+    "cheat_convar": {
+      "value": "sv_infinite_aux_power",
+      "default": "0",
+      "source": "src/game/server/hl2/hl2_player.cpp:112-113"
+    },
+    "notes": [
+      "For Recon, SuitPower_RemoveDevice returns before updating m_flTimeAllSuitDevicesOff (src/game/server/hl2/hl2_player.cpp:2237-2239). Ending a sprint therefore does not restart the 0.5 s recharge delay for Recon. This is inferred from the code and not verified in play.",
+      "Client/server difference: on the server, the NEO 'no drain while stationary / Recon exempt' block runs only when sv_stickysprint is 0 (default 0, src/game/server/hl2/hl2_player.cpp:120,2046). The client always runs it (src/game/client/hl2mp/c_hl2mp_player.cpp:663-681). With the default setting the behavior matches.",
+      "Juggernaut's AUX is set to 100 on activation (src/game/server/neo/neo_player.cpp:4093)."
+    ]
+  },
+  "cloak": {
+    "name": "Thermoptic camouflage (TOC)",
+    "classes": {
+      "value": [
+        "recon",
+        "assault"
+      ],
+      "source": "src/game/server/neo/neo_player.cpp:1263-1266,3832-3844"
+    },
+    "power_pool": {
+      "value": "Separate from AUX: m_HL2Local.m_cloakPower",
+      "source": "src/game/server/neo/neo_player.cpp:3775-3778"
+    },
+    "capacity": {
+      "value": {
+        "recon": 13.0,
+        "assault": 8.0,
+        "others": 0.0
+      },
+      "source": "src/game/server/neo/neo_player.cpp:3832-3844"
+    },
+    "drain_per_sec": {
+      "value": 1.0,
+      "note": "Applied in whole-second steps: drain = elapsed x 1.0 once at least 1 s has passed since the last tick.",
+      "source": "src/game/shared/neo/neo_player_shared.h:179; src/game/server/neo/neo_player.cpp:1102-1133"
+    },
+    "max_duration_sec": {
+      "value": {
+        "recon": 13,
+        "assault": 8
+      },
+      "derived": true,
+      "formula": "capacity / 1.0 per s",
+      "source": "src/game/server/neo/neo_player.cpp:3832-3844,1113-1119"
+    },
+    "regen_per_sec": {
+      "value": {
+        "recon": 0.55,
+        "assault": 0.25
+      },
+      "note": "Recharges only while not cloaked.",
+      "source": "src/game/server/neo/neo_player.cpp:1091-1094,3780-3798"
+    },
+    "full_recharge_time_sec": {
+      "value": {
+        "recon": 23.6,
+        "assault": 32.0
+      },
+      "derived": true,
+      "formula": "13/0.55 = 23.64; 8/0.25 = 32",
+      "source": "src/game/server/neo/neo_player.cpp:3780-3844"
+    },
+    "min_power_to_activate": {
+      "value": 0.1,
+      "source": "src/game/shared/neo/neo_player_shared.h:180; src/game/server/neo/neo_player.cpp:1268"
+    },
+    "auto_off_threshold": {
+      "value": 0.1,
+      "note": "Server turns cloak off when power <= 0.1 after a drain step.",
+      "source": "src/game/server/neo/neo_player.cpp:1121-1126"
+    },
+    "refill_on_spawn": {
+      "value": true,
+      "source": "src/game/server/neo/neo_player.cpp:721"
+    },
+    "what_breaks_it": {
+      "value": "Only running out of power, toggling it off, death, or respawn. No code was found that turns cloak off on firing, taking damage, or picking up the ghost.",
+      "source": "src/game/server/neo/neo_player.cpp:1121-1126,1257-1283,1638,725"
+    },
+    "activation_flash": {
+      "value": {
+        "duration_sec": 0.5,
+        "radius": 96,
+        "color_rgb": [
+          64,
+          64,
+          255
+        ]
+      },
+      "note": "A blue dynamic light (TE_TocFlash) sent to clients in PVS when cloak turns on.",
+      "source": "src/game/server/neo/neo_player.cpp:1240-1255,1270-1271"
+    },
+    "firing_flash": {
+      "value": {
+        "duration_sec": 0.1
+      },
+      "note": "Firing an unsuppressed weapon while cloaked triggers a short TOC flash. Suppressed weapons do not.",
+      "source": "src/game/shared/neo/weapons/weapon_neobasecombatweapon.cpp:1011-1019"
+    },
+    "sound": {
+      "value": "NeoPlayer.ThermOpticOn / NeoPlayer.ThermOpticOff, sent by PAS plus players within 50 units",
+      "source": "src/game/server/neo/neo_player.cpp:1173-1222"
+    },
+    "visibility_when_moving": {
+      "value": "A per-player 'TOC factor' (0..1, starts at 0.15) drives tint/refraction strength. Lower values are harder to spot. Each second, horizontal speed <= 20 u/s lowers it by 1.1; above that it rises by speed x 0.004 (for example +0.8/s at 200 u/s).",
+      "source": "src/game/client/neo/c_neo_player.cpp:464,1213-1224; src/game/client/neo/c_neo_player.h:266; src/game/client/neo/material_proxies/neo_matproxy_thermoptic.cpp:47-99"
+    },
+    "shadows": {
+      "value": "Cloaked players and their weapons cast no shadows.",
+      "source": "src/game/client/neo/c_neo_player.cpp:698-708; src/game/server/neo/neo_player.cpp:1224-1238"
+    },
+    "vs_thermal_vision": {
+      "value": "With Support thermal vision on, a cloaked player is drawn with the normal (non-cloak) material but WITHOUT the thermal 'hot' override that uncloaked players get.",
+      "source": "src/game/client/neo/c_neo_player.cpp:622-646,686-696"
+    },
+    "notes": [
+      "Client/server difference: the server forbids cloak for Support and VIP (src/game/server/neo/neo_player.cpp:1263). The client prediction only blocks Support (src/game/client/neo/c_neo_player.cpp:484). VIP and Juggernaut have 0 cloak capacity, so they cannot cloak either way.",
+      "The client does not predict the gradual drain. It only zeroes power and turns cloak off when power would run out (src/game/client/neo/c_neo_player.cpp:1077-1099).",
+      "Bot cloak perception is simulated server-side (detection-bonus convars below). Bots always detect ghost carriers through cloak. Source: src/game/server/neo/neo_player.cpp:1411-1563.",
+      "Cheat convar sv_neo_infinite_cloak disables cloak drain (src/game/server/neo/neo_player.cpp:227,3803-3806)."
+    ]
+  },
+  "super_jump": {
+    "class": {
+      "value": "recon",
+      "source": "src/game/server/neo/neo_player.cpp:1144"
+    },
+    "trigger": {
+      "value": "Press jump while holding sprint (IN_SPEED)",
+      "source": "src/game/server/neo/neo_player.cpp:1144-1146"
+    },
+    "requirements": {
+      "value": [
+        "currently sprinting (bots exempt)",
+        "not carrying the ghost",
+        "no move parent",
+        "on the ground",
+        "water level <= feet",
+        "holding at least one movement key",
+        "AUX >= 45"
+      ],
+      "source": "src/game/shared/neo/neo_player_shared.cpp:942-974"
+    },
+    "cost": {
+      "value": 45,
+      "source": "src/game/shared/neo/neo_player_shared.h:178; src/game/server/neo/neo_player.cpp:1148"
+    },
+    "boost": {
+      "value": "Horizontal impulse along the eye-forward vector (reversed if holding back), magnitude = current max speed (GetPlayerMaxSpeed), x0.7071 if a strafe key is also held. Added on top of the normal jump.",
+      "source": "src/game/server/neo/neo_player.cpp:1565-1584,1623"
+    },
+    "notes": [
+      "AUX is drained whenever IsAllowedToSuperJump passes, but the boost only applies if exactly one of forward/back is held (src/game/server/neo/neo_player.cpp:1148-1154). Jumping while sprinting with only strafe keys (or forward+back) costs 45 AUX and gives no boost. This is inferred from the code.",
+      "The eye-forward vector's z is zeroed without renormalizing (src/game/server/neo/neo_player.cpp:1568-1571), so looking up or down shrinks the horizontal boost by cos(pitch). This is inferred from the code.",
+      "The client predicts the same logic (src/game/client/neo/c_neo_player.cpp:1166-1177,1442-1464)."
+    ]
+  },
+  "vision_modes": [
+    {
+      "id": "night_vision",
+      "name": "Night vision",
+      "classes": {
+        "value": [
+          "recon",
+          "juggernaut"
+        ],
+        "source": "src/game/client/viewpostprocess.cpp:2352-2355"
+      },
+      "mechanics": {
+        "value": "Full-screen post-process using material dev/neo_nightvision. No entity-specific rendering changes found.",
+        "source": "src/game/client/viewpostprocess.cpp:2341-2381,2866-2870"
+      }
+    },
+    {
+      "id": "motion_vision",
+      "name": "Motion vision",
+      "classes": {
+        "value": [
+          "assault"
+        ],
+        "source": "src/game/client/viewpostprocess.cpp:2356-2358"
+      },
+      "mechanics": {
+        "value": "Full-screen post-process dev/neo_motionvision. Any model (excluding viewmodels) whose root velocity squared is > 0.25 (speed > 0.5 u/s) gets an extra pass with material dev/motion_model, highlighting moving objects, including cloaked players.",
+        "source": "src/game/client/c_baseanimating.cpp:3301-3329; src/game/client/neo/c_neo_player.h:16"
+      }
+    },
+    {
+      "id": "thermal_vision",
+      "name": "Thermal vision",
+      "classes": {
+        "value": [
+          "support"
+        ],
+        "source": "src/game/client/viewpostprocess.cpp:2359-2361"
+      },
+      "mechanics": {
+        "value": "Full-screen post-process dev/neo_thermalvision. Uncloaked players, NPCs, ragdolls and gibs are drawn with dev/thermal_model (hot). The own viewmodel uses dev/thermal_weapon_model. Smoke fog overlay is disabled. Cloaked players are not drawn hot (see cloak.vs_thermal_vision).",
+        "source": "src/game/client/neo/c_neo_player.cpp:622-646; src/game/client/c_baseanimating.cpp:3331-3338; src/game/client/smoke_fog_overlay.cpp:145-156; src/game/shared/neo/neo_predicted_viewmodel.cpp:256-270; src/game/client/neo/c_neo_player.h:15"
+      }
+    }
+  ],
+  "vision_common": {
+    "toggle_min_interval_sec": {
+      "value": 0.1,
+      "source": "src/game/shared/neo/neo_player_shared.cpp:797-801"
+    },
+    "vip_excluded": {
+      "value": true,
+      "source": "src/game/shared/neo/neo_player_shared.cpp:792-795"
+    },
+    "resource_cost": {
+      "value": null,
+      "note": "No AUX or cloak drain tied to vision modes was found; vision appears to be free and unlimited."
+    },
+    "reset_on_spawn_and_death": {
+      "value": true,
+      "source": "src/game/server/neo/neo_player.cpp:728,1638"
+    },
+    "sounds": {
+      "value": "NeoPlayer.VisionOn / NeoPlayer.VisionOff, heard only by the local player and in-eye spectators",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:816-856"
+    }
+  },
+  "ranks": [
+    {
+      "index": 0,
+      "id": "rankless_dog",
+      "name": "Rankless Dog",
+      "short": "Dog",
+      "xp_min": null,
+      "xp_max_exclusive": 0,
+      "source": "src/game/shared/neo/neo_player_shared.cpp:409-415,435-448"
+    },
+    {
+      "index": 1,
+      "id": "private",
+      "name": "Private",
+      "short": "Pvt",
+      "xp_min": 0,
+      "xp_max_exclusive": 4,
+      "source": "src/game/shared/neo/neo_weapon_loadout.h:11-12; src/game/shared/neo/neo_player_shared.cpp:416-419"
+    },
+    {
+      "index": 2,
+      "id": "corporal",
+      "name": "Corporal",
+      "short": "Cpl",
+      "xp_min": 4,
+      "xp_max_exclusive": 10,
+      "source": "src/game/shared/neo/neo_weapon_loadout.h:12-13"
+    },
+    {
+      "index": 3,
+      "id": "sergeant",
+      "name": "Sergeant",
+      "short": "Sgt",
+      "xp_min": 10,
+      "xp_max_exclusive": 20,
+      "source": "src/game/shared/neo/neo_weapon_loadout.h:13-14"
+    },
+    {
+      "index": 4,
+      "id": "lieutenant",
+      "name": "Lieutenant",
+      "short": "Lt",
+      "xp_min": 20,
+      "xp_max_exclusive": null,
+      "source": "src/game/shared/neo/neo_weapon_loadout.h:14; src/game/shared/neo/neo_player_shared.cpp:428-431"
+    }
+  ],
+  "rank_loadouts": {
+    "note": "A loadout slot unlocks when XP >= its price. XP_ANY (-255) means available even at negative XP. Slots are checked in order, and the first locked or empty slot ends the list. Names are display names from weapon_bits.h.",
+    "source": "src/game/shared/neo/neo_weapon_loadout.cpp:28-109; src/game/shared/neo/weapons/weapon_bits.h:6-40",
+    "recon": [
+      {
+        "weapon": "MPN45",
+        "min_xp": "any"
+      },
+      {
+        "weapon": "SRM",
+        "min_xp": 0
+      },
+      {
+        "weapon": "Jitte",
+        "min_xp": 0
+      },
+      {
+        "weapon": "SRM (silenced)",
+        "min_xp": 4
+      },
+      {
+        "weapon": "Jitte (with scope)",
+        "min_xp": 4
+      },
+      {
+        "weapon": "ZR68-L (accurized)",
+        "min_xp": 4
+      },
+      {
+        "weapon": "ZR68C",
+        "min_xp": 10
+      },
+      {
+        "weapon": "Murata Supa-7",
+        "min_xp": 20
+      },
+      {
+        "weapon": "Mosok Silenced",
+        "min_xp": 20
+      }
+    ],
+    "recon_source": "src/game/shared/neo/neo_weapon_loadout.cpp:30-36",
+    "assault": [
+      {
+        "weapon": "MPN45",
+        "min_xp": "any"
+      },
+      {
+        "weapon": "SRM",
+        "min_xp": 0
+      },
+      {
+        "weapon": "Jitte",
+        "min_xp": 0
+      },
+      {
+        "weapon": "ZR68C",
+        "min_xp": 0
+      },
+      {
+        "weapon": "ZR68-S (silenced)",
+        "min_xp": 0
+      },
+      {
+        "weapon": "Murata Supa-7",
+        "min_xp": 4
+      },
+      {
+        "weapon": "Mosok",
+        "min_xp": 4
+      },
+      {
+        "weapon": "Mosok Silenced",
+        "min_xp": 4
+      },
+      {
+        "weapon": "MX",
+        "min_xp": 10
+      },
+      {
+        "weapon": "MX Silenced",
+        "min_xp": 10
+      },
+      {
+        "weapon": "AA13",
+        "min_xp": 20
+      },
+      {
+        "weapon": "SRS",
+        "min_xp": 20
+      }
+    ],
+    "assault_source": "src/game/shared/neo/neo_weapon_loadout.cpp:37-43",
+    "support": [
+      {
+        "weapon": "MPN45",
+        "min_xp": "any"
+      },
+      {
+        "weapon": "SRM",
+        "min_xp": 0
+      },
+      {
+        "weapon": "ZR68C",
+        "min_xp": 0
+      },
+      {
+        "weapon": "Mosok",
+        "min_xp": 0
+      },
+      {
+        "weapon": "Murata Supa-7",
+        "min_xp": 0
+      },
+      {
+        "weapon": "MX",
+        "min_xp": 4
+      },
+      {
+        "weapon": "Mosok Silenced",
+        "min_xp": 4
+      },
+      {
+        "weapon": "MX Silenced",
+        "min_xp": 10
+      },
+      {
+        "weapon": "PZ252",
+        "min_xp": 20
+      }
+    ],
+    "support_source": "src/game/shared/neo/neo_weapon_loadout.cpp:44-54",
+    "support_note": "With build flag INCLUDE_WEP_PBK, PBK56 is added at 20 XP.",
+    "vip": [
+      {
+        "weapon": "SMAC",
+        "min_xp": "any"
+      },
+      {
+        "weapon": "MPN45",
+        "min_xp": 4
+      },
+      {
+        "weapon": "SRM",
+        "min_xp": 4
+      },
+      {
+        "weapon": "Jitte",
+        "min_xp": 10
+      },
+      {
+        "weapon": "SRM (silenced)",
+        "min_xp": 10
+      },
+      {
+        "weapon": "Jitte (with scope)",
+        "min_xp": 20
+      },
+      {
+        "weapon": "ZR68C",
+        "min_xp": 20
+      },
+      {
+        "weapon": "ZR68-L (accurized)",
+        "min_xp": 20
+      },
+      {
+        "weapon": "Murata Supa-7",
+        "min_xp": 20
+      }
+    ],
+    "vip_source": "src/game/shared/neo/neo_weapon_loadout.cpp:55-61",
+    "recon_detpack": {
+      "value": "The Recon detpack requires XP >= sv_neo_detpack_xp_limit (default 4; -1 = no requirement)",
+      "source": "src/game/server/neo/neo_player.cpp:3408-3417; src/game/shared/neo/weapons/weapon_detpack.cpp:71-72"
+    },
+    "loadout_change_window_sec": {
+      "value": 25.0,
+      "note": "After spawning, you can change loadout for sv_neo_time_alive_until_cant_change_loadout seconds, unless you have fired or dropped a weapon. Unlimited in idle, warmup and countdown.",
+      "source": "src/game/server/neo/neo_player.cpp:3485-3496; src/game/shared/baseentity_shared.cpp:1769; src/game/server/neo/neo_player.cpp:2952"
+    },
+    "notes": [
+      "The loadout entry 'Mosok Silenced' (key mosokl) spawns entity weapon_m41s, which really is the suppressed variant (NEO_WEP_M41_S | NEO_WEP_SUPPRESSED, weapon_m41s.h:37), so players get what the label says. However, its WeaponInfo bit is NEO_WEP_M41_L (the scoped variant, weapon_m41l.h:37), and the unused 'Mosok Scoped' entry also points to weapon_m41s (weapon_bits.h:17-18). The metadata mismatch may affect bot weapon profiles; it does not affect the player loadout."
+    ]
+  },
+  "xp_rules": {
+    "enemy_kill": {
+      "value": 1,
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4224-4226"
+    },
+    "team_kill": {
+      "value": -1,
+      "note": "Can go negative.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4200-4203"
+    },
+    "suicide_or_environment_death": {
+      "value": -1,
+      "note": "Can go negative. Grenade kills with no attacker are excluded.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4187-4191"
+    },
+    "kill_assist": {
+      "value": 1,
+      "note": "Goes to the first non-killer player who dealt >= 50% of the victim's max health.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4068-4104,4262-4267"
+    },
+    "team_kill_assist": {
+      "value": -1,
+      "note": "Only if sv_neo_teamdamage_assists = 1 (default 0).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:181,4250-4261"
+    },
+    "round_win": {
+      "value": 1,
+      "note": "Every player on the winning team.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:3999-4001"
+    },
+    "ghost_capture_or_vip_escape": {
+      "value": "rank up",
+      "note": "With sv_neo_cap_reward = 0 (default), each winning player who is alive (or all, if sv_neo_cap_reward_dead = 1) is raised to the next rank threshold (0/4/10/20), or +1 if already Lieutenant. This replaces the +1 round-win XP. A non-zero sv_neo_cap_reward gives that flat amount instead.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:1797-1825,4002-4028,164-165"
+    },
+    "ctg_vip_win_without_capture": {
+      "value": "+1 extra for surviving (sv_neo_survivor_bonus = 1), +1 extra for the ghost carrier (sv_neo_ghost_carrier_bonus = 1)",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4029-4039,166-167"
+    },
+    "cap_prevention_suicide": {
+      "value": "If the last alive player of a team suicides while the enemy holds the ghost, the enemy team is awarded the capture reward (sv_neo_suicide_prevent_cap_punish = 1).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:153-157,4106-4163,4056-4060"
+    },
+    "paused": {
+      "value": "No XP or death changes while paused.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4180-4185"
+    },
+    "negative_floor": {
+      "value": "Penalties applied with bAllowNegativeScore = false cannot take XP below 0. Kill, teamkill and suicide penalties pass true, so XP can go negative ('Rankless Dog').",
+      "source": "src/game/server/neo/neo_player.cpp:2351-2364"
+    },
+    "soft_suicide": {
+      "value": "SoftSuicide refunds the -1 XP and the frag (used for non-punitive suicides).",
+      "source": "src/game/server/neo/neo_player.cpp:1843-1864"
+    }
+  },
+  "spawn_and_protection": {
+    "preround_freeze": {
+      "value": "Players spawning during pre-round freeze get FL_GODMODE and NEO_FL_FREEZETIME (movement frozen, can look around). Both are removed when the round leaves freeze/post-round.",
+      "source": "src/game/server/neo/neo_player.cpp:659-665; src/game/shared/neo/neo_player_shared.h:247; src/game/shared/neo/neo_gamerules.cpp:4637-4648"
+    },
+    "preround_freeze_time_sec": {
+      "value": 15,
+      "convar": "sv_neo_preround_freeze_time",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+    },
+    "tdm_dm_spawn_protection": {
+      "value": "In TDM and DM, damage is scaled to 0 for the first 5 s alive, until the player fires or drops a weapon.",
+      "seconds": 5,
+      "source": "src/game/server/neo/neo_player.cpp:2667-2676; src/game/shared/baseentity_shared.cpp:1769; src/game/server/neo/neo_player.cpp:2952"
+    },
+    "blast_protection_sec": {
+      "value": 0.5,
+      "note": "HL2MP slam protection: DMG_BLAST is ignored for 0.5 s after spawn point selection.",
+      "source": "src/game/server/neo/neo_player.cpp:3101; src/game/server/hl2mp/hl2mp_player.cpp:1427-1429"
+    },
+    "warmup_godmode": {
+      "value": "sv_neo_warmup_godmode (default 0): no damage during idle, warmup, countdown and pause",
+      "source": "src/game/server/neo/neo_player.cpp:154,3298-3310"
+    },
+    "late_spawn_window_sec": {
+      "value": 15,
+      "convar": "sv_neo_latespawn_max_time",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:51"
+    },
+    "respawns_by_gamemode": {
+      "value": {
+        "TDM": true,
+        "CTG": false,
+        "VIP": false,
+        "DM": true,
+        "EMT": true,
+        "TUT": true,
+        "JGR": true
+      },
+      "source": "src/game/shared/neo/neo_gamerules.cpp:406-415"
+    },
+    "mirror_team_damage": {
+      "value": "During the first sv_neo_mirror_teamdamage_duration (7 s) of a live round, team damage is mirrored to the attacker x sv_neo_mirror_teamdamage_multiplier (2 in release builds, 0 in DEBUG builds). The victim takes no damage (sv_neo_mirror_teamdamage_immunity = 1).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:141-148,1916-1926; src/game/server/neo/neo_player.cpp:3332-3357"
+    },
+    "class_change": {
+      "value": "Class changes apply immediately when dead, during pre-round freeze (before firing or dropping), in idle/warmup/countdown, or in DM/TDM within sv_neo_dm_max_class_dur (10 s) of spawning. Otherwise they are queued for the next spawn.",
+      "source": "src/game/server/neo/neo_player.cpp:250-281,153"
+    },
+    "class_limits": {
+      "value": "sv_neo_class_limit_recon/assault/support (default -1 = unlimited, 0 = banned). If the requested class is full, the player gets the first non-full class; if all are full, no change.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:60-62; src/game/server/team.cpp:393-454"
+    }
+  },
+  "damage_model": {
+    "hitgroup_multipliers": {
+      "value": {
+        "head": 1.0,
+        "chest": 1.0,
+        "stomach": 0.75,
+        "arm": 0.75,
+        "leg": 0.6
+      },
+      "source": "src/game/server/player.cpp:196-201,1004-1027"
+    },
+    "bullet_damage_modifier": {
+      "value": 1.485,
+      "convar": "sv_neo_wep_dmg_modifier",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:53; src/game/server/neo/neo_player.cpp:4056-4059"
+    },
+    "explosive_damage_modifier": {
+      "value": 1.485,
+      "convar": "sv_neo_exp_dmg_modifier",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:54"
+    },
+    "notes": [
+      "The player code applies no extra headshot multiplier (sk_player_head = 1). Headshot damage may come from weapon script data, which was not investigated here.",
+      "sv_neo_hitboxgroup_pen (default 0): when it is on, limb hits are re-traced against the head, chest and stomach. Source: src/game/shared/neo/neo_player_shared.cpp:858,902-924."
+    ]
+  },
+  "convars": [
+    {
+      "name": "sv_neo_airfriction",
+      "default": "0",
+      "description": "Air friction.",
+      "source": "src/game/shared/gamemovement.cpp:1724"
+    },
+    {
+      "name": "sv_neo_airfriction_objective",
+      "default": "0.5",
+      "description": "Air friction for ghost carrier, VIP and juggernaut.",
+      "source": "src/game/shared/gamemovement.cpp:1725"
+    },
+    {
+      "name": "sv_neo_airstopspeed",
+      "default": "0",
+      "description": "Minimum stopping speed when in the air.",
+      "source": "src/game/shared/gamemovement.cpp:1726"
+    },
+    {
+      "name": "sv_neo_jumpbuffer",
+      "default": "0",
+      "description": "Allow Quake style jump buffering.",
+      "flags": "cheat",
+      "source": "src/game/shared/gamemovement.cpp:1727"
+    },
+    {
+      "name": "mp_falldamage",
+      "default": "1",
+      "description": "Whether to apply fall damage to players.",
+      "source": "src/game/server/game.cpp:36"
+    },
+    {
+      "name": "sv_neo_falldmg_scale",
+      "default": "0.25",
+      "description": "Scale factor for NEO fall damage.",
+      "flags": "cheat, developmentonly",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:4274"
+    },
+    {
+      "name": "sv_gravity",
+      "default": "800",
+      "description": "World gravity.",
+      "source": "src/game/shared/movevars_shared.cpp:22,37"
+    },
+    {
+      "name": "sv_stickysprint",
+      "default": "0",
+      "description": "(none)",
+      "source": "src/game/server/hl2/hl2_player.cpp:120"
+    },
+    {
+      "name": "sv_infinite_aux_power",
+      "default": "0",
+      "description": "(none)",
+      "flags": "cheat, replicated",
+      "source": "src/game/server/hl2/hl2_player.cpp:113"
+    },
+    {
+      "name": "sv_neo_infinite_cloak",
+      "default": "0",
+      "description": "Don't drain cloak",
+      "flags": "cheat, replicated",
+      "source": "src/game/server/neo/neo_player.cpp:227"
+    },
+    {
+      "name": "neo_lean_speed",
+      "default": "0.2",
+      "description": "Time to reach full lean",
+      "flags": "replicated, cheat",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:146"
+    },
+    {
+      "name": "neo_lean_peek_left_amount",
+      "default": "7.5",
+      "description": "How far sideways will a full left lean view reach.",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:147"
+    },
+    {
+      "name": "neo_lean_peek_right_amount",
+      "default": "15.0",
+      "description": "How far sideways will a full right lean view reach.",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:148"
+    },
+    {
+      "name": "neo_lean_fp_angle",
+      "default": "20",
+      "description": "How many degrees does the camera lean.",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:149"
+    },
+    {
+      "name": "neo_lean_tp_angle",
+      "default": "35",
+      "description": "How many degrees does the player character lean.",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:150"
+    },
+    {
+      "name": "neo_lean_fp_lower_eyes",
+      "default": "2",
+      "description": "How low to bring eye-level when leaning.",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:151"
+    },
+    {
+      "name": "neo_lean_thirdperson_roll_lerp_scale",
+      "default": "5",
+      "description": "Multiplier for 3rd person lean roll lerping.",
+      "source": "src/game/server/neo/neo_player.cpp:812-813"
+    },
+    {
+      "name": "cl_neo_lean_automatic",
+      "default": "0",
+      "description": "Automatic leaning around corners",
+      "flags": "client",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:305"
+    },
+    {
+      "name": "cl_neo_lean_viewmodel_only",
+      "default": "0",
+      "description": "Rotate view-model instead of camera when leaning",
+      "flags": "client",
+      "source": "src/game/shared/neo/neo_predicted_viewmodel.cpp:304"
+    },
+    {
+      "name": "sv_neo_can_change_classes_anytime",
+      "default": "0",
+      "description": "Can players change classes at any moment, even mid-round?",
+      "flags": "cheat, replicated",
+      "source": "src/game/server/neo/neo_player.cpp:149"
+    },
+    {
+      "name": "sv_neo_dm_max_class_dur",
+      "default": "10",
+      "description": "The time in seconds when the player can change class on respawn during deathmatch.",
+      "source": "src/game/server/neo/neo_player.cpp:153"
+    },
+    {
+      "name": "sv_neo_warmup_godmode",
+      "default": "0",
+      "description": "If enabled, everyone is invincible on idle and warmup.",
+      "source": "src/game/server/neo/neo_player.cpp:154"
+    },
+    {
+      "name": "sv_neo_time_alive_until_cant_change_loadout",
+      "default": "25.0",
+      "description": "How long after spawning changing loadouts is disabled",
+      "flags": "cheat, replicated",
+      "source": "src/game/server/neo/neo_player.cpp:3485"
+    },
+    {
+      "name": "sv_neo_class_limit_recon",
+      "default": "-1",
+      "description": "Maximum number of Recon class players per team (-1 = no limit, 0 = banned).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:60"
+    },
+    {
+      "name": "sv_neo_class_limit_assault",
+      "default": "-1",
+      "description": "Maximum number of Assault class players per team (-1 = no limit, 0 = banned).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:61"
+    },
+    {
+      "name": "sv_neo_class_limit_support",
+      "default": "-1",
+      "description": "Maximum number of Support class players per team (-1 = no limit, 0 = banned).",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:62"
+    },
+    {
+      "name": "sv_neo_preround_freeze_time",
+      "default": "15",
+      "description": "The pre-round freeze time, in seconds.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:50"
+    },
+    {
+      "name": "sv_neo_latespawn_max_time",
+      "default": "15",
+      "description": "How many seconds late are players still allowed to spawn.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:51"
+    },
+    {
+      "name": "sv_neo_wep_dmg_modifier",
+      "default": "1.485",
+      "description": "Weapon damage modifier.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:53"
+    },
+    {
+      "name": "sv_neo_exp_dmg_modifier",
+      "default": "1.485",
+      "description": "Explosive damage modifier",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:54"
+    },
+    {
+      "name": "sv_neo_mirror_teamdamage_multiplier",
+      "default": "2 (release) / 0 (DEBUG build)",
+      "description": "The damage multiplier given to the friendly-firing individual. Set value to 0 to disable mirror team damage.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:141-146"
+    },
+    {
+      "name": "sv_neo_mirror_teamdamage_duration",
+      "default": "7",
+      "description": "How long in seconds the mirror damage is active for the start of each round. Set to 0 for the entire round.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:147"
+    },
+    {
+      "name": "sv_neo_mirror_teamdamage_immunity",
+      "default": "1",
+      "description": "If enabled, the victim will not take damage from a teammate during the mirror team damage duration.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:148"
+    },
+    {
+      "name": "sv_neo_teamdamage_assists",
+      "default": "0",
+      "description": "Whether to drain XP when assisting the death of a teammate.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:181"
+    },
+    {
+      "name": "sv_neo_cap_reward",
+      "default": "0",
+      "description": "How much XP to reward for capturing the ghost or escaping as VIP. 0 = Rank up.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:164"
+    },
+    {
+      "name": "sv_neo_cap_reward_dead",
+      "default": "0",
+      "description": "Whether dead players should receive the ghost capture or escape reward.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:165"
+    },
+    {
+      "name": "sv_neo_survivor_bonus",
+      "default": "1",
+      "description": "Whether surviving players on the winning team in CTG and VIP should receive extra XP.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:166"
+    },
+    {
+      "name": "sv_neo_ghost_carrier_bonus",
+      "default": "1",
+      "description": "Whether the ghost carrier on the winning team should receive extra XP.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:167"
+    },
+    {
+      "name": "sv_neo_suicide_prevent_cap_punish",
+      "default": "1",
+      "description": "If enabled, if a player suicides and is the only one alive in their team, while the other team is holding the ghost, reward the ghost holder team a rank up.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:153-157"
+    },
+    {
+      "name": "sv_neo_ignore_wep_xp_limit",
+      "default": "0",
+      "description": "If true, allow equipping any loadout regardless of player XP.",
+      "flags": "cheat, replicated",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:529"
+    },
+    {
+      "name": "sv_neo_wep_xp_override",
+      "default": "-1",
+      "description": "Override the effective XP used for weapon eligibility checks, or -1 to disable.",
+      "flags": "cheat, replicated",
+      "source": "src/game/shared/neo/neo_weapon_loadout.cpp:111-112"
+    },
+    {
+      "name": "sv_neo_detpack_xp_limit",
+      "default": "4",
+      "description": "How many XP are required to unlock the detpack for recons (or -1 for no limit).",
+      "source": "src/game/shared/neo/weapons/weapon_detpack.cpp:71-72"
+    },
+    {
+      "name": "sv_neo_dm_win_xp",
+      "default": "50",
+      "description": "The XP limit to win the match.",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:532"
+    },
+    {
+      "name": "sv_neo_jgr_max_points",
+      "default": "20",
+      "description": "Maximum points required for a team to win in JGR",
+      "source": "src/game/shared/neo/neo_gamerules.cpp:83"
+    },
+    {
+      "name": "sv_neo_hitboxgroup_pen",
+      "default": "0",
+      "description": "When hitting outer limbs, do a second trace against head, chest and stomach",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:858"
+    },
+    {
+      "name": "sk_player_head",
+      "default": "1",
+      "description": "(none) hitgroup damage multiplier",
+      "source": "src/game/server/player.cpp:197"
+    },
+    {
+      "name": "sk_player_chest",
+      "default": "1",
+      "description": "(none) hitgroup damage multiplier",
+      "source": "src/game/server/player.cpp:198"
+    },
+    {
+      "name": "sk_player_stomach",
+      "default": "0.75",
+      "description": "(none) hitgroup damage multiplier",
+      "source": "src/game/server/player.cpp:199"
+    },
+    {
+      "name": "sk_player_arm",
+      "default": "0.75",
+      "description": "(none) hitgroup damage multiplier",
+      "source": "src/game/server/player.cpp:200"
+    },
+    {
+      "name": "sk_player_leg",
+      "default": "0.6",
+      "description": "(none) hitgroup damage multiplier",
+      "source": "src/game/server/player.cpp:201"
+    },
+    {
+      "name": "sv_neo_ghost_view_distance",
+      "default": "45.72",
+      "description": "How far can the ghost user see players in meters.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:62"
+    },
+    {
+      "name": "sv_neo_ghost_delay_secs",
+      "default": "3.3",
+      "description": "The delay in seconds until the ghost shows up after pick up.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:64-65"
+    },
+    {
+      "name": "sv_neo_spec_replace_player_bot_enable",
+      "default": "1",
+      "description": "Allow spectators to take over bots.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:70"
+    },
+    {
+      "name": "sv_neo_spec_replace_player_afk_enable",
+      "default": "0",
+      "description": "Allow spectators to take over AFK players.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:71"
+    },
+    {
+      "name": "sv_neo_spec_replace_player_min_exp",
+      "default": "0",
+      "description": "Minimum experience allowed to takeover players",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:72-75"
+    },
+    {
+      "name": "sv_neo_spec_replace_player_afk_time_sec",
+      "default": "180",
+      "description": "Seconds of inactivity before a player is considered AFK for spectator takeover.",
+      "source": "src/game/shared/neo/neo_player_shared.cpp:77-80"
+    },
+    {
+      "name": "bot_class",
+      "default": "-1",
+      "description": "Force all bots to spawn with the specified class number, or -1 to disable.",
+      "source": "src/game/server/neo/neo_player.cpp:156"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_threshold_ratio_easy",
+      "default": "0.35",
+      "description": "Bot cloak detection threshold for easy difficulty observers",
+      "source": "src/game/server/neo/neo_player.cpp:163"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_threshold_ratio_normal",
+      "default": "0.40",
+      "description": "Bot cloak detection threshold for normal difficulty observers",
+      "source": "src/game/server/neo/neo_player.cpp:164"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_threshold_ratio_hard",
+      "default": "0.45",
+      "description": "Bot cloak detection threshold for hard difficulty observers",
+      "source": "src/game/server/neo/neo_player.cpp:165"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_threshold_ratio_expert",
+      "default": "0.50",
+      "description": "Bot cloak detection threshold for expert difficulty observers",
+      "source": "src/game/server/neo/neo_player.cpp:166"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_threshold_ratio_aim_on_target",
+      "default": "0.98",
+      "description": "Bot cloak detection threshold when considered aimed on target",
+      "source": "src/game/server/neo/neo_player.cpp:169"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_disruption_effect",
+      "default": "8",
+      "description": "Bot cloak detection bonus for target being surrounded by the blue disruption effect",
+      "source": "src/game/server/neo/neo_player.cpp:180-181"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_assault_motion_vision",
+      "default": "15",
+      "description": "Bot cloak detection bonus for assault class detecting movement with motion vision",
+      "source": "src/game/server/neo/neo_player.cpp:183-184"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_non_support",
+      "default": "2",
+      "description": "Bot cloak detection bonus for non-support classes",
+      "source": "src/game/server/neo/neo_player.cpp:187-188"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_observer_stationary",
+      "default": "3",
+      "description": "Bot cloak detection bonus for observer being stationary",
+      "source": "src/game/server/neo/neo_player.cpp:190-191"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_observer_walking",
+      "default": "1",
+      "description": "Bot cloak detection bonus for observer walking",
+      "source": "src/game/server/neo/neo_player.cpp:193-194"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_target_running",
+      "default": "3",
+      "description": "Bot cloak detection bonus for target running",
+      "source": "src/game/server/neo/neo_player.cpp:196-197"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_target_moving",
+      "default": "1",
+      "description": "Bot cloak detection bonus for target moving",
+      "source": "src/game/server/neo/neo_player.cpp:199-200"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_target_standing",
+      "default": "1",
+      "description": "Bot cloak detection bonus for target standing",
+      "source": "src/game/server/neo/neo_player.cpp:202-203"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_scope_range",
+      "default": "3",
+      "description": "Bot cloak detection bonus for being in scope range",
+      "source": "src/game/server/neo/neo_player.cpp:205-206"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_shotgun_range",
+      "default": "12",
+      "description": "Bot cloak detection bonus for being in shotgun range",
+      "source": "src/game/server/neo/neo_player.cpp:208-209"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_melee_range",
+      "default": "20",
+      "description": "Bot cloak detection bonus for being in melee range",
+      "source": "src/game/server/neo/neo_player.cpp:211-212"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_per_injury",
+      "default": "1",
+      "description": "Bot cloak detection bonus per injury event",
+      "source": "src/game/server/neo/neo_player.cpp:214-215"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_lighting_enabled",
+      "default": "0",
+      "description": "Enable/Disable bot cloak detection lighting bonus",
+      "source": "src/game/server/neo/neo_player.cpp:219-220"
+    },
+    {
+      "name": "sv_neo_bot_cloak_detection_bonus_lighting",
+      "default": "0",
+      "description": "Bot cloak detection bonus for target being in a well lit area (scaled by light intensity ratio 0.0-1.0)",
+      "source": "src/game/server/neo/neo_player.cpp:223-224"
+    },
+    {
+      "name": "sv_neo_bot_cloak_debug_perceive_always_on",
+      "default": "0",
+      "description": "Debug: Force bots to perceive all players as having cloaking on all the time",
+      "flags": "cheat",
+      "source": "src/game/server/neo/neo_player.cpp:177-178"
+    }
+  ],
+  "open_questions": [
+    "Juggernaut sprint speed: 256 (CalculateSpeed) vs 270 (NEO_JUGGERNAUT_SPRINT_SPEED / GetSprintSpeed). Needs an in-game check.",
+    "Headshot damage: the player code multiplier is 1.0. Check per-weapon script data before stating headshot damage on the wiki.",
+    "weapon_bits.h WeaponInfo bits for the Mosok variants (mosokl uses M41_L but spawns weapon_m41s) look mislabeled. This affects metadata only.",
+    "Whether the Recon sprint-stop path skipping m_flTimeAllSuitDevicesOff has a visible effect on AUX regen timing."
+  ]
+}
