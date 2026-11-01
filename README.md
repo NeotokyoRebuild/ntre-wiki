@@ -10,6 +10,9 @@ cd ntre-wiki
 ./setup
 ```
 
+> [!NOTE]
+> **Windows:** use WSL. Clone inside your Linux home folder, not under `/mnt/c`, so `./serve` sees your edits. On Ubuntu, run `sudo apt install python3-venv` before `./setup`.
+
 ### Modifying the wiki
 
 ```sh
