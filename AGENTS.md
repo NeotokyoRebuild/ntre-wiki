@@ -1,0 +1,59 @@
+# Agent guidelines
+
+Rules for anyone, human or model, working in this repository.
+
+## What this is
+
+A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built with MkDocs and the Material theme.
+
+## Layout
+
+- `wiki/mkdocs.yml`: site config, including the sidebar menu (`nav`). A new page needs a nav entry.
+- `wiki/docs/**/*.md`: pages. Folders follow the menu (`weapons/rifles/zr68-s.md`); a folder's `index.md` is its section page.
+- `wiki/data/*.json`: gameplay data extracted from the NT;RE source, one record per value with a `source` citation
+- `wiki/hooks/wiki_hooks.py`: the MkDocs hooks: wiki links, citations, snippets, column tooltips and the build checks. `ntre.py` is only the entry point `mkdocs.yml` names; it reloads `wiki_hooks.py` and `generators.py` on every build, so `mkdocs serve` picks up edits without a restart.
+- `wiki/column-tips.yml`: the tooltip for every table column header, shared or per page
+- `wiki/hooks/generators.py`: builds the `{{table:…}}`, `{{infobox:…}}`, `{{stat:…}}` and `{{weapon:…}}` snippets from the data
+- `wiki/tools/`: data tools, standard library only. `check_data.py` checks every citation and the values read from weapon scripts and ConVars against the pinned commit (`--fix` updates those values). Run it after touching the data or citations. `repin.py COMMIT` moves every citation to a newer `neo` commit (see CONTRIBUTING.md); the tools read files with `git show`, never fetch, and never touch the checkouts.
+- `wiki/docs/stylesheets/ntre.css`: the skin; colours are `--ntre-*` tokens with dark (`slate`) and light (`default`) sets
+- `wiki/overrides/`: theme overrides. `partials/logo.html` inlines `docs/assets/nt-mark.svg` (the primary logo, from Wireframe) into the header.
+
+Set up with `cd wiki && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`. Preview with `.venv/bin/mkdocs serve`; check with `.venv/bin/mkdocs build --strict`, which fails on red links and unknown snippets. A clean build prints no warnings. Keep builds and deploys loud: never add `--quiet` to a strict build, because it hides the warnings and strict mode then passes them.
+
+## Deploying
+
+The wiki deploys with `wiki/deploy.sh <version> [title]`, which runs `mike` to publish under `wiki/` on the `gh-pages` branch of `sunmachine/ntre-dev`; see the README. The published address is set only in `deploy.sh`: don't hard-code it in `mkdocs.yml` or in pages. That branch also holds other pages (`footsteps/`, `place-mode/`, `weapons/`, the root `index.html`), so never use `mkdocs gh-deploy` or anything that rewrites the whole branch. GitHub Pages rejects symlinks, which is why `mkdocs.yml` sets mike's `alias_type: copy`. Deploying publishes to a public site: do it only when asked.
+
+## Style guide
+
+**Read [`WRITING-STYLE.md`](WRITING-STYLE.md) before writing or editing any page, or any text the generators produce.** It covers voice, keeping pages easy to read, sourcing, units, names, page anatomy and markup. The wiki's Style guide page (`wiki/docs/about/style-guide.md`) includes it and adds the visual rules. A change to how the wiki is written updates `WRITING-STYLE.md`, and a change to how it looks updates the style guide page, in the same commit as the change. The Branding pages document every asset with its source and rights; a new or changed asset updates `about/logos.md` too. The palette table on `about/colours-and-type.md` is generated from `ntre.css`, so it needs no hand edits.
+
+[`CONTRIBUTING.md`](CONTRIBUTING.md) is the how-to for human contributors. When a workflow it describes changes (setup, markup, data records, build checks), update it in the same commit.
+
+## Data rules
+
+- Every gameplay number must trace to a `path:line` in `NeotokyoRebuild/neo` (local checkout at `../neo`) or `NeotokyoRebuild/neoAssets` (you need a local checkout of it too; where you keep it is up to you). The commit is pinned in each JSON file's `meta.neo_commit`.
+- Read cited code at the pinned commit, never from the checkout's working tree, which can be ahead of or behind it: `git -C ../neo show <commit>:<path> | sed -n '<a>,<b>p'`. Don't number lines with `nl`: it skips blank lines, so every number after one is wrong.
+- Never guess a value. If the code is ambiguous or client and server disagree, record both in a `note` and say so on the page.
+- Values derived arithmetically carry `derived: true` and a `formula`.
+- A number shown in a table or infobox comes from the data: never type one into a page or into the generator code (`generators.py`). A generator that needs a number reads it from the data, like everything else.
+- Half-Life 2 leftovers that NT;RE doesn't use stay out of the wiki. Flag such a record `hl2_only`, with its source; generated tables skip it. See "Half-Life 2 leftovers" in CONTRIBUTING.md.
+- Don't modify the `neo` or `neoAssets` checkouts.
+
+## Conventions
+
+- Slugs are lowercase with hyphens and unique across the wiki: a page's slug is its file name without `.md`, or its folder name for an `index.md`. Links use slugs, so moving a page to another folder needs only a `nav` change, but renaming its file changes the slug and breaks every `[[slug|…]]` to it: search for `[[old-slug` and update them in the same commit.
+- In content, `[[slug|Label]]` is a wiki link and `[[src:path:line]]` is a citation that becomes a footnote. Plain Markdown links work too.
+- Weapon pages name their weapon in front matter (`weapon: weapon_zr68s`) and take every number from `{{weapon:…}}` snippets.
+- Quote front-matter values that contain a colon.
+- Python dependencies are pinned in `wiki/requirements.txt` (MkDocs Material, and `mike` for versioned deploys).
+
+## Engine
+
+The wiki engine is MkDocs Material (decided 2026-11-01). Material reaches end of life on 2027-05-05; its successor, Zensical, reads the same `mkdocs.yml`, so plan the move to it before then.
+
+## Open decisions
+
+- Data model for game facts
+- Content and media licensing (currently all rights reserved)
+- Hosting: self-hosted on the homelab K3s cluster, exposed through the VPS later
