@@ -1,0 +1,226 @@
+#!/usr/bin/env python3
+"""Set up this checkout to work on the wiki.
+
+    ./setup [--neo PATH] [--neo-assets PATH]
+
+Run it once after cloning. It's safe to run again, to change a path or repair the environment.
+
+1. Asks where your checkouts of the game's repositories are, NeotokyoRebuild/neo and
+   NeotokyoRebuild/neoAssets. It suggests any it finds next to this repository and offers to
+   clone a missing one there. The paths go in this repository's git config, as ntre.neo and
+   ntre.neoassets, where the data tools in wiki/tools/ read them.
+2. Creates the Python environment in wiki/.venv and installs wiki/requirements.txt.
+
+Without a terminal to ask in, it uses the paths it's given or finds, and fails if one is
+missing.
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent
+WIKI = REPO / "wiki"
+VENV = WIKI / ".venv"
+VENV_PY = VENV / "bin" / "python"
+
+GAME_REPOS = [
+    {"key": "neo", "github": "NeotokyoRebuild/neo", "flag": "neo",
+     "about": "the game's code, which every number in the wiki cites", "clone": []},
+    {"key": "neoassets", "github": "NeotokyoRebuild/neoAssets", "flag": "neo-assets",
+     "about": "the game's assets", "clone": ["--filter=blob:none"]},
+]
+NO_PIN = "doesn't have the commit the wiki's data is pinned to"
+
+
+def say(msg):
+    print(f"\033[1m==> {msg}\033[0m")
+
+
+def die(msg):
+    sys.exit(f"\033[31merror:\033[0m {msg}")
+
+
+def git(*args, cwd=REPO):
+    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True)
+
+
+def show(path):
+    """A path as the user would type it: relative when it's close, else from ~."""
+    rel = os.path.relpath(path)
+    if rel.count("..") <= 2:
+        return rel
+    home = str(Path.home())
+    return "~" + str(path)[len(home):] if str(path).startswith(home + os.sep) else str(path)
+
+
+def ask(prompt):
+    try:
+        return input(prompt).strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        die("setup cancelled")
+
+
+def pinned_commit():
+    pins = {json.loads(p.read_text())["meta"]["neo_commit"] for p in sorted((WIKI / "data").glob("*.json"))}
+    if len(pins) != 1:
+        die(f"the data files pin different neo commits ({', '.join(sorted(pins))})")
+    return pins.pop()
+
+
+def repo_name(url):
+    """'neo' for git@github.com:NeotokyoRebuild/neo.git, or for any fork of it."""
+    url = url.strip().rstrip("/")
+    url = url[:-4] if url.endswith(".git") else url
+    return url.replace(":", "/").rsplit("/", 1)[-1].lower()
+
+
+def repo_names(path):
+    """The repository names of all of a checkout's remotes."""
+    return {repo_name(line.split()[1]) for line in git("remote", "-v", cwd=path).stdout.splitlines()}
+
+
+def origin_name(path):
+    r = git("remote", "get-url", "origin", cwd=path)
+    return repo_name(r.stdout) if r.returncode == 0 else None
+
+
+def search_roots():
+    """The folder this checkout is in, and the main checkout's folder if this is a worktree."""
+    roots = [REPO.parent]
+    common = git("rev-parse", "--path-format=absolute", "--git-common-dir").stdout.strip()
+    if common and Path(common).name == ".git" and Path(common).parent.parent not in roots:
+        roots.append(Path(common).parent.parent)
+    return roots
+
+
+def siblings(spec):
+    """Checkouts next to this one whose origin is spec's repository or a fork of it. Only
+    origin counts: other repositories often keep neo as an extra remote."""
+    found = []
+    for root in search_roots():
+        for d in sorted(root.iterdir()):
+            if d.is_dir() and d != REPO and (d / ".git").exists() and origin_name(d) == spec["key"]:
+                found.append(d)
+    return found
+
+
+def check(path, spec, pin):
+    """(checkout root, problem or None) for a path given as a checkout of spec."""
+    path = Path(path).expanduser().resolve()
+    if not path.is_dir():
+        return path, "doesn't exist"
+    top = git("rev-parse", "--show-toplevel", cwd=path)
+    if top.returncode:
+        return path, "isn't a git checkout"
+    path = Path(top.stdout.strip())
+    if spec["key"] == "neo":
+        if git("cat-file", "-e", f"{pin}^{{commit}}", cwd=path).returncode:
+            return path, NO_PIN
+    elif "neoassets" not in repo_names(path) and git("cat-file", "-e", "HEAD:neo", cwd=path).returncode:
+        return path, f"doesn't look like {spec['github']}: no neo/ folder and no neoAssets remote"
+    return path, None
+
+
+def clone(spec, target):
+    say(f"Cloning {spec['github']} to {show(target)}")
+    url = f"https://github.com/{spec['github']}.git"
+    if subprocess.run(["git", "clone", *spec["clone"], url, str(target)]).returncode:
+        die(f"couldn't clone {url}")
+    return target
+
+
+def choose(spec, given, interactive, pin):
+    """The checkout to use for spec: from --flag, or asked for, or found."""
+    flag = f"--{spec['flag']}"
+    if given:
+        path, problem = check(given, spec, pin)
+        if problem:
+            die(f"{flag} {show(path)} {problem}" + (f": run git -C {show(path)} fetch" if problem == NO_PIN else ""))
+        return path
+
+    configured = git("config", "--get", f"ntre.{spec['key']}").stdout.strip()
+    found = []
+    for p in ([Path(configured)] if configured else []) + siblings(spec):
+        p = p.resolve()
+        if p.is_dir() and p not in found:
+            found.append(p)
+    default = found[0] if found else None
+    target = REPO.parent / spec["github"].split("/")[1]
+
+    if not interactive:
+        if not default:
+            die(f"no {spec['github']} checkout found next to this repository: pass {flag} PATH")
+        path, problem = check(default, spec, pin)
+        if problem:
+            die(f"{show(path)} {problem}" + (f": run git -C {show(path)} fetch" if problem == NO_PIN else ""))
+        return path
+
+    print(f"\n{spec['github']}: {spec['about']}")
+    if found:
+        print("  Found: " + ", ".join(show(p) for p in found))
+    while True:
+        if default:
+            answer = ask(f"  Path to your checkout [{show(default)}]: ") or str(default)
+        else:
+            answer = ask(f"  Path to your checkout, or Enter to clone it to {show(target)}: ")
+            if not answer:
+                if target.exists():
+                    print(f"  {show(target)} already exists and isn't a checkout of {spec['github']}. Enter a path.")
+                    continue
+                answer = str(clone(spec, target))
+        path, problem = check(answer, spec, pin)
+        if problem == NO_PIN:
+            if ask(f"  {show(path)} {problem}. Fetch it now? [Y/n] ").lower() in ("", "y", "yes"):
+                subprocess.run(["git", "-C", str(path), "fetch"])
+                path, problem = check(path, spec, pin)
+                if problem:
+                    print(f"  {show(path)} still {problem}, after fetching.")
+        elif problem:
+            print(f"  {show(path)} {problem}.")
+        if not problem:
+            return path
+        # A suggestion that turned out wrong stops being the default, so Enter offers a clone.
+        if default and Path(answer).expanduser().resolve() == default:
+            default = None
+
+
+def environment():
+    healthy = VENV_PY.exists() and subprocess.run([str(VENV_PY), "-c", ""]).returncode == 0
+    if not healthy:
+        say(f"Creating the Python environment in {show(VENV)}")
+        if subprocess.run([sys.executable, "-m", "venv", "--clear", str(VENV)]).returncode:
+            die("couldn't create the environment: see the message above")
+    say(f"Installing {show(WIKI / 'requirements.txt')}")
+    pip = [str(VENV_PY), "-m", "pip", "install", "-q", "--disable-pip-version-check", "-r", str(WIKI / "requirements.txt")]
+    if subprocess.run(pip).returncode:
+        die("couldn't install the requirements: see the message above")
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    for spec in GAME_REPOS:
+        ap.add_argument(f"--{spec['flag']}", metavar="PATH", help=f"your {spec['github']} checkout")
+    args = ap.parse_args()
+    if sys.version_info < (3, 9):
+        die(f"Python 3.9 or newer is needed; this is {sys.version.split()[0]}")
+
+    interactive = sys.stdin.isatty()
+    pin = pinned_commit()
+    chosen = {spec["key"]: choose(spec, getattr(args, spec["flag"].replace("-", "_")), interactive, pin)
+              for spec in GAME_REPOS}
+    print()
+    for spec in GAME_REPOS:
+        git("config", f"ntre.{spec['key']}", str(chosen[spec["key"]]))
+        say(f"{spec['github']}: {show(chosen[spec['key']])}")
+
+    environment()
+    say("Ready. Preview the wiki with ./serve")
+
+
+if __name__ == "__main__":
+    main()

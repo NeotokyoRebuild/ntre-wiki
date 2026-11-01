@@ -14,7 +14,10 @@ WIKI = Path(__file__).resolve().parent.parent
 REPO = WIKI.parent
 DATA = WIKI / "data"
 DOCS = WIKI / "docs"
-DEFAULT_NEO = REPO.parent / "neo"
+
+# The neo checkout ./setup recorded in this repository's git config, else ../neo.
+_configured = subprocess.run(["git", "-C", str(REPO), "config", "--get", "ntre.neo"], capture_output=True, text=True)
+DEFAULT_NEO = Path(_configured.stdout.strip()) if _configured.stdout.strip() else REPO.parent / "neo"
 
 # Files whose text can hold citations: the data, the pages, and the generators.
 def cited_files():
@@ -85,7 +88,7 @@ class Neo:
     def __init__(self, path=DEFAULT_NEO):
         self.path = Path(path)
         if not (self.path / ".git").exists():
-            raise SystemExit(f"no neo checkout at {self.path}; pass --neo PATH")
+            raise SystemExit(f"no neo checkout at {self.path}; run ./setup, or pass --neo PATH")
 
     def git(self, *args, check=True):
         r = subprocess.run(["git", "-C", str(self.path), *args], capture_output=True, text=True)

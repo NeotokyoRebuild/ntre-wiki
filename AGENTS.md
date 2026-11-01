@@ -8,6 +8,7 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 
 ## Layout
 
+- `setup`, `serve`: set up a checkout once, and preview the wiki
 - `wiki/mkdocs.yml`: site config, including the sidebar menu (`nav`). A new page needs a nav entry.
 - `wiki/docs/**/*.md`: pages. Folders follow the menu (`weapons/rifles/zr68-s.md`); a folder's `index.md` is its section page.
 - `wiki/data/*.json`: gameplay data extracted from the NT;RE source, one record per value with a `source` citation
@@ -18,7 +19,7 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 - `wiki/docs/stylesheets/ntre.css`: the skin; colours are `--ntre-*` tokens with dark (`slate`) and light (`default`) sets
 - `wiki/overrides/`: theme overrides. `partials/logo.html` inlines `docs/assets/nt-mark.svg` (the primary logo, from Wireframe) into the header.
 
-Set up with `cd wiki && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`. Preview with `.venv/bin/mkdocs serve`; check with `.venv/bin/mkdocs build --strict`, which fails on red links and unknown snippets. A clean build prints no warnings. Keep builds and deploys loud: never add `--quiet` to a strict build, because it hides the warnings and strict mode then passes them.
+Set up with `./setup`: it creates `wiki/.venv` and records the `neo` and `neoAssets` checkouts in this repository's git config as `ntre.neo` and `ntre.neoassets`, which the data tools read. Preview with `./serve`; check with `.venv/bin/mkdocs build --strict` from `wiki/`, which fails on red links and unknown snippets. A clean build prints no warnings. Keep builds and deploys loud: never add `--quiet` to a strict build, because it hides the warnings and strict mode then passes them.
 
 ## Deploying
 
@@ -32,7 +33,7 @@ The wiki deploys with `wiki/deploy.sh <version> [title]`, which runs `mike` to p
 
 ## Data rules
 
-- Every gameplay number must trace to a `path:line` in `NeotokyoRebuild/neo` (local checkout at `../neo`) or `NeotokyoRebuild/neoAssets` (you need a local checkout of it too; where you keep it is up to you). The commit is pinned in each JSON file's `meta.neo_commit`.
+- Every gameplay number must trace to a `path:line` in `NeotokyoRebuild/neo` or `NeotokyoRebuild/neoAssets`. Where the local checkouts are is up to each contributor: `git config ntre.neo` and `git config ntre.neoassets` give them (the examples here use `../neo`). The commit is pinned in each JSON file's `meta.neo_commit`.
 - Read cited code at the pinned commit, never from the checkout's working tree, which can be ahead of or behind it: `git -C ../neo show <commit>:<path> | sed -n '<a>,<b>p'`. Don't number lines with `nl`: it skips blank lines, so every number after one is wrong.
 - Never guess a value. If the code is ambiguous or client and server disagree, record both in a `note` and say so on the page.
 - Values derived arithmetically carry `derived: true` and a `formula`.

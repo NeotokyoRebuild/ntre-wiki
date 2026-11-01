@@ -2,24 +2,29 @@
 
 A wiki for [NEOTOKYO Rebuild](https://github.com/NeotokyoRebuild/neo). Pre-alpha. The wiki is built with [MkDocs](https://www.mkdocs.org/) and the Material theme, in `wiki/`.
 
+## Quick Start
+
+```sh
+git clone https://github.com/sunmachine/ntre-wiki.git
+cd ntre-wiki
+./setup
+```
+
+### Modifying the wiki
+
+```sh
+./serve
+```
+
 ## Layout
 
 - `wiki/`: the MkDocs wiki, built from Markdown pages and game data extracted from the NT;RE source
+- `setup`: sets up a checkout once: asks where your checkouts of the game's repositories are, and creates the Python environment
+- `serve`: previews the wiki at http://127.0.0.1:8000/
 
 ## Contributing
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to edit pages, add one, or change the game data, and [`WRITING-STYLE.md`](WRITING-STYLE.md) for how the wiki is written.
-
-## Build the wiki
-
-```sh
-cd wiki
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/mkdocs serve
-```
-
-Then open http://127.0.0.1:8000/. `mkdocs build --strict` fails on red links and unknown snippets.
 
 ## Deploy
 

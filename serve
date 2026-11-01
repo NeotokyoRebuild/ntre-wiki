@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Preview the wiki at http://127.0.0.1:8000/. It rebuilds when you save a page, a data
+# file, column-tips.yml or the hook code. Extra arguments go to `mkdocs serve`.
+set -euo pipefail
+cd "$(dirname "$0")/wiki"
+[[ -x .venv/bin/mkdocs ]] || { printf '\033[31merror:\033[0m no Python environment yet: run ./setup\n' >&2; exit 1; }
+export NO_MKDOCS_2_WARNING=1
+exec .venv/bin/mkdocs serve "$@"

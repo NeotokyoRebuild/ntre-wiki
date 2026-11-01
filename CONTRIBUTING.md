@@ -7,15 +7,15 @@ Read [`WRITING-STYLE.md`](WRITING-STYLE.md) before you write anything. It covers
 ## Set up
 
 ```sh
-cd wiki
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/mkdocs serve
+./setup     # once
+./serve     # each time you work
 ```
 
-Then open http://127.0.0.1:8000/. The preview rebuilds when you save a page, a data file, `column-tips.yml` or the hook code.
+`./setup` needs Python 3.9 or newer. It asks where your checkouts of the game's repositories are, [NeotokyoRebuild/neo](https://github.com/NeotokyoRebuild/neo) and [NeotokyoRebuild/neoAssets](https://github.com/NeotokyoRebuild/neoAssets). It suggests any it finds next to this repository and offers to clone a missing one there. Then it creates the Python environment in `wiki/.venv`. The paths go in this repository's git config (`ntre.neo`, `ntre.neoassets`), where the data tools read them. Run it again to change a path or repair the environment. Don't change either game checkout: the tools read them by commit.
 
-To check citations or change numbers you also need checkouts of the game's repositories, [NeotokyoRebuild/neo](https://github.com/NeotokyoRebuild/neo) and [NeotokyoRebuild/neoAssets](https://github.com/NeotokyoRebuild/neoAssets). The examples here assume `neo` sits next to this repository, at `../neo`. Don't change either checkout.
+`./serve` previews the wiki at http://127.0.0.1:8000/. It rebuilds when you save a page, a data file, `column-tips.yml` or the hook code.
+
+The examples here assume `neo` sits next to this repository, at `../neo`.
 
 ## How a page is put together
 
