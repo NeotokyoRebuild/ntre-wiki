@@ -1,0 +1,8 @@
+# A pull request that changes any of these needs the maintainer's approval before it can
+# merge (the `main` ruleset requires code owner review). They decide what 🏗 CI checks
+# and what 🚀 Deploy and ⏪ Rollback publish. GitHub reads this file from `main`, so a
+# pull request can't lift its own requirement.
+/.github/   @sunmachine
+/deploy     @sunmachine
+/check      @sunmachine
+/setup      @sunmachine

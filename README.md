@@ -30,7 +30,7 @@ cd ntre-wiki
 
 ## Contributing
 
-Contributions reach `main` through pull requests. Push your branch and open a PR against `main`: 🏗 CI runs `./check` on it, and once it passes you can merge your own PR.
+Contributions reach `main` through pull requests. Push your branch and open a PR against `main`: 🏗 CI runs `./check` on it, and once it passes you can merge your own PR. A PR that changes `.github/` (the workflows), `deploy`, `check` or `setup` also needs the maintainer's approval.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to edit pages, add one, or change the game data, and [`WRITING-STYLE.md`](WRITING-STYLE.md) for how the wiki is written.
 
