@@ -23,6 +23,7 @@ The rules every page on this wiki follows. The writing rules live in `WRITING-ST
 - In numeric table columns, citation markers come before the value, so the numbers line up on their right edge. Text cells and infoboxes keep them after the text. The build moves them; write citations after the value as usual.
 - Red is for the brand dot only: after page titles and beside the current page. Never for link text, because red text means a missing page.
 - Link underlines are a cool, desaturated cyan. On hover the line fills left to right, snaps into place, pulses once and settles. Cards lift to a lighter surface on hover instead.
+- Icon buttons, like "Edit this page", are small: the icon at 60% of the theme's size, in a circle with a hairline border. They stay muted until hovered.
 - The NT;RE mark is the primary logo. The wordmark appears only on the main page.
 - Image slots are grey placeholders labelled with what belongs there, until assets are licensed.
 
