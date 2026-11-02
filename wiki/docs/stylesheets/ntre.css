@@ -132,6 +132,19 @@ body {
   font-weight: 650;
   letter-spacing: -0.01em;
 }
+/* The header carries two repository links (overrides/partials/source.html),
+   side by side. */
+@media screen and (min-width: 60em) {
+  .md-header__source {
+    display: flex;
+    gap: 0.8rem;
+    width: auto;
+    max-width: none;
+  }
+  .md-header__source .md-source {
+    width: 11rem;
+  }
+}
 .md-search__input {
   font-size: var(--ntre-text-secondary);
 }

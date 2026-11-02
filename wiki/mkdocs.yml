@@ -3,10 +3,13 @@ site_name: NT;RE Wiki
 # local builds and previews carry no host URL and serve from /.
 site_url: !ENV NTRE_WIKI_URL
 site_description: Reference wiki for NEOTOKYO Rebuild, with every stat sourced from the game's code.
-repo_url: https://github.com/sunmachine/ntre-wiki
-repo_name: sunmachine/ntre-wiki
-# "Edit this page" opens the page's Markdown in GitHub's editor.
-edit_uri: edit/main/wiki/docs/
+# The header links to the game's repositories (extra.repos below), not to
+# this one. repo_url only switches that header slot on.
+repo_url: https://github.com/NeotokyoRebuild/neo
+repo_name: NeotokyoRebuild/neo
+# "Edit this page" opens the page's Markdown in GitHub's editor, in this
+# repository. It's a full address because repo_url points elsewhere.
+edit_uri: https://github.com/sunmachine/ntre-wiki/edit/main/wiki/docs/
 
 theme:
   name: material
@@ -47,8 +50,16 @@ theme:
 extra_css:
   - stylesheets/ntre.css
 
+extra_javascript:
+  - javascripts/sources.js
+
 extra:
   generator: false
+  # The repositories linked in the header, drawn by
+  # overrides/partials/source.html with facts from docs/javascripts/sources.js.
+  repos:
+    - NeotokyoRebuild/neo
+    - NeotokyoRebuild/neoAssets
   # Version dropdown in the header, fed by `mike` on the gh-pages branch.
   # It stays hidden until a versions.json exists, so local builds show nothing.
   version:

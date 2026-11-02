@@ -1,0 +1,17 @@
+{#- The header's repository links, one per entry in `extra.repos` (mkdocs.yml).
+    Material's own widget shows one repository and caches its stars and forks
+    under a single key, so these leave out its `data-md-component="source"`;
+    docs/javascripts/sources.js fills in each one's facts instead. Two full
+    owner/name labels don't fit the header, so each shows its name, with the
+    owner in the tooltip. -#}
+{%- for repo in config.extra.repos %}
+<a href="https://github.com/{{ repo }}" title="{{ repo }}" class="md-source" data-ntre-source="{{ repo }}">
+  <div class="md-source__icon md-icon">
+    {% set icon = config.theme.icon.repo or "fontawesome/brands/git-alt" %}
+    {% include ".icons/" ~ icon ~ ".svg" %}
+  </div>
+  <div class="md-source__repository">
+    {{ repo.split("/")[-1] }}
+  </div>
+</a>
+{%- endfor %}
