@@ -11,7 +11,8 @@
 #   ./deploy --dry-run ...          a deploy, rollback or delete, without the push
 #
 # A deploy only runs from a clean tree whose HEAD is on main in sunmachine/ntre-wiki, and
-# only after ./check passes. The ⏪ Rollback workflow runs rollback. Delete never touches
+# only after ./check passes. A new version identical to what `latest` serves is not
+# deployed. The ⏪ Rollback workflow runs rollback. Delete never touches
 # the version `latest` points at. The published address is set here and nowhere else
 # (override with NTRE_WIKI_URL).
 set -euo pipefail
@@ -137,6 +138,22 @@ print({"minor": f"{major}.{minor + 1}", "major": f"{major + 1}.0"}.get(kind, kin
     cd wiki
     mike deploy --remote "$REMOTE" --branch "$BRANCH" --update-aliases --title "$title" \
       -m "Deploy the wiki $version from $sha" "$version" latest
+  )
+  # A new version identical to what latest/ already serves would only add a duplicate to
+  # the version menu: stop instead, and discard the local commit. The sitemaps don't
+  # count: they carry the build date.
+  if [[ $kind == minor || $kind == major ]] && [[ -n $BASE ]] \
+     && git rev-parse -q --verify "$BASE:latest" >/dev/null \
+     && git diff --quiet "$BASE:latest" "$BRANCH:$version" -- . ':(exclude)sitemap.xml' ':(exclude)sitemap.xml.gz'; then
+    git branch -f "$BRANCH" "$BASE"
+    local current
+    current=$(versions_json | python3 -c 'import json, sys; print(next((v["version"] for v in json.load(sys.stdin) if "latest" in v["aliases"]), "latest"))')
+    [[ -z ${GITHUB_ACTIONS:-} ]] || echo "::notice title=Nothing to deploy::The site built from $sha is identical to $current, which latest already serves."
+    say "Nothing to deploy: the site built from $sha is identical to $current, which latest already serves"
+    return 0
+  fi
+  (
+    cd wiki
     mike set-default --remote "$REMOTE" --branch "$BRANCH" --template redirect.html \
       -m "Point the wiki at $version" latest
   )

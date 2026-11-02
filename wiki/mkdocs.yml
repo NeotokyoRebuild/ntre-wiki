@@ -3,9 +3,10 @@ site_name: NT;RE Wiki
 # local builds and previews carry no host URL and serve from /.
 site_url: !ENV NTRE_WIKI_URL
 site_description: Reference wiki for NEOTOKYO Rebuild, with every stat sourced from the game's code.
-repo_url: https://github.com/NeotokyoRebuild/neo
-repo_name: NeotokyoRebuild/neo
-edit_uri: ""
+repo_url: https://github.com/sunmachine/ntre-wiki
+repo_name: sunmachine/ntre-wiki
+# "Edit this page" opens the page's Markdown in GitHub's editor.
+edit_uri: edit/main/wiki/docs/
 
 theme:
   name: material
@@ -41,6 +42,7 @@ theme:
     - search.highlight
     - content.footnote.tooltips
     - content.tooltips
+    - content.action.edit
 
 extra_css:
   - stylesheets/ntre.css

@@ -62,4 +62,4 @@ The wiki engine is MkDocs Material (decided 2026-11-01). Material reaches end of
 
 - Data model for game facts
 - Content and media licensing (currently all rights reserved)
-- Hosting: self-hosted on the homelab K3s cluster, exposed through the VPS later
+- Hosting: GitHub Pages, from the `gh-pages` branch of `sunmachine/ntre-wiki`, for now
