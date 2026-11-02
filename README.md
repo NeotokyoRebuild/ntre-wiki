@@ -30,7 +30,7 @@ cd ntre-wiki
 
 ## Contributing
 
-Every change reaches `main` through a pull request. Push your branch and open a PR against `main`: 🏗 CI runs `./check` on it, and a maintainer reviews it. A PR is merged once CI passes and a maintainer approves it.
+Every change reaches `main` through a pull request. Push your branch and open a PR against `main`: 🏗 CI runs `./check` on it, and the PR can merge once CI passes. Only contributors with write access to the repository merge PRs.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to edit pages, add one, or change the game data, and [`WRITING-STYLE.md`](WRITING-STYLE.md) for how the wiki is written.
 
