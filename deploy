@@ -62,7 +62,7 @@ fetch_pages() {
 versions_json() { if [[ -n $BASE ]]; then git show "$BRANCH:versions.json"; else echo '[]'; fi; }
 
 # A regex matching any of the given versions exactly, as a path segment: 0.1 -> 0\.1
-versions_re() { local IFS='|'; local v=("${@//./\\.}"); printf '%s' "${v[*]}"; }
+versions_re() { local out= v; for v in "$@"; do out+=${out:+|}${v//./\\.}; done; printf '%s' "$out"; }
 
 # Guard rails for the local commit: no symlinks (GitHub Pages rejects them), a fast-forward
 # of the remote, and every changed path matching $1.
