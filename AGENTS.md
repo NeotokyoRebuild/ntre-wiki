@@ -28,7 +28,7 @@ Set up with `./setup`: it creates `wiki/.venv` and records the `neo` and `neoAss
 
 The wiki is published at https://sunmachine.github.io/ntre-wiki/, from the `gh-pages` branch of `sunmachine/ntre-wiki`. The 🚀 Deploy workflow runs `./deploy`, which has `mike` build `main` into a new version folder (the next minor version by default, or the next major when chosen), points `latest` and the site's root at it, and pushes. It refuses a dirty tree, a commit that isn't on `main` in `sunmachine/ntre-wiki`, a failing `./check`, symlinks, and changes outside the new version, `latest/` and mike's root files. The published address is set only in `deploy`: don't hard-code it in `mkdocs.yml` or in pages. Never use `mkdocs gh-deploy`: it replaces the whole branch, and every earlier version with it. GitHub Pages rejects symlinks, which is why `mkdocs.yml` sets mike's `alias_type: copy`. Deploying publishes to a public site: do it only when asked.
 
-Changes reach `main` only through pull requests that pass 🏗 CI.
+A ruleset on `main` requires a pull request that passes 🏗 CI (no approval needed), and blocks force pushes and deletion. Contributors merge their own PRs once CI passes. The maintainer, and agents working with them, push to `main` directly through the admin bypass.
 
 ## Style guide
 

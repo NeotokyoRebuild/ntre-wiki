@@ -151,7 +151,7 @@ It runs the strict build, then the data check against the game's code. These are
 - a table column with no tooltip
 - a mention of a game mode still in development outside its own pages (see "Modes in development" in `WRITING-STYLE.md`)
 
-Every change reaches `main` through a pull request: commit on a branch, push it, and open a PR against `main`. It can merge once 🏗 CI passes, and a contributor with write access to the repository merges it.
+Contributions reach `main` through pull requests: commit on a branch, push it, and open a PR against `main`. Once 🏗 CI passes, you can merge it yourself; no approval is needed.
 
 - **Commit messages** start with a short, imperative summary in sentence case ("Generate the cloak battery table from the data"), then a body that says why.
 - **Style changes go with the change.** A change to how the wiki is written updates `WRITING-STYLE.md`, and a change to how it looks updates the Style guide page (`wiki/docs/about/style-guide.md`), in the same commit.
