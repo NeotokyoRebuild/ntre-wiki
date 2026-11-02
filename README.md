@@ -25,8 +25,8 @@ cd ntre-wiki
 - `setup`: sets up a checkout once: asks where your checkouts of the game's repositories are, and creates the Python environment
 - `serve`: previews the wiki at http://127.0.0.1:8000/
 - `check`: the checks every change must pass: the strict build, and the data checked against the game's code
-- `deploy`: publishes the wiki (the 🚀 Deploy workflow runs it), and lists and deletes deployed versions
-- `.github/workflows/`: the 🏗 CI and 🚀 Deploy workflows
+- `deploy`: publishes the wiki and rolls it back (the 🚀 Deploy and ⏪ Rollback workflows run it), and lists and deletes deployed versions
+- `.github/workflows/`: the 🏗 CI, 🚀 Deploy and ⏪ Rollback workflows
 
 ## Contributing
 
@@ -37,6 +37,8 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to edit pages, add one, or chan
 ## Deploy
 
 The wiki is published at https://sunmachine.github.io/ntre-wiki/. Maintainers deploy it with the 🚀 Deploy workflow, from the Actions tab. Each run publishes `main` as the next minor version (0.3 → 0.4) and makes it `latest`; choose `major` to start the next major version (0.4 → 1.0). Earlier versions stay in the header's version menu.
+
+To undo a bad deploy, run the ⏪ Rollback workflow with the version to go back to (such as `0.2`). It points `latest` at that version without rebuilding anything. It doesn't change `main`, so fix or revert the change there before the next deploy, which publishes `main` again.
 
 To remove old versions, run these locally. `delete` shows what it will delete and keep, asks first, and never deletes the version `latest` points at:
 

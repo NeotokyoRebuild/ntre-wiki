@@ -5,13 +5,15 @@
 #   ./deploy                        deploy the next minor version: 0.3 -> 0.4 (the first is 0.1)
 #   ./deploy major                  deploy the next major version: 0.4 -> 1.0
 #   ./deploy 0.4 [TITLE]            deploy that exact version, replacing it if it exists
+#   ./deploy rollback VERSION       point `latest` at a deployed version, without a build
 #   ./deploy list                   list the deployed versions
 #   ./deploy delete VERSION...      delete versions from the site, after asking
-#   ./deploy --dry-run ...          a deploy or delete, without the push
+#   ./deploy --dry-run ...          a deploy, rollback or delete, without the push
 #
 # A deploy only runs from a clean tree whose HEAD is on main in sunmachine/ntre-wiki, and
-# only after ./check passes. Delete never touches the version `latest` points at. The
-# published address is set here and nowhere else (override with NTRE_WIKI_URL).
+# only after ./check passes. The ⏪ Rollback workflow runs rollback. Delete never touches
+# the version `latest` points at. The published address is set here and nowhere else
+# (override with NTRE_WIKI_URL).
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -144,6 +146,37 @@ print({"minor": f"{major}.{minor + 1}", "major": f"{major + 1}.0"}.get(kind, kin
   say "Published ${NTRE_WIKI_URL}latest/ ($version from $sha)"
 }
 
+# ./deploy rollback VERSION: moves `latest` (a copy of a version's folder) to another
+# deployed version. Nothing is built, and main isn't touched: the next deploy publishes
+# main again.
+rollback_to() {
+  [[ $# -eq 1 ]] || die "name one version to roll back to, e.g. ./deploy rollback 0.2 (./deploy list shows them)"
+  local target=$1 current
+  [[ $target =~ ^[0-9]+\.[0-9]+$ ]] || die "not a version: $target (use a version like 0.2)"
+  fetch_pages
+  [[ -n $BASE ]] || die "nothing is deployed yet"
+  current=$(versions_json | python3 -c '
+import json, sys
+target = sys.argv[1]
+versions = json.load(sys.stdin)
+current = next((v["version"] for v in versions if "latest" in v["aliases"]), "")
+if target not in [v["version"] for v in versions]:
+    sys.exit("error: " + target + " is not a deployed version (./deploy list shows them)")
+if target == current:
+    sys.exit("error: latest already points at " + target)
+print(current)' "$target")
+
+  say "Moving latest from ${current:-nothing} to $target"
+  (
+    cd wiki
+    mike alias --remote "$REMOTE" --branch "$BRANCH" --update-aliases \
+      -m "Roll the wiki back to $target (latest was ${current:-unset})" "$target" latest
+  )
+  check_result "^latest/|^versions\.json$" "the rollback changed files outside latest/"
+  publish
+  say "Published ${NTRE_WIKI_URL}latest/ ($target)"
+}
+
 # ./deploy list: each version with its aliases, and when and from which commit it was
 # deployed (read from mike's commit messages).
 list_versions() {
@@ -204,6 +237,7 @@ print("Keep:  ", ", ".join(v + (" (" + ", ".join(d["aliases"]) + ")" if d["alias
 find_remote
 case ${1:-} in
   list) list_versions ;;
+  rollback) shift; rollback_to "$@" ;;
   delete) shift; delete_versions "$@" ;;
   *) deploy_version "$@" ;;
 esac

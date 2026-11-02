@@ -10,8 +10,8 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 
 - `setup`, `serve`: set up a checkout once, and preview the wiki
 - `check`: the checks every change must pass, the strict build and `tools/check_data.py`. CI runs it on every pull request, and `deploy` runs it first.
-- `deploy`: publishes a new version of the wiki (the 🚀 Deploy workflow runs it); `deploy list` and `deploy delete VERSION...` manage deployed versions, locally only
-- `.github/workflows/`: `ci.yml` (🏗 CI, every pull request into `main`) and `deploy.yml` (🚀 Deploy, run by hand). `.github/actions/setup/` checks out `neo` and `neoAssets` next to the repository and runs `./setup`, for both.
+- `deploy`: publishes a new version of the wiki (the 🚀 Deploy workflow runs it); `deploy rollback VERSION` points `latest` at an earlier version (the ⏪ Rollback workflow runs it); `deploy list` and `deploy delete VERSION...` manage deployed versions, locally only
+- `.github/workflows/`: `ci.yml` (🏗 CI, every pull request into `main`), `deploy.yml` (🚀 Deploy, run by hand) and `rollback.yml` (⏪ Rollback, run by hand with the target version as its input; it shares the deploy's queue). `.github/actions/setup/` checks out `neo` and `neoAssets` next to the repository and runs `./setup`, for both.
 - `wiki/mkdocs.yml`: site config, including the sidebar menu (`nav`). A new page needs a nav entry.
 - `wiki/docs/**/*.md`: pages. Folders follow the menu (`weapons/rifles/zr68-s.md`); a folder's `index.md` is its section page.
 - `wiki/data/*.json`: gameplay data extracted from the NT;RE source, one record per value with a `source` citation

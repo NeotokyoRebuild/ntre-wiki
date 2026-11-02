@@ -1,0 +1,45 @@
+name: "⏪ Rollback"
+
+# Point https://sunmachine.github.io/ntre-wiki/latest/ at an earlier deployed version.
+# Nothing is rebuilt and main isn't changed, so the next 🚀 Deploy publishes main again:
+# fix or revert the change on main before then.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to point latest at, such as 0.2 (see the version menu on the site, or ./deploy list)"
+        type: string
+        required: true
+
+permissions:
+  contents: write     # push the gh-pages branch
+  pages: read         # check that GitHub Pages is set up
+  deployments: read   # wait for GitHub Pages to publish
+
+# Shares the deploy's queue, so a rollback and a deploy never run at once.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Rollback
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ntre-wiki
+          fetch-depth: 0
+
+      - uses: ./ntre-wiki/.github/actions/setup
+
+      - name: ./deploy rollback ${{ inputs.version }}
+        working-directory: ntre-wiki
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./deploy rollback "$VERSION"
