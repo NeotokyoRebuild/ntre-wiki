@@ -317,7 +317,7 @@ body {
   initial-value: #a2bec3;
 }
 
-.md-typeset a:not(.footnote-ref):not(.footnote-backref):not(.headerlink):not(.md-button):not(.new) {
+.md-typeset a:not(.footnote-ref):not(.footnote-backref):not(.headerlink):not(.md-button):not(.new):not(.md-content__button) {
   color: var(--ntre-text-strong);
   --ntre-ul-c: var(--ntre-underline);
   background-image: linear-gradient(var(--ntre-ul-c), var(--ntre-ul-c)),
@@ -328,7 +328,7 @@ body {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.md-typeset a:not(.footnote-ref):not(.footnote-backref):not(.headerlink):not(.md-button):not(.new):is(:hover, :focus-visible) {
+.md-typeset a:not(.footnote-ref):not(.footnote-backref):not(.headerlink):not(.md-button):not(.new):not(.md-content__button):is(:hover, :focus-visible) {
   color: var(--ntre-text-strong);
   animation: ntre-underline-fill 400ms forwards;
 }
@@ -361,6 +361,29 @@ body {
     animation: none;
   }
 }
+/* "Edit this page": the icon at 60% of Material's size, in a thin circle. It stays
+   muted until hovered, so it doesn't compete with the page title beside it. */
+.md-typeset .md-content__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.2rem;
+  border: 1px solid var(--ntre-border-strong);
+  border-radius: 50%;
+  color: var(--ntre-muted);
+  transition: color 150ms ease-out, border-color 150ms ease-out;
+}
+.md-typeset .md-content__button:is(:hover, :focus-visible) {
+  border-color: var(--ntre-muted);
+  color: var(--ntre-text-strong);
+}
+.md-content__button.md-icon svg {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
 /* A link to a page that doesn't exist yet. */
 .md-typeset a.new {
   color: var(--ntre-danger);
