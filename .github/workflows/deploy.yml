@@ -1,15 +1,20 @@
 name: "🚀 Deploy"
 
 # Publish main to https://sunmachine.github.io/ntre-wiki/ as a new version. Run it from
-# the Actions tab: it deploys the next minor version unless you choose major.
+# the Actions tab: it deploys the next minor version after latest, unless you choose
+# major or type an exact version.
 on:
   workflow_dispatch:
     inputs:
       bump:
-        description: "Version to deploy: the next minor (0.3 → 0.4) or the next major (0.4 → 1.0)"
+        description: "Next version after latest: minor (0.3 → 0.4) or major (0.4 → 1.0). Versions that already exist are skipped."
         type: choice
         options: [minor, major]
         default: minor
+      version:
+        description: "Or an exact version, M.m (such as 0.4), instead of the bump. Replaces that version if it exists."
+        type: string
+        required: false
       title:
         description: "Title in the version menu (default: the version number)"
         type: string
@@ -38,13 +43,14 @@ jobs:
 
       - uses: ./ntre-wiki/.github/actions/setup
 
-      - name: ./deploy ${{ inputs.bump }}
+      - name: ./deploy ${{ inputs.version || inputs.bump }}
         working-directory: ntre-wiki
         env:
           GH_TOKEN: ${{ github.token }}
           BUMP: ${{ inputs.bump }}
+          VERSION: ${{ inputs.version }}
           TITLE: ${{ inputs.title }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          ./deploy "$BUMP" ${TITLE:+"$TITLE"}
+          ./deploy "${VERSION:-$BUMP}" ${TITLE:+"$TITLE"}

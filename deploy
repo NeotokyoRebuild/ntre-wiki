@@ -2,13 +2,18 @@
 # Publish the wiki to https://sunmachine.github.io/ntre-wiki/, and manage the versions on
 # the gh-pages branch of sunmachine/ntre-wiki. The 🚀 Deploy workflow runs the first two.
 #
-#   ./deploy                        deploy the next minor version: 0.3 -> 0.4 (the first is 0.1)
-#   ./deploy major                  deploy the next major version: 0.4 -> 1.0
-#   ./deploy 0.4 [TITLE]            deploy that exact version, replacing it if it exists
+#   ./deploy [minor] [TITLE]        deploy the next minor version after latest: 0.3 -> 0.4
+#   ./deploy major [TITLE]          deploy the next major version after latest: 0.4 -> 1.0
+#   ./deploy M.m [TITLE]            deploy that exact version, replacing it if it exists
 #   ./deploy rollback VERSION       point `latest` at a deployed version, without a build
 #   ./deploy list                   list the deployed versions
 #   ./deploy delete VERSION...      delete versions from the site, after asking
 #   ./deploy --dry-run ...          a deploy, rollback or delete, without the push
+#
+# minor and major count from the version `latest` points at (the first deploy is 0.1, or
+# 1.0 for major), and skip versions that already exist by applying the same step again:
+# with latest at 0.1 and 0.2 deployed, the next minor is 0.3. An exact version must be
+# M.m: two whole numbers without leading zeros, such as 0.4 or 1.10.
 #
 # A deploy only runs from a clean tree whose HEAD is on main in sunmachine/ntre-wiki, and
 # only after ./check passes. A new version identical to what `latest` serves is not
@@ -61,6 +66,9 @@ fetch_pages() {
 
 versions_json() { if [[ -n $BASE ]]; then git show "$BRANCH:versions.json"; else echo '[]'; fi; }
 
+# A version is M.m: two whole numbers without leading zeros (0.4, 1.10; not 01.2 or 1.2.3).
+is_version() { [[ $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; }
+
 # A regex matching any of the given versions exactly, as a path segment: 0.1 -> 0\.1
 versions_re() { local out= v; for v in "$@"; do out+=${out:+|}${v//./\\.}; done; printf '%s' "$out"; }
 
@@ -104,33 +112,43 @@ publish() {
   fi
 }
 
-# ./deploy [minor|major|VERSION [TITLE]]
+# ./deploy [minor|major|M.m] [TITLE]
 deploy_version() {
+  local sha kind version title
+  kind=${1:-minor}
+  case $kind in
+    minor|major) ;;
+    *) is_version "$kind" || die "not a version: $kind (use minor, major, or M.m, such as 0.4)" ;;
+  esac
+
   say "Checking the source"
   [[ -z $(git status --porcelain) ]] || die "uncommitted changes: commit and merge them first"
   git fetch -q "$REMOTE" main
   git merge-base --is-ancestor HEAD FETCH_HEAD || die "HEAD $(git rev-parse --short HEAD) isn't on $REMOTE/main"
-  local sha kind version title
   sha=$(git rev-parse --short HEAD)
   ./check
   fetch_pages
 
-  kind=${1:-minor}
-  case $kind in
-    minor|major) ;;
-    *) [[ $kind =~ ^[0-9]+\.[0-9]+$ ]] || die "not a version: $kind (use minor, major, or a version like 0.4)" ;;
-  esac
   version=$(versions_json | python3 -c '
 import json, sys
 kind = sys.argv[1]
-deployed = []
+if kind not in ("minor", "major"):
+    print(kind)
+    sys.exit()
+deployed, latest = set(), None
 for v in json.load(sys.stdin):
     try:
-        deployed.append(tuple(int(n) for n in v["version"].split(".")))
+        number = tuple(int(n) for n in v["version"].split("."))
     except ValueError:
-        pass
-major, minor = max(deployed) if deployed else (0, 0)
-print({"minor": f"{major}.{minor + 1}", "major": f"{major + 1}.0"}.get(kind, kind))' "$kind")
+        continue
+    deployed.add(number)
+    if "latest" in v["aliases"]:
+        latest = number
+step = (lambda m, n: (m, n + 1)) if kind == "minor" else (lambda m, n: (m + 1, 0))
+target = step(*(latest or max(deployed, default=(0, 0))))
+while target in deployed:
+    target = step(*target)
+print("%d.%d" % target)' "$kind")
   title=${2:-$version}
 
   say "Deploying $version ($title) from $sha to $BRANCH"
@@ -169,7 +187,7 @@ print({"minor": f"{major}.{minor + 1}", "major": f"{major + 1}.0"}.get(kind, kin
 rollback_to() {
   [[ $# -eq 1 ]] || die "name one version to roll back to, e.g. ./deploy rollback 0.2 (./deploy list shows them)"
   local target=$1 current
-  [[ $target =~ ^[0-9]+\.[0-9]+$ ]] || die "not a version: $target (use a version like 0.2)"
+  is_version "$target" || die "not a version: $target (use M.m, such as 0.2)"
   fetch_pages
   [[ -n $BASE ]] || die "nothing is deployed yet"
   current=$(versions_json | python3 -c '
