@@ -10,7 +10,7 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 
 - `setup`, `serve`: set up a checkout once, and preview the wiki
 - `check`: the checks every change must pass, the strict build and `tools/check_data.py`. CI runs it on every pull request, and `deploy` runs it first.
-- `deploy`: publishes a new version of the wiki; the 🚀 Deploy workflow runs it
+- `deploy`: publishes a new version of the wiki (the 🚀 Deploy workflow runs it); `deploy list` and `deploy delete VERSION...` manage deployed versions, locally only
 - `.github/workflows/`: `ci.yml` (🏗 CI, every pull request into `main`) and `deploy.yml` (🚀 Deploy, run by hand). `.github/actions/setup/` checks out `neo` and `neoAssets` next to the repository and runs `./setup`, for both.
 - `wiki/mkdocs.yml`: site config, including the sidebar menu (`nav`). A new page needs a nav entry.
 - `wiki/docs/**/*.md`: pages. Folders follow the menu (`weapons/rifles/zr68-s.md`); a folder's `index.md` is its section page.
@@ -26,7 +26,7 @@ Set up with `./setup`: it creates `wiki/.venv` and records the `neo` and `neoAss
 
 ## Deploying
 
-The wiki is published at https://sunmachine.github.io/ntre-wiki/, from the `gh-pages` branch of `sunmachine/ntre-wiki`. The 🚀 Deploy workflow runs `./deploy`, which has `mike` build `main` into a new version folder (the next minor version by default, or the next major when chosen), points `latest` and the site's root at it, and pushes. It refuses a dirty tree, a commit that isn't on `main` in `sunmachine/ntre-wiki`, a failing `./check`, symlinks, and changes outside the new version, `latest/` and mike's root files. The published address is set only in `deploy`: don't hard-code it in `mkdocs.yml` or in pages. Never use `mkdocs gh-deploy`: it replaces the whole branch, and every earlier version with it. GitHub Pages rejects symlinks, which is why `mkdocs.yml` sets mike's `alias_type: copy`. Deploying publishes to a public site: do it only when asked.
+The wiki is published at https://sunmachine.github.io/ntre-wiki/, from the `gh-pages` branch of `sunmachine/ntre-wiki`. The 🚀 Deploy workflow runs `./deploy`, which has `mike` build `main` into a new version folder (the next minor version by default, or the next major when chosen), points `latest` and the site's root at it, and pushes. It refuses a dirty tree, a commit that isn't on `main` in `sunmachine/ntre-wiki`, a failing `./check`, symlinks, and changes outside the new version, `latest/` and mike's root files. The published address is set only in `deploy`: don't hard-code it in `mkdocs.yml` or in pages. Old versions are removed only by hand, locally: `./deploy delete` lists what goes and what stays, asks before deleting, and refuses the version `latest` points at. Never delete versions without the maintainer's say-so. Never use `mkdocs gh-deploy`: it replaces the whole branch, and every earlier version with it. GitHub Pages rejects symlinks, which is why `mkdocs.yml` sets mike's `alias_type: copy`. Deploying publishes to a public site: do it only when asked.
 
 A ruleset on `main` requires a pull request that passes 🏗 CI (no approval needed), and blocks force pushes and deletion. Contributors merge their own PRs once CI passes. The maintainer, and agents working with them, push to `main` directly through the admin bypass.
 
