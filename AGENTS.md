@@ -15,9 +15,9 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 - `wiki/mkdocs.yml`: site config, including the sidebar menu (`nav`). A new page needs a nav entry.
 - `wiki/docs/**/*.md`: pages. Folders follow the menu (`weapons/rifles/zr68-s.md`); a folder's `index.md` is its section page.
 - `wiki/data/*.json`: gameplay data extracted from the NT;RE source, one record per value with a `source` citation
-- `wiki/hooks/wiki_hooks.py`: the MkDocs hooks: wiki links, citations, snippets, column tooltips and the build checks. `ntre.py` is only the entry point `mkdocs.yml` names; it reloads `wiki_hooks.py` and `generators.py` on every build, so `mkdocs serve` picks up edits without a restart.
+- `wiki/hooks/wiki_hooks.py`: the MkDocs hooks: wiki links, citations, snippets, column tooltips and the build checks. `ntre.py` is only the entry point `mkdocs.yml` names; it reloads `wiki_hooks.py` and the `snippets/` package on every build, so `mkdocs serve` picks up edits without a restart.
 - `wiki/column-tips.yml`: the tooltip for every table column header, shared or per page
-- `wiki/hooks/generators.py`: builds the `{{table:…}}`, `{{infobox:…}}`, `{{stat:…}}` and `{{weapon:…}}` snippets from the data
+- `wiki/hooks/snippets/`: builds the `{{table:…}}`, `{{infobox:…}}`, `{{stat:…}}` and `{{weapon:…}}` snippets from the data. There is one module per wiki section, named after its folder under `wiki/docs/`, and `_core.py` holds the shared helpers. Each snippet function carries `@snippet("table:modes")` with the name pages use, so a search for the name finds the code. `__init__.py` lists the modules.
 - `wiki/tools/`: data tools, standard library only. `check_data.py` checks every citation and the values read from weapon scripts and ConVars against the pinned commit (`--fix` updates those values). Run it after touching the data or citations. `repin.py COMMIT` moves every citation to a newer `neo` commit (see CONTRIBUTING.md); the tools read files with `git show`, never fetch, and never touch the checkouts.
 - `wiki/docs/stylesheets/ntre.css`: the skin; colours are `--ntre-*` tokens with dark (`slate`) and light (`default`) sets
 - `wiki/overrides/`: theme overrides. `partials/logo.html` inlines `docs/assets/nt-mark.svg` (the primary logo, from Wireframe) into the header. `partials/source.html` draws the header's repository links, one per entry in `extra.repos` (`mkdocs.yml`), and `docs/javascripts/sources.js` fills in each one's release, stars and forks. `repo_url` points at `NeotokyoRebuild/neo`, so `edit_uri` is a full address into this repository.
@@ -42,7 +42,7 @@ A ruleset on `main` requires a pull request that passes 🏗 CI, and blocks forc
 - Read cited code at the pinned commit, never from the checkout's working tree, which can be ahead of or behind it: `git -C ../neo show <commit>:<path> | sed -n '<a>,<b>p'`. Don't number lines with `nl`: it skips blank lines, so every number after one is wrong.
 - Never guess a value. If the code is ambiguous or client and server disagree, record both in a `note` and say so on the page.
 - Values derived arithmetically carry `derived: true` and a `formula`.
-- A number shown in a table or infobox comes from the data: never type one into a page or into the generator code (`generators.py`). A generator that needs a number reads it from the data, like everything else.
+- A number shown in a table or infobox comes from the data: never type one into a page or into the snippet code (`wiki/hooks/snippets/`). A generator that needs a number reads it from the data, like everything else.
 - Half-Life 2 leftovers that NT;RE doesn't use stay out of the wiki. Flag such a record `hl2_only`, with its source; generated tables skip it. See "Half-Life 2 leftovers" in CONTRIBUTING.md.
 - Don't modify the `neo` or `neoAssets` checkouts.
 

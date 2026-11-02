@@ -3,7 +3,7 @@
 Adds three things on top of plain Markdown, in this order:
 
   {{table:...}} {{infobox:...}} {{stat:...}} {{weapon:...}}
-      Data-driven snippets, expanded by generators.py from data/*.json.
+      Data-driven snippets, expanded by the snippets/ package from data/*.json.
   [[slug]] / [[slug|Label]] / [[slug#anchor|Label]]
       Wiki link. A slug is a page's file name without .md; for an index.md it is
       the folder name. Unknown slugs render as red links and are reported as
@@ -19,6 +19,7 @@ import html
 import importlib.util
 import logging
 import re
+import sys
 from pathlib import Path
 
 from mkdocs.utils import get_relative_url
@@ -26,15 +27,26 @@ from mkdocs.utils import get_relative_url
 HOOKS = Path(__file__).resolve().parent
 
 
-def load_generators():
-    """Load generators.py fresh, so `mkdocs serve` picks up edits to it and to data/."""
-    spec = importlib.util.spec_from_file_location("ntre_generators", HOOKS / "generators.py")
+SNIPPETS_PKG = "ntre_snippets"
+
+
+def load_snippets():
+    """Load the snippets/ package fresh, so `mkdocs serve` picks up edits to it and to data/.
+
+    Every module from the last build is dropped first, or the package's imports of its own
+    modules would get the old ones back."""
+    for name in [n for n in sys.modules if n == SNIPPETS_PKG or n.startswith(SNIPPETS_PKG + ".")]:
+        del sys.modules[name]
+    pkg = HOOKS / "snippets"
+    spec = importlib.util.spec_from_file_location(SNIPPETS_PKG, pkg / "__init__.py",
+                                                  submodule_search_locations=[str(pkg)])
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[SNIPPETS_PKG] = mod
     spec.loader.exec_module(mod)
     return mod
 
 
-gen = load_generators()
+gen = load_snippets()
 
 log = logging.getLogger("mkdocs.hooks.ntre")
 
@@ -62,7 +74,7 @@ def slug_of(src_uri):
 
 def on_config(config):
     global COMMIT, gen
-    gen = load_generators()
+    gen = load_snippets()
     COMMIT = gen.data("weapons")["meta"]["neo_commit"]
     config["copyright"] = (
         f'Game data extracted from <a href="{REPO_URL}/tree/{COMMIT}"><code>NeotokyoRebuild/neo@{COMMIT}</code></a>; '

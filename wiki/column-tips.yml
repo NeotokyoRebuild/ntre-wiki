@@ -2,7 +2,7 @@
 #
 # `columns` gives the tip for a header wherever it appears. `pages` overrides it on one
 # page, keyed by the page's slug, for a header that means something else there.
-# A generated table can also set a tip where it's built in hooks/generators.py.
+# A generated table can also set a tip where it's built in hooks/snippets/.
 #
 # Every column header needs a tip: the build warns about one that has none. Write tips
 # the way WRITING-STYLE.md asks for all copy: plain and short.

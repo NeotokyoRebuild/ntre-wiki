@@ -19,9 +19,10 @@ DOCS = WIKI / "docs"
 _configured = subprocess.run(["git", "-C", str(REPO), "config", "--get", "ntre.neo"], capture_output=True, text=True)
 DEFAULT_NEO = Path(_configured.stdout.strip()) if _configured.stdout.strip() else REPO.parent / "neo"
 
-# Files whose text can hold citations: the data, the pages, and the generators.
+# Files whose text can hold citations: the data, the pages, and the snippet code.
 def cited_files():
-    return [*sorted(DATA.glob("*.json")), *sorted(DOCS.rglob("*.md")), WIKI / "hooks" / "generators.py"]
+    return [*sorted(DATA.glob("*.json")), *sorted(DOCS.rglob("*.md")),
+            *sorted((WIKI / "hooks" / "snippets").glob("*.py"))]
 
 
 # A citation: a repo-relative path under src/ or game/, then optionally ':' and lines,

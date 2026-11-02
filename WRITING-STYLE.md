@@ -132,4 +132,4 @@ Kept out of the wiki's style guide page, which follows the rule above.
 
 - The modes in development are **VIP** and **Juggernaut** (JGR). Their pages are `game-modes/vip.md` and `game-modes/juggernaut.md`.
 - Their roles are the VIP and the Juggernaut; their weapons are the **SMAC** (VIP) and the **BALC** (Juggernaut). Each weapon is a section of its mode's page: `[[vip#smac|SMAC]]`, `[[juggernaut#balc|BALC]]`.
-- `without_wip()` in `wiki/hooks/generators.py` filters them out of data text, and `WIP_TERMS` in `wiki/hooks/wiki_hooks.py` is the build check. `WIP_ALLOWED_IN` there exempts the modes table on the Game modes page. When a mode leaves development, take it out of `WIP_MODES`, `WIP_CLASSES` and `WIP_WEAPONS` and those two places, and list it like any other mode.
+- `without_wip()` in `wiki/hooks/snippets/_core.py` filters them out of data text, and `WIP_TERMS` in `wiki/hooks/wiki_hooks.py` is the build check. `WIP_ALLOWED_IN` there exempts the modes table on the Game modes page. When a mode leaves development, take it out of `WIP_MODES`, `WIP_CLASSES` and `WIP_WEAPONS` and those two places, and list it like any other mode.

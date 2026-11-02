@@ -36,6 +36,6 @@ In `wiki/`, install the requirements with `pip install -r requirements.txt`, the
 
 - **Pages** live in `docs/`.
 - **Extracted game data** lives in `data/`.
-- **Snippets, wiki links and citations** are handled by `hooks/wiki_hooks.py` and `hooks/generators.py`.
+- **Snippets, wiki links and citations** are handled by `hooks/wiki_hooks.py` and the `hooks/snippets/` package.
 
 See [[style-guide|Style guide]] for the markup.

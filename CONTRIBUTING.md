@@ -127,11 +127,13 @@ All citations point at one pinned commit of `neo`, so the wiki describes one ver
 
 ## Add a generated table or infobox
 
-Generated tables and infoboxes are Python functions in `wiki/hooks/generators.py`, registered in the `SNIPPETS` dictionary near the end of the file. To add one:
+Generated tables and infoboxes are Python functions in `wiki/hooks/snippets/`. There is one module per wiki section, named after its folder under `wiki/docs/`, so the Mechanics snippets are in `mechanics.py`. Inside a module, a divider comment names the page each group is for. The line above each function names the snippet, so searching for `table:cloak` finds its code. To add one:
 
-1. Write a function that reads the data with `data("player")` and so on, and returns `table(...)` or `infobox(...)`. Cite each value: `val(record)` gives the value with its citation, and `cite(record)` gives the citation alone.
-2. Add it to `SNIPPETS`, for example `"table:cloak": table_cloak`.
+1. In the module for the page's section, under its page's divider, write a function that reads the data with `data("player")` and so on, and returns `table(...)` or `infobox(...)`. Cite each value: `val(record)` gives the value with its citation, and `cite(record)` gives the citation alone. Import helpers like these from `._core`.
+2. Put `@snippet("table:cloak")` on the line above the function.
 3. Put `{{table:cloak}}` on the page.
+
+A new section gets a new module, added to the import line in `snippets/__init__.py`.
 
 Text the generators produce follows `WRITING-STYLE.md` like any other copy.
 
