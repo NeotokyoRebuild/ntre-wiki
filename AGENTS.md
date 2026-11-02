@@ -9,6 +9,9 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 ## Layout
 
 - `setup`, `serve`: set up a checkout once, and preview the wiki
+- `check`: the checks every change must pass, the strict build and `tools/check_data.py`. CI runs it on every pull request, and `deploy` runs it first.
+- `deploy`: publishes a new version of the wiki; the 🚀 Deploy workflow runs it
+- `.github/workflows/`: `ci.yml` (🏗 CI, every pull request into `main`) and `deploy.yml` (🚀 Deploy, run by hand). `.github/actions/setup/` checks out `neo` and `neoAssets` next to the repository and runs `./setup`, for both.
 - `wiki/mkdocs.yml`: site config, including the sidebar menu (`nav`). A new page needs a nav entry.
 - `wiki/docs/**/*.md`: pages. Folders follow the menu (`weapons/rifles/zr68-s.md`); a folder's `index.md` is its section page.
 - `wiki/data/*.json`: gameplay data extracted from the NT;RE source, one record per value with a `source` citation
@@ -19,11 +22,13 @@ A monorepo for the NEOTOKYO Rebuild (NT;RE) wiki. `wiki/` is the wiki, built wit
 - `wiki/docs/stylesheets/ntre.css`: the skin; colours are `--ntre-*` tokens with dark (`slate`) and light (`default`) sets
 - `wiki/overrides/`: theme overrides. `partials/logo.html` inlines `docs/assets/nt-mark.svg` (the primary logo, from Wireframe) into the header.
 
-Set up with `./setup`: it creates `wiki/.venv` and records the `neo` and `neoAssets` checkouts in this repository's git config as `ntre.neo` and `ntre.neoassets`, which the data tools read. Preview with `./serve`; check with `.venv/bin/mkdocs build --strict` from `wiki/`, which fails on red links and unknown snippets. A clean build prints no warnings. Keep builds and deploys loud: never add `--quiet` to a strict build, because it hides the warnings and strict mode then passes them.
+Set up with `./setup`: it creates `wiki/.venv` and records the `neo` and `neoAssets` checkouts in this repository's git config as `ntre.neo` and `ntre.neoassets`, which the data tools read. Preview with `./serve`; check with `./check`, whose strict build fails on red links and unknown snippets. A clean build prints no warnings. Keep builds and deploys loud: never add `--quiet` to a strict build, because it hides the warnings and strict mode then passes them.
 
 ## Deploying
 
-The wiki deploys with `wiki/deploy.sh <version> [title]`, which runs `mike` to publish under `wiki/` on the `gh-pages` branch of `sunmachine/ntre-dev`; see the README. The published address is set only in `deploy.sh`: don't hard-code it in `mkdocs.yml` or in pages. That branch also holds other pages (`footsteps/`, `place-mode/`, `weapons/`, the root `index.html`), so never use `mkdocs gh-deploy` or anything that rewrites the whole branch. GitHub Pages rejects symlinks, which is why `mkdocs.yml` sets mike's `alias_type: copy`. Deploying publishes to a public site: do it only when asked.
+The wiki is published at https://sunmachine.github.io/ntre-wiki/, from the `gh-pages` branch of `sunmachine/ntre-wiki`. The 🚀 Deploy workflow runs `./deploy`, which has `mike` build `main` into a new version folder (the next minor version by default, or the next major when chosen), points `latest` and the site's root at it, and pushes. It refuses a dirty tree, a commit that isn't on `main` in `sunmachine/ntre-wiki`, a failing `./check`, symlinks, and changes outside the new version, `latest/` and mike's root files. The published address is set only in `deploy`: don't hard-code it in `mkdocs.yml` or in pages. Never use `mkdocs gh-deploy`: it replaces the whole branch, and every earlier version with it. GitHub Pages rejects symlinks, which is why `mkdocs.yml` sets mike's `alias_type: copy`. Deploying publishes to a public site: do it only when asked.
+
+Changes reach `main` only through pull requests that pass 🏗 CI.
 
 ## Style guide
 

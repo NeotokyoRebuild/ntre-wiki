@@ -30,7 +30,7 @@ So you can rewrite a page without touching a single number. When the data change
 
 1. Find the page in `wiki/docs/`. The path matches the address: `/mechanics/aux-power/` is `wiki/docs/mechanics/aux-power.md`.
 2. Edit the words. Leave `{{…}}` placeholders where they are, and keep every `[[src:…]]` citation with the fact it supports.
-3. Check it in the preview, then build with `.venv/bin/mkdocs build --strict` from `wiki/`.
+3. Check it in the preview, then run `./check`.
 
 The "Rewriting a page" section of `WRITING-STYLE.md` has the rules: keep citations word for word, don't lose a number, don't change a fact.
 
@@ -137,14 +137,13 @@ Text the generators produce follows `WRITING-STYLE.md` like any other copy.
 
 ## Before you send a change
 
-Build from `wiki/`, and if you touched the data or any citation, run the data check too:
+Run the checks from the repository root:
 
 ```sh
-.venv/bin/mkdocs build --strict
-python3 tools/check_data.py
+./check
 ```
 
-A clean build prints no warnings. It fails or warns on:
+It runs the strict build, then the data check against the game's code. These are the checks 🏗 CI runs on your pull request, and the ones a deploy has to pass. A clean build prints no warnings. It fails or warns on:
 
 - broken `[[…]]` links and unknown `{{…}}` snippets
 - stat paths that don't exist, or that use a list position instead of an id
@@ -152,7 +151,7 @@ A clean build prints no warnings. It fails or warns on:
 - a table column with no tooltip
 - a mention of a game mode still in development outside its own pages (see "Modes in development" in `WRITING-STYLE.md`)
 
-Then commit on a branch and open a pull request against `main`.
+Every change reaches `main` through a pull request: commit on a branch, push it, and open a PR against `main`. It's merged once 🏗 CI passes and a maintainer approves it.
 
 - **Commit messages** start with a short, imperative summary in sentence case ("Generate the cloak battery table from the data"), then a body that says why.
 - **Style changes go with the change.** A change to how the wiki is written updates `WRITING-STYLE.md`, and a change to how it looks updates the Style guide page (`wiki/docs/about/style-guide.md`), in the same commit.
@@ -160,5 +159,5 @@ Then commit on a branch and open a pull request against `main`.
 
 ## What not to touch
 
-- `wiki/deploy.sh` publishes the site. Only the maintainer deploys.
+- `deploy` and `.github/workflows/` publish the site. Maintainers deploy with the 🚀 Deploy workflow.
 - Don't modify the `neo` or `neoAssets` checkouts.

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Run every check a change has to pass to deploy: the strict build, then the data check
+# against the game's code. The 🏗 CI workflow runs this on every pull request, and
+# ./deploy runs it before publishing.
+set -euo pipefail
+cd "$(dirname "$0")/wiki"
+
+say() { printf '\033[1m==> %s\033[0m\n' "$*"; }
+[[ -x .venv/bin/mkdocs ]] || { printf '\033[31merror:\033[0m no Python environment yet: run ./setup\n' >&2; exit 1; }
+export NO_MKDOCS_2_WARNING=1
+
+say "Building the wiki (strict)"
+# Not --quiet: it hides warnings from --strict, which then passes them.
+.venv/bin/mkdocs build --strict 2>&1 | { grep -v '^INFO' || true; }
+say "Checking the data against the game's code"
+.venv/bin/python tools/check_data.py
+say "All checks passed"

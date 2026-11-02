@@ -1,0 +1,50 @@
+name: "🚀 Deploy"
+
+# Publish main to https://sunmachine.github.io/ntre-wiki/ as a new version. Run it from
+# the Actions tab: it deploys the next minor version unless you choose major.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version to deploy: the next minor (0.3 → 0.4) or the next major (0.4 → 1.0)"
+        type: choice
+        options: [minor, major]
+        default: minor
+      title:
+        description: "Title in the version menu (default: the version number)"
+        type: string
+        required: false
+
+permissions:
+  contents: write     # push the gh-pages branch
+  pages: read         # check that GitHub Pages is set up
+  deployments: read   # wait for GitHub Pages to publish
+
+# One deploy at a time, and never cancel one halfway.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ntre-wiki
+          fetch-depth: 0
+
+      - uses: ./ntre-wiki/.github/actions/setup
+
+      - name: ./deploy ${{ inputs.bump }}
+        working-directory: ntre-wiki
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUMP: ${{ inputs.bump }}
+          TITLE: ${{ inputs.title }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./deploy "$BUMP" ${TITLE:+"$TITLE"}

@@ -1,0 +1,31 @@
+name: Set up the wiki
+description: >-
+  Check out the game's repositories next to this one, as ./setup expects, and run
+  ./setup. The calling workflow checks this repository out to ntre-wiki/.
+
+runs:
+  using: composite
+  steps:
+    - name: Check out NeotokyoRebuild/neo
+      uses: actions/checkout@v7
+      with:
+        repository: NeotokyoRebuild/neo
+        path: neo
+        # The data tools read the code at the commit the data is pinned to.
+        fetch-depth: 0
+
+    - name: Clone NeotokyoRebuild/neoAssets
+      shell: bash
+      # Only the latest commit's folders: nothing reads its files yet.
+      run: git clone --quiet --depth 1 --filter=blob:none --no-checkout https://github.com/NeotokyoRebuild/neoAssets.git neoAssets
+
+    - uses: actions/setup-python@v7
+      with:
+        python-version: "3.12"
+        cache: pip
+        cache-dependency-path: ntre-wiki/wiki/requirements.txt
+
+    - name: ./setup
+      shell: bash
+      working-directory: ntre-wiki
+      run: ./setup

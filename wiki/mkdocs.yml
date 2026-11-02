@@ -1,14 +1,11 @@
 site_name: NT;RE Wiki
-# The published address comes from the deploy (deploy.sh), not from here, so
+# The published address comes from the deploy (./deploy), not from here, so
 # local builds and previews carry no host URL and serve from /.
 site_url: !ENV NTRE_WIKI_URL
 site_description: Reference wiki for NEOTOKYO Rebuild, with every stat sourced from the game's code.
 repo_url: https://github.com/NeotokyoRebuild/neo
 repo_name: NeotokyoRebuild/neo
 edit_uri: ""
-# `mike deploy` pushes here: the gh-pages branch of sunmachine/ntre-dev.
-remote_name: ntre-dev
-remote_branch: gh-pages
 
 theme:
   name: material
@@ -58,12 +55,11 @@ extra:
 
 plugins:
   - search
-  # Versioned deploys. The wiki lives under wiki/ on a branch it shares with
-  # other pages, so mike only touches that folder. Aliases are copies because
-  # GitHub Pages refuses to deploy symlinks. Leave mike's version_selector on:
-  # Material only draws its version menu when it is.
+  # Versioned deploys: ./deploy has mike build each version into its own
+  # folder on the gh-pages branch. Aliases are copies because GitHub Pages
+  # refuses to deploy symlinks. Leave mike's version_selector on: Material
+  # only draws its version menu when it is.
   - mike:
-      deploy_prefix: wiki
       alias_type: copy
       # Every version's pages name the latest version as canonical, so each
       # page has one stable address.

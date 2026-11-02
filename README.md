@@ -24,34 +24,19 @@ cd ntre-wiki
 - `wiki/`: the MkDocs wiki, built from Markdown pages and game data extracted from the NT;RE source
 - `setup`: sets up a checkout once: asks where your checkouts of the game's repositories are, and creates the Python environment
 - `serve`: previews the wiki at http://127.0.0.1:8000/
+- `check`: the checks every change must pass: the strict build, and the data checked against the game's code
+- `deploy`: publishes the wiki; the 🚀 Deploy workflow runs it
+- `.github/workflows/`: the 🏗 CI and 🚀 Deploy workflows
 
 ## Contributing
+
+Every change reaches `main` through a pull request. Push your branch and open a PR against `main`: 🏗 CI runs `./check` on it, and a maintainer reviews it. A PR is merged once CI passes and a maintainer approves it.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to edit pages, add one, or change the game data, and [`WRITING-STYLE.md`](WRITING-STYLE.md) for how the wiki is written.
 
 ## Deploy
 
-The wiki is published at https://sunmachine.github.io/ntre-dev/wiki/, under `wiki/` on the `gh-pages` branch of [sunmachine/ntre-dev](https://github.com/sunmachine/ntre-dev). That branch also hosts other write-ups, so deploys go through [mike](https://github.com/jimporter/mike), which only touches `wiki/` and keeps one folder per version for the header's version menu.
-
-Once per checkout, add the remote and a local `gh-pages` branch:
-
-```sh
-git remote add ntre-dev git@github.com:sunmachine/ntre-dev.git
-git config remote.ntre-dev.fetch '+refs/heads/gh-pages:refs/remotes/ntre-dev/gh-pages'
-git fetch ntre-dev && git branch --track gh-pages ntre-dev/gh-pages
-```
-
-Then commit, push to git, and run:
-
-```sh
-wiki/deploy.sh                          # redeploy the current latest version
-wiki/deploy.sh 0.2 "0.2 (prototype)"    # deploy a new version and make it latest
-wiki/deploy.sh --dry-run                # everything except the push
-```
-
-It does what a CI job would: it only deploys commits already pushed to `main` in git, from a clean tree, after a strict build. Then it checks that nothing outside `wiki/` changed and that there are no symlinks (GitHub Pages rejects them), pushes, and waits for GitHub Pages to report success.
-
-The published address lives only in `deploy.sh` (override it with `NTRE_WIKI_URL`). `mkdocs.yml` reads it from that variable, so local builds carry no host URL, and every version's pages name `latest/` as their canonical address.
+The wiki is published at https://sunmachine.github.io/ntre-wiki/. Maintainers deploy it with the 🚀 Deploy workflow, from the Actions tab. Each run publishes `main` as the next minor version (0.3 → 0.4) and makes it `latest`; choose `major` to start the next major version (0.4 → 1.0). Earlier versions stay in the header's version menu.
 
 ## License
 

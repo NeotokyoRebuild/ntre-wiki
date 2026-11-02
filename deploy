@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# Publish the wiki to https://sunmachine.github.io/ntre-wiki/: build it into a new version
+# folder on the gh-pages branch of sunmachine/ntre-wiki, and point `latest` and the site's
+# root at it. The 🚀 Deploy workflow runs this.
+#
+#   ./deploy                    the next minor version: 0.3 -> 0.4 (the first is 0.1)
+#   ./deploy major              the next major version: 0.4 -> 1.0
+#   ./deploy 0.4 [TITLE]        that exact version, replacing it if it exists
+#   ./deploy --dry-run ...      everything except the push
+#
+# It only deploys a clean tree whose HEAD is on main in sunmachine/ntre-wiki, and only
+# after ./check passes. The published address is set here and nowhere else (override
+# with NTRE_WIKI_URL).
+set -euo pipefail
+cd "$(dirname "$0")"
+
+DRY_RUN=0
+if [[ ${1:-} == --dry-run ]]; then DRY_RUN=1; shift; fi
+
+REPO_SLUG=sunmachine/ntre-wiki
+BRANCH=gh-pages
+export NTRE_WIKI_URL=${NTRE_WIKI_URL:-https://sunmachine.github.io/ntre-wiki/}
+export NO_MKDOCS_2_WARNING=1
+
+say() { printf '\033[1m==> %s\033[0m\n' "$*"; }
+die() { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
+
+[[ -x wiki/.venv/bin/mike ]] || die "no Python environment yet: run ./setup"
+export PATH="$PWD/wiki/.venv/bin:$PATH"
+
+# The remote for sunmachine/ntre-wiki, found by URL: origin in CI, often upstream locally.
+REMOTE=
+for r in $(git remote); do
+  if [[ $(git remote get-url --push "$r") =~ github\.com[:/]$REPO_SLUG(\.git)?$ ]]; then REMOTE=$r; break; fi
+done
+[[ -n $REMOTE ]] || die "no remote for github.com/$REPO_SLUG: git remote add upstream git@github.com:$REPO_SLUG.git"
+
+# 1. Only deploy what's committed and on main in sunmachine/ntre-wiki, and passes ./check.
+say "Checking the source"
+[[ -z $(git status --porcelain) ]] || die "uncommitted changes: commit and merge them first"
+git fetch -q "$REMOTE" main
+git merge-base --is-ancestor HEAD FETCH_HEAD || die "HEAD $(git rev-parse --short HEAD) isn't on $REMOTE/main"
+SHA=$(git rev-parse --short HEAD)
+./check
+
+# 2. Bring gh-pages up to date; fails rather than overwrite a local branch that differs.
+say "Fetching $REMOTE/$BRANCH"
+if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null; then
+  git fetch -q "$REMOTE" "$BRANCH:$BRANCH" \
+    || die "local $BRANCH isn't behind $REMOTE/$BRANCH: delete it (git branch -D $BRANCH) and run again"
+  BASE=$(git rev-parse "$BRANCH")
+  RESET="git branch -f $BRANCH $BASE"
+else
+  ! git rev-parse -q --verify "refs/heads/$BRANCH" >/dev/null \
+    || die "$REMOTE has no $BRANCH yet, but a local one exists: delete it (git branch -D $BRANCH) so the first deploy starts empty"
+  BASE=
+  RESET="git branch -D $BRANCH"
+fi
+
+# 3. The version: the next minor or major after the highest deployed, or the one given.
+KIND=${1:-minor}
+case $KIND in
+  minor|major) ;;
+  *) [[ $KIND =~ ^[0-9]+\.[0-9]+$ ]] || die "not a version: $KIND (use minor, major, or a version like 0.4)" ;;
+esac
+VERSION=$( { [[ -n $BASE ]] && git show "$BRANCH:versions.json" 2>/dev/null || echo '[]'; } | python3 -c '
+import json, sys
+kind = sys.argv[1]
+deployed = []
+for v in json.load(sys.stdin):
+    try:
+        deployed.append(tuple(int(n) for n in v["version"].split(".")))
+    except ValueError:
+        pass
+major, minor = max(deployed) if deployed else (0, 0)
+print({"minor": f"{major}.{minor + 1}", "major": f"{major + 1}.0"}.get(kind, kind))' "$KIND")
+TITLE=${2:-$VERSION}
+
+# 4. Commit the build to gh-pages with mike (no push yet).
+say "Deploying $VERSION ($TITLE) from $SHA to $BRANCH"
+(
+  cd wiki
+  mike deploy --remote "$REMOTE" --branch "$BRANCH" --update-aliases --title "$TITLE" \
+    -m "Deploy the wiki $VERSION from $SHA" "$VERSION" latest
+  mike set-default --remote "$REMOTE" --branch "$BRANCH" --template redirect.html \
+    -m "Point the wiki at $VERSION" latest
+)
+
+# 5. Guard rails.
+say "Checking the result"
+links=$(git ls-tree -r "$BRANCH" | awk '$1 == "120000" {print $4}')
+[[ -z $links ]] || die "symlinks on $BRANCH, which GitHub Pages rejects: $links (undo with: $RESET)"
+if [[ -n $BASE ]]; then
+  git merge-base --is-ancestor "$BASE" "$BRANCH" || die "$BRANCH isn't a fast-forward of $REMOTE/$BRANCH (undo with: $RESET)"
+  outside=$(git diff --name-only "$BASE" "$BRANCH" | grep -v -E "^(${VERSION//./\\.}|latest)/|^(versions\.json|index\.html|\.nojekyll)$" || true)
+  [[ -z $outside ]] || die "the deploy changed files outside $VERSION/ and latest/: $outside (undo with: $RESET)"
+fi
+
+if (( DRY_RUN )); then
+  say "Dry run: not pushing. To discard the local deploy: $RESET"
+  exit 0
+fi
+
+# 6. Publish and wait for GitHub Pages.
+say "Pushing to $REMOTE"
+git push -q "$REMOTE" "$BRANCH"
+if command -v gh >/dev/null && gh auth status >/dev/null 2>&1; then
+  gh api "repos/$REPO_SLUG/pages" >/dev/null 2>&1 \
+    || die "pushed, but GitHub Pages isn't set up for $REPO_SLUG: in Settings → Pages, deploy from the $BRANCH branch, / (root)"
+  deployed=$(git rev-parse "$BRANCH")
+  say "Waiting for GitHub Pages"
+  for _ in $(seq 1 30); do
+    id=$(gh api "repos/$REPO_SLUG/deployments?sha=$deployed&per_page=1" --jq '.[0].id // empty' 2>/dev/null || true)
+    state=${id:+$(gh api "repos/$REPO_SLUG/deployments/$id/statuses" --jq '.[0].state // empty' 2>/dev/null || true)}
+    case $state in
+      success) break ;;
+      failure|error) die "GitHub Pages deploy $state: https://github.com/$REPO_SLUG/deployments" ;;
+    esac
+    sleep 10
+  done
+  [[ ${state:-} == success ]] || die "timed out waiting for GitHub Pages: https://github.com/$REPO_SLUG/deployments"
+fi
+say "Published ${NTRE_WIKI_URL}latest/ ($VERSION from $SHA)"
