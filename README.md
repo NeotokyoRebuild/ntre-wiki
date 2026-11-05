@@ -5,7 +5,7 @@ A wiki for [NEOTOKYO Rebuild](https://github.com/NeotokyoRebuild/neo). Pre-alpha
 ## Quick Start
 
 ```sh
-git clone https://github.com/sunmachine/ntre-wiki.git
+git clone https://github.com/NeotokyoRebuild/ntre-wiki.git
 cd ntre-wiki
 ./setup
 ```
@@ -36,7 +36,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to edit pages, add one, or chan
 
 ## Deploy
 
-The wiki is published at https://sunmachine.github.io/ntre-wiki/. Maintainers deploy it with the 🚀 Deploy workflow, from the Actions tab. Each run publishes `main` as the next minor version after `latest` (0.3 → 0.4, skipping any version that already exists) and makes it `latest`. Choose `major` for the next major version (0.4 → 1.0), or type an exact version in M.m form, such as `0.4`. Earlier versions stay in the header's version menu. A run that would publish the same site `latest` already serves stops without deploying.
+The wiki is published at https://neotokyorebuild.github.io/ntre-wiki/. Maintainers deploy it with the 🚀 Deploy workflow, from the Actions tab. Each run publishes `main` as the next minor version after `latest` (0.3 to 0.4, skipping any version that already exists) and makes it `latest`. Choose `major` for the next major version (0.4 to 1.0), or type an exact version in M.m form, such as `0.4`. Earlier versions stay in the header's version menu. A run that would publish the same site `latest` already serves stops without deploying.
 
 To undo a bad deploy, run the ⏪ Rollback workflow with the version to go back to (such as `0.2`). It points `latest` at that version without rebuilding anything. It doesn't change `main`, so fix or revert the change there before the next deploy, which publishes `main` again.
 

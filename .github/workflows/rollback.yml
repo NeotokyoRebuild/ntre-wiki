@@ -1,6 +1,6 @@
 name: "⏪ Rollback"
 
-# Point https://sunmachine.github.io/ntre-wiki/latest/ at an earlier deployed version.
+# Point https://neotokyorebuild.github.io/ntre-wiki/latest/ at an earlier deployed version.
 # Nothing is rebuilt and main isn't changed, so the next 🚀 Deploy publishes main again:
 # fix or revert the change on main before then.
 on:

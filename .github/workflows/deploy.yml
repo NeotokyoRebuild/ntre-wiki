@@ -1,6 +1,6 @@
 name: "🚀 Deploy"
 
-# Publish main to https://sunmachine.github.io/ntre-wiki/ as a new version. Run it from
+# Publish main to https://neotokyorebuild.github.io/ntre-wiki/ as a new version. Run it from
 # the Actions tab: it deploys the next minor version after latest, unless you choose
 # major or type an exact version.
 on:
