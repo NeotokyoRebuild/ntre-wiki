@@ -8,7 +8,9 @@
 #   ./deploy rollback VERSION       point `latest` at a deployed version, without a build
 #   ./deploy list                   list the deployed versions
 #   ./deploy delete VERSION...      delete versions from the site, after asking
-#   ./deploy --dry-run ...          a deploy, rollback or delete, without the push
+#   ./deploy maintenance on         put up the maintenance page and hide the wiki
+#   ./deploy maintenance off        take the maintenance page down and bring the wiki back
+#   ./deploy --dry-run ...          any of these but list, without the push
 #
 # minor and major count from the version `latest` points at (the first deploy is 0.1, or
 # 1.0 for major), and skip versions that already exist by applying the same step again:
@@ -20,6 +22,13 @@
 # deployed. The ⏪ Rollback workflow runs rollback. Delete never touches
 # the version `latest` points at. The published address is set here and nowhere else
 # (override with NTRE_WIKI_URL).
+#
+# The 🚧 Maintenance workflow runs maintenance. `on` moves the whole site into offline/ and
+# puts wiki/maintenance.html at the root, as index.html and as 404.html, so every address
+# into the wiki shows the page. The wiki still works at offline/latest/ for anyone who
+# knows the address: it is out of the way, not secret. `off` moves the site back exactly as
+# it was. While the page is up, deploy, rollback, list and delete work on the wiki under
+# offline/, and the page stays up.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -28,13 +37,15 @@ if [[ ${1:-} == --dry-run ]]; then DRY_RUN=1; shift; fi
 
 REPO_SLUG=NeotokyoRebuild/ntre-wiki
 BRANCH=gh-pages
+HIDDEN=offline
 export NTRE_WIKI_URL=${NTRE_WIKI_URL:-https://neotokyorebuild.github.io/ntre-wiki/}
 export NO_MKDOCS_2_WARNING=1
 
 say() { printf '\033[1m==> %s\033[0m\n' "$*"; }
 die() { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
-[[ -x wiki/.venv/bin/mike ]] || die "no Python environment yet: run ./setup"
+# Only maintenance runs without mike, so its workflow can skip the setup.
+[[ ${1:-} == maintenance || -x wiki/.venv/bin/mike ]] || die "no Python environment yet: run ./setup"
 export PATH="$PWD/wiki/.venv/bin:$PATH"
 
 # The remote for NeotokyoRebuild/ntre-wiki, found by URL: origin in CI, often upstream locally.
@@ -47,8 +58,10 @@ find_remote() {
 }
 
 # Bring the local gh-pages up to date; fails rather than overwrite a local branch that
-# differs. Sets BASE (the remote tip, empty before the first deploy) and RESET (how to
-# undo a local commit on top of it).
+# differs. Sets BASE (the remote tip, empty before the first deploy), RESET (how to
+# undo a local commit on top of it), SITE (where the wiki is on the branch: the root, or
+# $HIDDEN/ while the maintenance page is up) and MIKE (the options every mike command takes,
+# which point it at SITE).
 fetch_pages() {
   say "Fetching $REMOTE/$BRANCH"
   if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null; then
@@ -62,9 +75,16 @@ fetch_pages() {
     BASE=
     RESET="git branch -D $BRANCH"
   fi
+  SITE=
+  MIKE=(--remote "$REMOTE" --branch "$BRANCH")
+  if [[ -n $BASE ]] && git rev-parse -q --verify "$BASE:$HIDDEN" >/dev/null; then
+    SITE=$HIDDEN/
+    MIKE+=(--deploy-prefix "$HIDDEN")
+    say "The maintenance page is up: working on the wiki under $SITE"
+  fi
 }
 
-versions_json() { if [[ -n $BASE ]]; then git show "$BRANCH:versions.json"; else echo '[]'; fi; }
+versions_json() { if [[ -n $BASE ]]; then git show "$BRANCH:${SITE}versions.json"; else echo '[]'; fi; }
 
 # A version is M.m: two whole numbers without leading zeros (0.4, 1.10; not 01.2 or 1.2.3).
 is_version() { [[ $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; }
@@ -73,7 +93,7 @@ is_version() { [[ $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; }
 versions_re() { local out= v; for v in "$@"; do out+=${out:+|}${v//./\\.}; done; printf '%s' "$out"; }
 
 # Guard rails for the local commit: no symlinks (GitHub Pages rejects them), a fast-forward
-# of the remote, and every changed path matching $1.
+# of the remote, and every changed path matching $1, if given.
 check_result() {
   say "Checking the result"
   local links outside
@@ -81,6 +101,7 @@ check_result() {
   [[ -z $links ]] || die "symlinks on $BRANCH, which GitHub Pages rejects: $links (undo with: $RESET)"
   [[ -n $BASE ]] || return 0
   git merge-base --is-ancestor "$BASE" "$BRANCH" || die "$BRANCH isn't a fast-forward of $REMOTE/$BRANCH (undo with: $RESET)"
+  [[ -n $1 ]] || return 0
   outside=$(git diff --name-only "$BASE" "$BRANCH" | grep -v -E "$1" || true)
   [[ -z $outside ]] || die "$2: $outside (undo with: $RESET)"
 }
@@ -112,6 +133,14 @@ publish() {
   fi
 }
 
+# Only a clean tree whose HEAD is on main gets published.
+check_source() {
+  say "Checking the source"
+  [[ -z $(git status --porcelain) ]] || die "uncommitted changes: commit and merge them first"
+  git fetch -q "$REMOTE" main
+  git merge-base --is-ancestor HEAD FETCH_HEAD || die "HEAD $(git rev-parse --short HEAD) isn't on $REMOTE/main"
+}
+
 # ./deploy [minor|major|M.m] [TITLE]
 deploy_version() {
   local sha kind version title
@@ -121,10 +150,7 @@ deploy_version() {
     *) is_version "$kind" || die "not a version: $kind (use minor, major, or M.m, such as 0.4)" ;;
   esac
 
-  say "Checking the source"
-  [[ -z $(git status --porcelain) ]] || die "uncommitted changes: commit and merge them first"
-  git fetch -q "$REMOTE" main
-  git merge-base --is-ancestor HEAD FETCH_HEAD || die "HEAD $(git rev-parse --short HEAD) isn't on $REMOTE/main"
+  check_source
   sha=$(git rev-parse --short HEAD)
   ./check
   fetch_pages
@@ -154,15 +180,15 @@ print("%d.%d" % target)' "$kind")
   say "Deploying $version ($title) from $sha to $BRANCH"
   (
     cd wiki
-    mike deploy --remote "$REMOTE" --branch "$BRANCH" --update-aliases --title "$title" \
+    mike deploy "${MIKE[@]}" --update-aliases --title "$title" \
       -m "Deploy the wiki $version from $sha" "$version" latest
   )
   # A new version identical to what latest/ already serves would only add a duplicate to
   # the version menu: stop instead, and discard the local commit. The sitemaps don't
   # count: they carry the build date.
   if [[ $kind == minor || $kind == major ]] && [[ -n $BASE ]] \
-     && git rev-parse -q --verify "$BASE:latest" >/dev/null \
-     && git diff --quiet "$BASE:latest" "$BRANCH:$version" -- . ':(exclude)sitemap.xml' ':(exclude)sitemap.xml.gz'; then
+     && git rev-parse -q --verify "$BASE:${SITE}latest" >/dev/null \
+     && git diff --quiet "$BASE:${SITE}latest" "$BRANCH:$SITE$version" -- . ':(exclude)sitemap.xml' ':(exclude)sitemap.xml.gz'; then
     git branch -f "$BRANCH" "$BASE"
     local current
     current=$(versions_json | python3 -c 'import json, sys; print(next((v["version"] for v in json.load(sys.stdin) if "latest" in v["aliases"]), "latest"))')
@@ -172,13 +198,13 @@ print("%d.%d" % target)' "$kind")
   fi
   (
     cd wiki
-    mike set-default --remote "$REMOTE" --branch "$BRANCH" --template redirect.html \
+    mike set-default "${MIKE[@]}" --template redirect.html \
       -m "Point the wiki at $version" latest
   )
-  check_result "^($(versions_re "$version")|latest)/|^(versions\.json|index\.html|\.nojekyll)$" \
-    "the deploy changed files outside $version/ and latest/"
+  check_result "^$SITE($(versions_re "$version")|latest)/|^$SITE(versions\.json|index\.html|\.nojekyll)$" \
+    "the deploy changed files outside $SITE$version/ and ${SITE}latest/"
   publish
-  say "Published ${NTRE_WIKI_URL}latest/ ($version from $sha)"
+  say "Published ${NTRE_WIKI_URL}${SITE}latest/ ($version from $sha)"
 }
 
 # ./deploy rollback VERSION: moves `latest` (a copy of a version's folder) to another
@@ -204,12 +230,12 @@ print(current)' "$target")
   say "Moving latest from ${current:-nothing} to $target"
   (
     cd wiki
-    mike alias --remote "$REMOTE" --branch "$BRANCH" --update-aliases \
+    mike alias "${MIKE[@]}" --update-aliases \
       -m "Roll the wiki back to $target (latest was ${current:-unset})" "$target" latest
   )
-  check_result "^latest/|^versions\.json$" "the rollback changed files outside latest/"
+  check_result "^${SITE}latest/|^${SITE}versions\.json$" "the rollback changed files outside ${SITE}latest/"
   publish
-  say "Published ${NTRE_WIKI_URL}latest/ ($target)"
+  say "Published ${NTRE_WIKI_URL}${SITE}latest/ ($target)"
 }
 
 # ./deploy list: each version with its aliases, and when and from which commit it was
@@ -260,13 +286,68 @@ print("Keep:  ", ", ".join(v + (" (" + ", ".join(d["aliases"]) + ")" if d["alias
   fi
   (
     cd wiki
-    mike delete --remote "$REMOTE" --branch "$BRANCH" -m "Delete the wiki $* from the site" "$@"
+    mike delete "${MIKE[@]}" -m "Delete the wiki $* from the site" "$@"
   )
-  check_result "^($(versions_re "$@"))/|^versions\.json$" "the delete changed files outside the deleted versions"
-  [[ -z $(git diff --diff-filter=AM --name-only "$BASE" "$BRANCH" | grep -v '^versions\.json$' || true) ]] \
+  check_result "^$SITE($(versions_re "$@"))/|^${SITE}versions\.json$" "the delete changed files outside the deleted versions"
+  [[ -z $(git diff --diff-filter=AM --name-only "$BASE" "$BRANCH" | grep -v "^${SITE}versions\\.json$" || true) ]] \
     || die "the delete added or changed files instead of only removing them (undo with: $RESET)"
   publish
-  say "Deleted $* from ${NTRE_WIKI_URL}"
+  say "Deleted $* from ${NTRE_WIKI_URL}$SITE"
+}
+
+# Commit tree $1 on top of the remote tip as the local gh-pages, unless it is already the
+# tree there. Returns 1 when there is nothing to commit.
+commit_pages() {
+  local tree=$1 message=$2 commit
+  [[ $tree != $(git rev-parse "$BASE^{tree}") ]] || return 1
+  commit=$(git commit-tree -p "$BASE" -m "$message" "$tree")
+  git update-ref "refs/heads/$BRANCH" "$commit" "$BASE"
+}
+
+# Report a run that changed nothing, in the workflow's summary too.
+nothing_to_do() {
+  [[ -z ${GITHUB_ACTIONS:-} ]] || echo "::notice title=Nothing to do::$1"
+  say "Nothing to do: $1"
+}
+
+# ./deploy maintenance on|off: the gh-pages tree is rebuilt by hand, with no checkout. `on`
+# also refreshes the page while it is up, after a change to wiki/maintenance.html.
+maintenance() {
+  [[ $# -eq 1 && ( $1 == on || $1 == off ) ]] || die "use ./deploy maintenance on, or ./deploy maintenance off"
+  [[ $1 == off ]] || check_source
+  fetch_pages
+  [[ -n $BASE ]] || die "nothing is deployed yet"
+  local site page empty tree
+  site=$(git rev-parse "$BASE:$SITE")
+
+  if [[ $1 == off ]]; then
+    [[ -n $SITE ]] || { nothing_to_do "the maintenance page isn't up"; return 0; }
+    say "Taking down the maintenance page and bringing the wiki back from $SITE"
+    commit_pages "$site" "Take down the maintenance page and bring the wiki back"
+    check_result "" ""
+    [[ $(git rev-parse "$BRANCH^{tree}") == "$site" ]] \
+      || die "the wiki at the root isn't what was under $SITE (undo with: $RESET)"
+    publish
+    say "Published ${NTRE_WIKI_URL}: the wiki is back"
+    return 0
+  fi
+
+  page=$(git hash-object -w wiki/maintenance.html)
+  empty=$(git hash-object -w /dev/null)
+  tree=$(printf '100644 blob %s	%s
+' "$empty" .nojekyll "$page" 404.html "$page" index.html \
+    | { cat; printf '040000 tree %s	%s
+' "$site" "$HIDDEN"; } | git mktree)
+  if ! commit_pages "$tree" "Put up the maintenance page and hide the wiki under $HIDDEN/"; then
+    nothing_to_do "the maintenance page is already up, and unchanged"
+    return 0
+  fi
+  say "Putting up the maintenance page and hiding the wiki under $HIDDEN/"
+  check_result "" ""
+  [[ $(git rev-parse "$BRANCH:$HIDDEN") == "$site" ]] \
+    || die "the wiki under $HIDDEN/ isn't what was deployed (undo with: $RESET)"
+  publish
+  say "Published the maintenance page at ${NTRE_WIKI_URL}. The wiki is at ${NTRE_WIKI_URL}$HIDDEN/latest/"
 }
 
 find_remote
@@ -274,5 +355,6 @@ case ${1:-} in
   list) list_versions ;;
   rollback) shift; rollback_to "$@" ;;
   delete) shift; delete_versions "$@" ;;
+  maintenance) shift; maintenance "$@" ;;
   *) deploy_version "$@" ;;
 esac

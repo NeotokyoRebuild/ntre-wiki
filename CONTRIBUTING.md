@@ -161,5 +161,5 @@ Contributions reach `main` through pull requests: commit on a branch, push it, a
 
 ## What not to touch
 
-- `deploy` and `.github/workflows/` publish the site. Maintainers deploy with the 🚀 Deploy workflow.
+- `deploy`, `wiki/maintenance.html` and `.github/workflows/` publish the site. Maintainers deploy with the 🚀 Deploy workflow, and take the wiki offline with the 🚧 Maintenance workflow.
 - Don't modify the `neo` or `neoAssets` checkouts.

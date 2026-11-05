@@ -1,0 +1,48 @@
+name: "🚧 Maintenance"
+
+# Put up a maintenance page at https://neotokyorebuild.github.io/ntre-wiki/, or take it down.
+# Check the box to put the page up: every address into the wiki then shows it, and the
+# wiki moves to offline/ on the gh-pages branch, untouched. Run it again unchecked to bring
+# the wiki back as it was. While the page is up, 🚀 Deploy and ⏪ Rollback still work: they
+# publish to the hidden wiki under offline/, so a fix can be checked there before the page
+# comes down.
+on:
+  workflow_dispatch:
+    inputs:
+      maintenance:
+        description: "Show the maintenance page and hide the wiki. Leave unchecked to take the page down and bring the wiki back."
+        type: boolean
+        default: false
+
+permissions:
+  contents: write     # push the gh-pages branch
+  pages: read         # check that GitHub Pages is set up
+  deployments: read   # wait for GitHub Pages to publish
+
+# Shares the deploy's queue, so it never runs at the same time as a deploy or a rollback.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  maintenance:
+    name: Maintenance
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # The page is a single file, and ./deploy maintenance needs neither the game's
+      # repositories nor the Python environment, so the setup action is skipped.
+      - uses: actions/checkout@v7
+        with:
+          path: ntre-wiki
+          fetch-depth: 0
+
+      - name: ./deploy maintenance ${{ inputs.maintenance && 'on' || 'off' }}
+        working-directory: ntre-wiki
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATE: ${{ inputs.maintenance && 'on' || 'off' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./deploy maintenance "$STATE"
