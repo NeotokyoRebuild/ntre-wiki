@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Publish the wiki to https://sunmachine.github.io/ntre-wiki/, and manage the versions on
-# the gh-pages branch of sunmachine/ntre-wiki. The 🚀 Deploy workflow runs the first two.
+# Publish the wiki to https://neotokyorebuild.github.io/ntre-wiki/, and manage the versions on
+# the gh-pages branch of NeotokyoRebuild/ntre-wiki. The 🚀 Deploy workflow runs the first two.
 #
 #   ./deploy [minor] [TITLE]        deploy the next minor version after latest: 0.3 -> 0.4
 #   ./deploy major [TITLE]          deploy the next major version after latest: 0.4 -> 1.0
@@ -15,7 +15,7 @@
 # with latest at 0.1 and 0.2 deployed, the next minor is 0.3. An exact version must be
 # M.m: two whole numbers without leading zeros, such as 0.4 or 1.10.
 #
-# A deploy only runs from a clean tree whose HEAD is on main in sunmachine/ntre-wiki, and
+# A deploy only runs from a clean tree whose HEAD is on main in NeotokyoRebuild/ntre-wiki, and
 # only after ./check passes. A new version identical to what `latest` serves is not
 # deployed. The ⏪ Rollback workflow runs rollback. Delete never touches
 # the version `latest` points at. The published address is set here and nowhere else
@@ -26,9 +26,9 @@ cd "$(dirname "$0")"
 DRY_RUN=0
 if [[ ${1:-} == --dry-run ]]; then DRY_RUN=1; shift; fi
 
-REPO_SLUG=sunmachine/ntre-wiki
+REPO_SLUG=NeotokyoRebuild/ntre-wiki
 BRANCH=gh-pages
-export NTRE_WIKI_URL=${NTRE_WIKI_URL:-https://sunmachine.github.io/ntre-wiki/}
+export NTRE_WIKI_URL=${NTRE_WIKI_URL:-https://neotokyorebuild.github.io/ntre-wiki/}
 export NO_MKDOCS_2_WARNING=1
 
 say() { printf '\033[1m==> %s\033[0m\n' "$*"; }
@@ -37,7 +37,7 @@ die() { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 [[ -x wiki/.venv/bin/mike ]] || die "no Python environment yet: run ./setup"
 export PATH="$PWD/wiki/.venv/bin:$PATH"
 
-# The remote for sunmachine/ntre-wiki, found by URL: origin in CI, often upstream locally.
+# The remote for NeotokyoRebuild/ntre-wiki, found by URL: origin in CI, often upstream locally.
 find_remote() {
   REMOTE=
   for r in $(git remote); do

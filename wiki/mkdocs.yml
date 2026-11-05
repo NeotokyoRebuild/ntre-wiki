@@ -9,7 +9,7 @@ repo_url: https://github.com/NeotokyoRebuild/neo
 repo_name: NeotokyoRebuild/neo
 # "Edit this page" opens the page's Markdown in GitHub's editor, in this
 # repository. It's a full address because repo_url points elsewhere.
-edit_uri: https://github.com/sunmachine/ntre-wiki/edit/main/wiki/docs/
+edit_uri: https://github.com/NeotokyoRebuild/ntre-wiki/edit/main/wiki/docs/
 
 theme:
   name: material
