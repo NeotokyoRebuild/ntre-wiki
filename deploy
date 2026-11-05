@@ -28,7 +28,8 @@
 # into the wiki shows the page. The wiki still works at offline/latest/ for anyone who
 # knows the address: it is out of the way, not secret. `off` moves the site back exactly as
 # it was. While the page is up, deploy, rollback, list and delete work on the wiki under
-# offline/, and the page stays up.
+# offline/, and the page stays up. A run that finds nothing to change still checks that
+# GitHub Pages published the branch, and asks Pages to build it again if it didn't.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -304,6 +305,40 @@ commit_pages() {
   git update-ref "refs/heads/$BRANCH" "$commit" "$BASE"
 }
 
+# The last GitHub Pages build: its status, commit and creation time.
+pages_build() { gh api -X GET "repos/$REPO_SLUG/pages/builds/latest" --jq '"\(.status) \(.commit) \(.created_at)"'; }
+
+# The branch can be right while the site isn't: GitHub Pages sometimes fails to publish a
+# push, and a run that then finds nothing to change pushes nothing. When the last Pages
+# build isn't a good build of the branch's tip, ask Pages to build it again, and wait.
+republish_if_needed() {
+  (( ! DRY_RUN )) || return 0
+  command -v gh >/dev/null && gh auth status >/dev/null 2>&1 || return 0
+  local head build before
+  head=$(git rev-parse "$BRANCH")
+  build=$(pages_build) || die "couldn't read the last GitHub Pages build: https://github.com/$REPO_SLUG/settings/pages"
+  case ${build% *} in
+    "built $head") return 0 ;;
+    "queued $head"|"building $head") say "GitHub Pages is still publishing $BRANCH: waiting" ;;
+    *)
+      say "GitHub Pages hasn't published $BRANCH (its last build: ${build% *}): asking it to build again"
+      before=${build##* }
+      gh api -X POST "repos/$REPO_SLUG/pages/builds" >/dev/null \
+        || die "couldn't ask GitHub Pages to build again: the token needs pages: write"
+      ;;
+  esac
+  for _ in $(seq 1 30); do
+    sleep 10
+    build=$(pages_build 2>/dev/null) || continue
+    [[ -z ${before:-} || ${build##* } != "$before" ]] || continue
+    case ${build% *} in
+      "built $head") say "GitHub Pages published $BRANCH"; return 0 ;;
+      errored*) die "GitHub Pages failed to build $BRANCH again: https://github.com/$REPO_SLUG/actions" ;;
+    esac
+  done
+  die "timed out waiting for GitHub Pages: https://github.com/$REPO_SLUG/actions"
+}
+
 # Report a run that changed nothing, in the workflow's summary too.
 nothing_to_do() {
   [[ -z ${GITHUB_ACTIONS:-} ]] || echo "::notice title=Nothing to do::$1"
@@ -321,7 +356,7 @@ maintenance() {
   site=$(git rev-parse "$BASE:$SITE")
 
   if [[ $1 == off ]]; then
-    [[ -n $SITE ]] || { nothing_to_do "the maintenance page isn't up"; return 0; }
+    [[ -n $SITE ]] || { nothing_to_do "the maintenance page isn't up"; republish_if_needed; return 0; }
     say "Taking down the maintenance page and bringing the wiki back from $SITE"
     commit_pages "$site" "Take down the maintenance page and bring the wiki back"
     check_result "" ""
@@ -340,6 +375,7 @@ maintenance() {
 ' "$site" "$HIDDEN"; } | git mktree)
   if ! commit_pages "$tree" "Put up the maintenance page and hide the wiki under $HIDDEN/"; then
     nothing_to_do "the maintenance page is already up, and unchanged"
+    republish_if_needed
     return 0
   fi
   say "Putting up the maintenance page and hiding the wiki under $HIDDEN/"

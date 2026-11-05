@@ -5,7 +5,8 @@ name: "🚧 Maintenance"
 # wiki moves to offline/ on the gh-pages branch, untouched. Run it again unchecked to bring
 # the wiki back as it was. While the page is up, 🚀 Deploy and ⏪ Rollback still work: they
 # publish to the hidden wiki under offline/, so a fix can be checked there before the page
-# comes down.
+# comes down. If GitHub Pages failed to publish an earlier run, running it again with the
+# same choice asks Pages to build the branch again.
 on:
   workflow_dispatch:
     inputs:
@@ -16,7 +17,7 @@ on:
 
 permissions:
   contents: write     # push the gh-pages branch
-  pages: read         # check that GitHub Pages is set up
+  pages: write        # check that GitHub Pages is set up, and ask it to build again
   deployments: read   # wait for GitHub Pages to publish
 
 # Shares the deploy's queue, so it never runs at the same time as a deploy or a rollback.
